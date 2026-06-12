@@ -1052,6 +1052,20 @@ function HaritaBolumu({
   bolum: SiteBolumu;
   proje: ProjeVerisi;
 }) {
+  const adres = proje.adres.trim();
+
+  const haritaAdresi = adres
+    ? `https://www.google.com/maps?q=${encodeURIComponent(
+        adres,
+      )}&output=embed`
+    : "";
+
+  const haritadaAcAdresi = adres
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        adres,
+      )}`
+    : "";
+
   return (
     <div className={styles.haritaAlani}>
       <motion.div
@@ -1061,12 +1075,32 @@ function HaritaBolumu({
         viewport={{ once: true }}
       >
         {bolum.ustBaslik.trim() && (
-          <span className={styles.kucukBaslik}>{bolum.ustBaslik}</span>
+          <span className={styles.kucukBaslik}>
+            {bolum.ustBaslik}
+          </span>
         )}
 
-        {bolum.baslik.trim() && <h2>{bolum.baslik}</h2>}
+        {bolum.baslik.trim() && (
+          <h2>{bolum.baslik}</h2>
+        )}
 
-        {bolum.aciklama.trim() && <p>{bolum.aciklama}</p>}
+        {adres ? (
+          <>
+            <p>{adres}</p>
+
+            <a
+              href={haritadaAcAdresi}
+              target="_blank"
+              rel="noreferrer"
+              className={styles.haritadaAc}
+            >
+              Google Maps’te aç
+              <ExternalLink size={16} />
+            </a>
+          </>
+        ) : (
+          <p>Konum bilgisi henüz eklenmedi.</p>
+        )}
       </motion.div>
 
       <motion.div
@@ -1087,27 +1121,24 @@ function HaritaBolumu({
           duration: 0.8,
         }}
       >
-        <motion.div
-          animate={{
-            y: [0, -10, 0],
-          }}
-          transition={{
-            duration: 2.3,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        >
-          <MapPin size={38} />
-        </motion.div>
-
-        <strong>{proje.adres || "Konum bilgisi"}</strong>
-
-        <span>Gerçek Google Maps bağlantısı yayın aşamasında eklenecek.</span>
+        {haritaAdresi ? (
+          <iframe
+            src={haritaAdresi}
+            title={`${proje.firmaAdi} konumu`}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            allowFullScreen
+          />
+        ) : (
+          <div className={styles.haritaBosDurum}>
+            <MapPin size={38} />
+            <strong>Adres bilgisi eklenmedi</strong>
+          </div>
+        )}
       </motion.div>
     </div>
   );
 }
-
 function BolumRender({
   bolum,
   proje,

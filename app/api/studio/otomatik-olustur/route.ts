@@ -14,6 +14,7 @@ interface OpenAITextPart {
   text?: string;
 }
 
+
 interface OpenAIOutputItem {
   type?: string;
   content?: OpenAITextPart[];

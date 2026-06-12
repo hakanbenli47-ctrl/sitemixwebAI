@@ -776,40 +776,48 @@
 }
 
 .haritaYerTutucu {
+  position: relative;
+  min-height: 470px;
+  overflow: hidden;
+  border: 1px solid var(--site-cizgi);
+  background: var(--site-ikinci-arka-plan);
+}
+
+.haritaYerTutucu iframe {
+  width: 100%;
+  height: 470px;
+  display: block;
+  border: 0;
+}
+
+.haritaBosDurum {
   min-height: 470px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--site-cizgi);
-  background:
-    linear-gradient(
-      90deg,
-      transparent 49.8%,
-      var(--site-cizgi) 50%,
-      transparent 50.2%
-    ),
-    linear-gradient(
-      transparent 49.8%,
-      var(--site-cizgi) 50%,
-      transparent 50.2%
-    );
+  gap: 18px;
   color: var(--site-soluk-yazi);
   text-align: center;
 }
 
-.haritaYerTutucu strong {
-  max-width: 80%;
-  margin-top: 20px;
+.haritaBosDurum strong {
   color: var(--site-yazi);
-  font-size: 21px;
+  font-size: 18px;
 }
 
-.haritaYerTutucu span {
-  max-width: 320px;
-  margin-top: 10px;
+.haritadaAc {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 25px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--site-vurgu);
+  color: var(--site-yazi);
   font-size: 11px;
-  line-height: 1.6;
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .bosSayfa {
@@ -1320,9 +1328,12 @@
     border-radius: 100px 100px 0 0;
   }
 
-  .haritaYerTutucu {
-    min-height: 330px;
-  }
+.haritaYerTutucu,
+.haritaYerTutucu iframe,
+.haritaBosDurum {
+  min-height: 330px;
+  height: 330px;
+}
 
   .footer {
     padding: 90px 20px 30px;

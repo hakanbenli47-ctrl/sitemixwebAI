@@ -14,6 +14,12 @@ export interface ProjeVerisi {
   tema: string;
   sayfalar: SiteSayfasi[];
 
+  domain?: string;
+  vercelUrl?: string;
+  seoBaslik?: string;
+  seoAciklama?: string;
+  seoKelimeler?: string[];
+
   githubAktarildiMi?: boolean;
   githubRepoAdi?: string;
   githubUrl?: string;

@@ -1196,9 +1196,23 @@ function BolumRender({
 
 interface SiteGorunumuProps {
   proje: ProjeVerisi;
+  baslangicSlug?: string;
+  gercekRotaKullan?: boolean;
 }
 
-export default function SiteGorunumu({ proje }: SiteGorunumuProps) {
+function sayfaYoluOlustur(sayfa: SiteSayfasi) {
+  if (sayfa.anaSayfa || !sayfa.slug.trim()) {
+    return "/";
+  }
+
+  return `/${turkceSlugOlustur(sayfa.slug || sayfa.ad)}`;
+}
+
+export default function SiteGorunumu({
+  proje,
+  baslangicSlug = "",
+  gercekRotaKullan = false,
+}: SiteGorunumuProps) {
   const [aktifSayfaId, setAktifSayfaId] = useState("");
 
   const [mobilMenuAcik, setMobilMenuAcik] = useState(false);
@@ -1217,14 +1231,55 @@ export default function SiteGorunumu({ proje }: SiteGorunumuProps) {
       return;
     }
 
+    const temizBaslangicSlug = turkceSlugOlustur(baslangicSlug);
+
+    const baslangicSayfasi = temizBaslangicSlug
+      ? siraliSayfalar.find(
+          (sayfa) =>
+            turkceSlugOlustur(sayfa.slug || sayfa.ad) === temizBaslangicSlug,
+        )
+      : anaSayfa;
+
     setAktifSayfaId((mevcutSayfaId) => {
       const sayfaHalaVar = siraliSayfalar.some(
         (sayfa) => sayfa.id === mevcutSayfaId,
       );
 
-      return sayfaHalaVar ? mevcutSayfaId : anaSayfa.id;
+      if (sayfaHalaVar && !baslangicSlug) {
+        return mevcutSayfaId;
+      }
+
+      return baslangicSayfasi?.id ?? anaSayfa.id;
     });
-  }, [anaSayfa, siraliSayfalar]);
+  }, [anaSayfa, baslangicSlug, siraliSayfalar]);
+
+  useEffect(() => {
+    if (!gercekRotaKullan) {
+      return;
+    }
+
+    function tarayiciGecmisiniUygula() {
+      const yolSlug = turkceSlugOlustur(
+        window.location.pathname.replace(/^\/+|\/+$/g, ""),
+      );
+
+      const hedefSayfa = yolSlug
+        ? siraliSayfalar.find(
+            (sayfa) => turkceSlugOlustur(sayfa.slug || sayfa.ad) === yolSlug,
+          )
+        : anaSayfa;
+
+      if (hedefSayfa) {
+        setAktifSayfaId(hedefSayfa.id);
+      }
+    }
+
+    window.addEventListener("popstate", tarayiciGecmisiniUygula);
+
+    return () => {
+      window.removeEventListener("popstate", tarayiciGecmisiniUygula);
+    };
+  }, [anaSayfa, gercekRotaKullan, siraliSayfalar]);
 
   const aktifSayfa = useMemo(() => {
     return (
@@ -1235,8 +1290,17 @@ export default function SiteGorunumu({ proje }: SiteGorunumuProps) {
   }, [siraliSayfalar, aktifSayfaId, anaSayfa]);
 
   function sayfaDegistir(sayfaId: string, bolumId?: string) {
+    const hedefSayfa = siraliSayfalar.find((sayfa) => sayfa.id === sayfaId);
+
     setAktifSayfaId(sayfaId);
     setMobilMenuAcik(false);
+
+    if (gercekRotaKullan && hedefSayfa) {
+      const sayfaYolu = sayfaYoluOlustur(hedefSayfa);
+      const yeniAdres = bolumId ? `${sayfaYolu}#bolum-${bolumId}` : sayfaYolu;
+
+      window.history.pushState({}, "", yeniAdres);
+    }
 
     if (bolumId) {
       bolumeKaydir(bolumId);

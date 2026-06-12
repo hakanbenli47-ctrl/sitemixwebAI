@@ -9,6 +9,7 @@ import {
   Eye,
   FilePenLine,
   GitBranch,
+  Globe2,
   Plus,
   Trash2,
 } from "lucide-react";
@@ -117,7 +118,10 @@ export default function ProjelerSayfasi() {
 
   function projeyiAc(
     proje: ProjeVerisi,
-    hedef: "/studio/icerik" | "/studio/onizleme",
+    hedef:
+      | "/studio/icerik"
+      | "/studio/onizleme"
+      | "/studio/yayin",
   ) {
     localStorage.setItem(
       AKTIF_PROJE_ANAHTARI,
@@ -258,6 +262,14 @@ export default function ProjelerSayfasi() {
                 >
                   <Eye size={16} />
                   Önizle
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => projeyiAc(proje, "/studio/yayin")}
+                >
+                  <Globe2 size={16} />
+                  Yayın ayarları
                 </button>
 
                 {proje.githubUrl && (

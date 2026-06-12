@@ -36,7 +36,6 @@ interface GitHubTree {
 
 interface GitHubHataCevabi {
   message?: string;
-  errors?: unknown;
 }
 
 class GitHubApiHatasi extends Error {
@@ -73,18 +72,57 @@ function turkceSlugOlustur(metin: string) {
   return slug || `sitemix-site-${Date.now()}`;
 }
 
+function adresiTemizle(deger?: string) {
+  return (deger ?? "")
+    .trim()
+    .replace(/^https?:\/\//i, "")
+    .replace(/\/+$/g, "");
+}
+
+function siteAdresiniOlustur(proje: ProjeVerisi, repoAdi: string) {
+  const domain = adresiTemizle(proje.domain);
+  const vercelUrl = adresiTemizle(proje.vercelUrl);
+
+  if (domain) {
+    return `https://${domain}`;
+  }
+
+  if (vercelUrl) {
+    return `https://${vercelUrl}`;
+  }
+
+  return `https://${repoAdi}.vercel.app`;
+}
+
 function projeAciklamasiOlustur(proje: ProjeVerisi) {
   const anaSayfa =
-    proje.sayfalar.find((sayfa) => sayfa.anaSayfa) ??
-    proje.sayfalar[0];
+    proje.sayfalar.find((sayfa) => sayfa.anaSayfa) ?? proje.sayfalar[0];
 
   const heroBolumu = anaSayfa?.bolumler.find(
     (bolum) => bolum.aktif && bolum.tur === "hero",
   );
 
   return (
+    proje.seoAciklama?.trim() ||
     heroBolumu?.aciklama.trim() ||
-    `${proje.firmaAdi} resmi web sitesi.`
+    `${proje.firmaAdi}, ${proje.sektorAdi} alanında profesyonel hizmet sunar.`
+  );
+}
+
+function seoBasligiOlustur(proje: ProjeVerisi) {
+  return proje.seoBaslik?.trim() || `${proje.firmaAdi} | ${proje.sektorAdi}`;
+}
+
+function seoKelimeleriOlustur(proje: ProjeVerisi) {
+  const varsayilanKelimeler = [
+    proje.firmaAdi,
+    proje.sektorAdi,
+    proje.sektor,
+    proje.adres,
+  ].filter(Boolean);
+
+  return Array.from(
+    new Set([...(proje.seoKelimeler ?? []), ...varsayilanKelimeler]),
   );
 }
 
@@ -93,23 +131,19 @@ async function githubIstek<T>(
   token: string,
   init: RequestInit = {},
 ): Promise<T> {
-  const cevap = await fetch(
-    `https://api.github.com${apiYolu}`,
-    {
-      ...init,
-      headers: {
-        Accept: "application/vnd.github+json",
-        Authorization: `Bearer ${token}`,
-        "X-GitHub-Api-Version": "2022-11-28",
-        "Content-Type": "application/json",
-        ...init.headers,
-      },
-      cache: "no-store",
+  const cevap = await fetch(`https://api.github.com${apiYolu}`, {
+    ...init,
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: `Bearer ${token}`,
+      "X-GitHub-Api-Version": "2022-11-28",
+      "Content-Type": "application/json",
+      ...init.headers,
     },
-  );
+    cache: "no-store",
+  });
 
   const cevapMetni = await cevap.text();
-
   let veri: unknown = null;
 
   if (cevapMetni) {
@@ -128,8 +162,7 @@ async function githubIstek<T>(
 
     throw new GitHubApiHatasi(
       cevap.status,
-      hataVerisi?.message ??
-        `GitHub isteği başarısız oldu: ${cevap.status}`,
+      hataVerisi?.message ?? `GitHub isteği başarısız oldu: ${cevap.status}`,
     );
   }
 
@@ -149,9 +182,7 @@ async function repoBulVeyaOlustur({
 }) {
   try {
     const mevcutRepo = await githubIstek<GitHubRepo>(
-      `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(
-        repoAdi,
-      )}`,
+      `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repoAdi)}`,
       token,
     );
 
@@ -160,31 +191,24 @@ async function repoBulVeyaOlustur({
       yeniOlusturuldu: false,
     };
   } catch (error) {
-    if (
-      !(error instanceof GitHubApiHatasi) ||
-      error.status !== 404
-    ) {
+    if (!(error instanceof GitHubApiHatasi) || error.status !== 404) {
       throw error;
     }
   }
 
-  const yeniRepo = await githubIstek<GitHubRepo>(
-    "/user/repos",
-    token,
-    {
-      method: "POST",
-      body: JSON.stringify({
-        name: repoAdi,
-        description: projeAciklamasiOlustur(proje),
-        private: true,
-        auto_init: true,
-        has_issues: false,
-        has_projects: false,
-        has_wiki: false,
-        has_discussions: false,
-      }),
-    },
-  );
+  const yeniRepo = await githubIstek<GitHubRepo>("/user/repos", token, {
+    method: "POST",
+    body: JSON.stringify({
+      name: repoAdi,
+      description: projeAciklamasiOlustur(proje),
+      private: true,
+      auto_init: true,
+      has_issues: false,
+      has_projects: false,
+      has_wiki: false,
+      has_discussions: false,
+    }),
+  });
 
   return {
     repo: yeniRepo,
@@ -208,9 +232,7 @@ async function branchReferansiniBekle({
   for (let deneme = 0; deneme < 8; deneme += 1) {
     try {
       return await githubIstek<GitHubReferans>(
-        `/repos/${encodeURIComponent(
-          owner,
-        )}/${encodeURIComponent(
+        `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(
           repoAdi,
         )}/git/ref/heads/${encodeURIComponent(branch)}`,
         token,
@@ -236,46 +258,19 @@ async function branchReferansiniBekle({
 async function kaynakDosyalariOku() {
   const kokDizin = process.cwd();
 
-  const [
-    siteGorunumu,
-    siteStilleri,
-    sektorSablonlari,
-    projeTipi,
-  ] = await Promise.all([
-    readFile(
-      path.join(
-        kokDizin,
-        "components",
-        "site",
-        "SiteGorunumu.tsx",
+  const [siteGorunumu, siteStilleri, sektorSablonlari, projeTipi] =
+    await Promise.all([
+      readFile(
+        path.join(kokDizin, "components", "site", "SiteGorunumu.tsx"),
+        "utf8",
       ),
-      "utf8",
-    ),
-
-    readFile(
-      path.join(
-        kokDizin,
-        "components",
-        "site",
-        "siteGorunumu.module.css",
+      readFile(
+        path.join(kokDizin, "components", "site", "siteGorunumu.module.css"),
+        "utf8",
       ),
-      "utf8",
-    ),
-
-    readFile(
-      path.join(
-        kokDizin,
-        "data",
-        "sektorSablonlari.ts",
-      ),
-      "utf8",
-    ),
-
-    readFile(
-      path.join(kokDizin, "types", "proje.ts"),
-      "utf8",
-    ),
-  ]);
+      readFile(path.join(kokDizin, "data", "sektorSablonlari.ts"), "utf8"),
+      readFile(path.join(kokDizin, "types", "proje.ts"), "utf8"),
+    ]);
 
   return {
     siteGorunumu,
@@ -290,14 +285,15 @@ async function aktarilacakDosyalariOlustur(
   repoAdi: string,
 ) {
   const kaynaklar = await kaynakDosyalariOku();
+  const siteUrl = siteAdresiniOlustur(proje, repoAdi);
+  const seoBasligi = seoBasligiOlustur(proje);
+  const seoAciklama = projeAciklamasiOlustur(proje);
+  const seoKelimeleri = seoKelimeleriOlustur(proje);
 
-  const aciklama = projeAciklamasiOlustur(proje);
-
-  const guvenliProjeJson = JSON.stringify(
-    proje,
-    null,
-    2,
-  ).replace(/</g, "\\u003c");
+  const guvenliProjeJson = JSON.stringify(proje, null, 2).replace(
+    /</g,
+    "\\u003c",
+  );
 
   const packageJson = JSON.stringify(
     {
@@ -331,9 +327,31 @@ async function aktarilacakDosyalariOlustur(
 import type { ReactNode } from "react";
 import "./globals.css";
 
+const siteUrl = ${JSON.stringify(siteUrl)};
+
 export const metadata: Metadata = {
-  title: ${JSON.stringify(proje.firmaAdi)},
-  description: ${JSON.stringify(aciklama)},
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: ${JSON.stringify(seoBasligi)},
+    template: ${JSON.stringify(`%s | ${proje.firmaAdi}`)},
+  },
+  description: ${JSON.stringify(seoAciklama)},
+  keywords: ${JSON.stringify(seoKelimeleri)},
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "tr_TR",
+    url: siteUrl,
+    siteName: ${JSON.stringify(proje.firmaAdi)},
+    title: ${JSON.stringify(seoBasligi)},
+    description: ${JSON.stringify(seoAciklama)},
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -353,7 +371,125 @@ export default function RootLayout({
 import { proje } from "@/data/proje";
 
 export default function AnaSayfa() {
-  return <SiteGorunumu proje={proje} />;
+  return (
+    <SiteGorunumu
+      proje={proje}
+      baslangicSlug=""
+      gercekRotaKullan
+    />
+  );
+}
+`;
+
+  const dinamikSayfaTsx = `import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import SiteGorunumu from "@/components/site/SiteGorunumu";
+import { proje } from "@/data/proje";
+
+interface DinamikSayfaProps {
+  params: Promise<{
+    slug: string;
+  }>;
+}
+
+function sayfayiBul(slug: string) {
+  return proje.sayfalar.find(
+    (sayfa) => !sayfa.anaSayfa && sayfa.slug === slug,
+  );
+}
+
+export function generateStaticParams() {
+  return proje.sayfalar
+    .filter((sayfa) => !sayfa.anaSayfa && sayfa.slug.trim())
+    .map((sayfa) => ({
+      slug: sayfa.slug,
+    }));
+}
+
+export async function generateMetadata({
+  params,
+}: DinamikSayfaProps): Promise<Metadata> {
+  const { slug } = await params;
+  const sayfa = sayfayiBul(slug);
+
+  if (!sayfa) {
+    return {};
+  }
+
+  const hero = sayfa.bolumler.find(
+    (bolum) => bolum.aktif && bolum.tur === "hero",
+  );
+
+  const aciklama =
+    hero?.aciklama ||
+    sayfa.ad + " hakkında bilgi almak için " + proje.firmaAdi + " web sitesini inceleyin.";
+
+  return {
+    title: sayfa.ad,
+    description: aciklama,
+    alternates: {
+      canonical: "/" + sayfa.slug,
+    },
+    openGraph: {
+      title: sayfa.ad + " | " + proje.firmaAdi,
+      description: aciklama,
+      url: "/" + sayfa.slug,
+    },
+  };
+}
+
+export default async function DinamikSayfa({
+  params,
+}: DinamikSayfaProps) {
+  const { slug } = await params;
+  const sayfa = sayfayiBul(slug);
+
+  if (!sayfa) {
+    notFound();
+  }
+
+  return (
+    <SiteGorunumu
+      proje={proje}
+      baslangicSlug={sayfa.slug}
+      gercekRotaKullan
+    />
+  );
+}
+`;
+
+  const sitemapTs = `import type { MetadataRoute } from "next";
+import { proje } from "@/data/proje";
+
+const siteUrl = ${JSON.stringify(siteUrl)};
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  return proje.sayfalar
+    .filter((sayfa) => sayfa.anaSayfa || sayfa.slug.trim())
+    .map((sayfa) => ({
+      url: sayfa.anaSayfa
+        ? siteUrl
+        : siteUrl + "/" + sayfa.slug,
+      lastModified: new Date(proje.guncellenmeTarihi),
+      changeFrequency: sayfa.anaSayfa ? "weekly" : "monthly",
+      priority: sayfa.anaSayfa ? 1 : 0.8,
+    }));
+}
+`;
+
+  const robotsTs = `import type { MetadataRoute } from "next";
+
+const siteUrl = ${JSON.stringify(siteUrl)};
+
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: {
+      userAgent: "*",
+      allow: "/",
+    },
+    sitemap: siteUrl + "/sitemap.xml",
+    host: siteUrl,
+  };
 }
 `;
 
@@ -405,21 +541,12 @@ img {
         isolatedModules: true,
         jsx: "react-jsx",
         incremental: true,
-        plugins: [
-          {
-            name: "next",
-          },
-        ],
+        plugins: [{ name: "next" }],
         paths: {
           "@/*": ["./*"],
         },
       },
-      include: [
-        "next-env.d.ts",
-        "**/*.ts",
-        "**/*.tsx",
-        ".next/types/**/*.ts",
-      ],
+      include: ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
       exclude: ["node_modules"],
     },
     null,
@@ -454,6 +581,10 @@ node_modules
 
 Bu proje Sitemix Studio tarafından oluşturulmuştur.
 
+## Canlı adres
+
+${siteUrl}
+
 ## Çalıştırma
 
 \`\`\`bash
@@ -461,9 +592,10 @@ npm install
 npm run dev
 \`\`\`
 
-## Yayınlama
+## SEO adresleri
 
-Bu repository Vercel'e doğrudan bağlanabilir.
+- ${siteUrl}/sitemap.xml
+- ${siteUrl}/robots.txt
 `;
 
   return {
@@ -476,19 +608,15 @@ Bu repository Vercel'e doğrudan bağlanabilir.
 
     "app/layout.tsx": layoutTsx,
     "app/page.tsx": pageTsx,
+    "app/[slug]/page.tsx": dinamikSayfaTsx,
+    "app/sitemap.ts": sitemapTs,
+    "app/robots.ts": robotsTs,
     "app/globals.css": globalCss,
 
-    "components/site/SiteGorunumu.tsx":
-      kaynaklar.siteGorunumu,
-
-    "components/site/siteGorunumu.module.css":
-      kaynaklar.siteStilleri,
-
-    "data/sektorSablonlari.ts":
-      kaynaklar.sektorSablonlari,
-
+    "components/site/SiteGorunumu.tsx": kaynaklar.siteGorunumu,
+    "components/site/siteGorunumu.module.css": kaynaklar.siteStilleri,
+    "data/sektorSablonlari.ts": kaynaklar.sektorSablonlari,
     "data/proje.ts": projeTs,
-
     "types/proje.ts": kaynaklar.projeTipi,
   };
 }
@@ -518,45 +646,41 @@ async function dosyalariCommitEt({
   const mevcutCommitSha = referans.object.sha;
 
   const mevcutCommit = await githubIstek<GitHubCommit>(
-    `/repos/${encodeURIComponent(
-      owner,
-    )}/${encodeURIComponent(
+    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(
       repoAdi,
     )}/git/commits/${mevcutCommitSha}`,
     token,
   );
 
   const treeElemanlari = await Promise.all(
-    Object.entries(dosyalar).map(
-      async ([dosyaYolu, icerik]) => {
-        const blob = await githubIstek<GitHubBlob>(
-          `/repos/${encodeURIComponent(
-            owner,
-          )}/${encodeURIComponent(repoAdi)}/git/blobs`,
-          token,
-          {
-            method: "POST",
-            body: JSON.stringify({
-              content: icerik,
-              encoding: "utf-8",
-            }),
-          },
-        );
+    Object.entries(dosyalar).map(async ([dosyaYolu, icerik]) => {
+      const blob = await githubIstek<GitHubBlob>(
+        `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(
+          repoAdi,
+        )}/git/blobs`,
+        token,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            content: icerik,
+            encoding: "utf-8",
+          }),
+        },
+      );
 
-        return {
-          path: dosyaYolu,
-          mode: "100644",
-          type: "blob",
-          sha: blob.sha,
-        };
-      },
-    ),
+      return {
+        path: dosyaYolu,
+        mode: "100644",
+        type: "blob",
+        sha: blob.sha,
+      };
+    }),
   );
 
   const yeniTree = await githubIstek<GitHubTree>(
-    `/repos/${encodeURIComponent(
-      owner,
-    )}/${encodeURIComponent(repoAdi)}/git/trees`,
+    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(
+      repoAdi,
+    )}/git/trees`,
     token,
     {
       method: "POST",
@@ -568,16 +692,16 @@ async function dosyalariCommitEt({
   );
 
   const yeniCommit = await githubIstek<GitHubCommit>(
-    `/repos/${encodeURIComponent(
-      owner,
-    )}/${encodeURIComponent(repoAdi)}/git/commits`,
+    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(
+      repoAdi,
+    )}/git/commits`,
     token,
     {
       method: "POST",
       body: JSON.stringify({
         message: yeniOlusturuldu
           ? "Sitemix sitesi oluşturuldu"
-          : "Sitemix sitesi güncellendi",
+          : "Sitemix sitesi ve yayın ayarları güncellendi",
         tree: yeniTree.sha,
         parents: [mevcutCommitSha],
       }),
@@ -585,9 +709,7 @@ async function dosyalariCommitEt({
   );
 
   await githubIstek(
-    `/repos/${encodeURIComponent(
-      owner,
-    )}/${encodeURIComponent(
+    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(
       repoAdi,
     )}/git/refs/heads/${encodeURIComponent(branch)}`,
     token,
@@ -611,8 +733,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         basarili: false,
-        mesaj:
-          ".env.local içindeki GITHUB_TOKEN veya GITHUB_OWNER eksik.",
+        mesaj: ".env.local içindeki GITHUB_TOKEN veya GITHUB_OWNER eksik.",
       },
       { status: 500 },
     );
@@ -647,29 +768,22 @@ export async function POST(request: Request) {
     );
   }
 
-  const repoAdi = turkceSlugOlustur(
-    proje.slug || proje.firmaAdi,
-  );
+  const repoAdi =
+    proje.githubRepoAdi?.trim() ||
+    turkceSlugOlustur(proje.slug || proje.firmaAdi);
 
   try {
-    const { repo, yeniOlusturuldu } =
-      await repoBulVeyaOlustur({
-        token,
-        owner,
-        repoAdi,
-        proje,
-      });
+    const { repo, yeniOlusturuldu } = await repoBulVeyaOlustur({
+      token,
+      owner,
+      repoAdi,
+      proje,
+    });
 
     const branch =
-      repo.default_branch ||
-      process.env.GITHUB_DEFAULT_BRANCH ||
-      "main";
+      repo.default_branch || process.env.GITHUB_DEFAULT_BRANCH || "main";
 
-    const dosyalar =
-      await aktarilacakDosyalariOlustur(
-        proje,
-        repoAdi,
-      );
+    const dosyalar = await aktarilacakDosyalariOlustur(proje, repoAdi);
 
     const commit = await dosyalariCommitEt({
       token,
@@ -687,17 +801,15 @@ export async function POST(request: Request) {
       branch,
       githubUrl: repo.html_url,
       commitUrl: commit.html_url ?? null,
+      siteUrl: siteAdresiniOlustur(proje, repoAdi),
       mesaj: yeniOlusturuldu
         ? "Site GitHub'a başarıyla aktarıldı."
-        : "GitHub'daki site başarıyla güncellendi.",
+        : "Site, domain ve SEO ayarları GitHub'da güncellendi.",
     });
   } catch (error) {
     console.error("GitHub aktarım hatası:", error);
 
-    const durumKodu =
-      error instanceof GitHubApiHatasi
-        ? error.status
-        : 500;
+    const durumKodu = error instanceof GitHubApiHatasi ? error.status : 500;
 
     const mesaj =
       error instanceof Error
@@ -710,10 +822,7 @@ export async function POST(request: Request) {
         mesaj,
       },
       {
-        status:
-          durumKodu >= 400 && durumKodu < 600
-            ? durumKodu
-            : 500,
+        status: durumKodu >= 400 && durumKodu < 600 ? durumKodu : 500,
       },
     );
   }

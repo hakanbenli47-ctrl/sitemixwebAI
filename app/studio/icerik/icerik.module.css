@@ -1,0 +1,681 @@
+.sayfa {
+  min-height: 100vh;
+  padding: 0 3vw 80px;
+  background: #f4f1e9;
+  color: #111713;
+}
+
+.ustAlan {
+  min-height: 78px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  border-bottom: 1px solid rgba(17, 23, 19, 0.2);
+}
+
+.geri {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #626a64;
+  font-size: 13px;
+}
+
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.logo span {
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.logo small {
+  color: #626a64;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+}
+
+.kayitDurumu {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.kayitDurumu span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #1e4d3a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.kayitDurumu strong {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
+.baslikAlani {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 50px;
+  padding: 50px 0 42px;
+  border-bottom: 1px solid rgba(17, 23, 19, 0.2);
+}
+
+.baslikAlani > div > span {
+  display: block;
+  margin-bottom: 19px;
+  color: #1e4d3a;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+}
+
+.baslikAlani h1 {
+  margin: 0;
+  font-size: clamp(46px, 6vw, 84px);
+  line-height: 0.92;
+  letter-spacing: -0.07em;
+}
+
+.baslikAlani p {
+  max-width: 680px;
+  margin: 22px 0 0;
+  color: #626a64;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.onizlemeButonu {
+  min-width: 190px;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  padding: 0 17px;
+  border: 1px solid #111713;
+  background: #111713;
+  color: white;
+  cursor: pointer;
+}
+
+.onizlemeButonu:hover {
+  background: #1e4d3a;
+  border-color: #1e4d3a;
+}
+
+.editorAlani {
+  display: grid;
+  grid-template-columns:
+    minmax(190px, 0.4fr)
+    minmax(260px, 0.55fr)
+    minmax(390px, 1fr);
+  gap: 3vw;
+  padding-top: 45px;
+}
+
+.panelBasligi {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(17, 23, 19, 0.2);
+}
+
+.panelBasligi span {
+  color: #1e4d3a;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.panelBasligi h2 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.sayfaButonu {
+  width: 100%;
+  min-height: 65px;
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border: 0;
+  border-bottom: 1px solid rgba(17, 23, 19, 0.13);
+  background: transparent;
+  color: #111713;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sayfaButonu div {
+  min-width: 0;
+}
+
+.sayfaButonu strong {
+  display: block;
+  overflow: hidden;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sayfaButonu span {
+  display: block;
+  margin-top: 5px;
+  color: #737a75;
+  font-size: 10px;
+}
+
+.aktifSayfa {
+  color: #1e4d3a;
+}
+
+.bolumButonu {
+  width: 100%;
+  min-height: 72px;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 8px;
+  border: 0;
+  border-bottom: 1px solid rgba(17, 23, 19, 0.13);
+  background: transparent;
+  color: #111713;
+  text-align: left;
+  cursor: pointer;
+}
+
+.bolumButonu > span {
+  color: #1e4d3a;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.bolumButonu div {
+  min-width: 0;
+}
+
+.bolumButonu strong {
+  display: block;
+  overflow: hidden;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bolumButonu small {
+  display: block;
+  margin-top: 5px;
+  color: #737a75;
+  font-size: 10px;
+}
+
+.aktifBolum {
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: inset 3px 0 0 #1e4d3a;
+}
+
+.ayarPaneli {
+  min-width: 0;
+  padding-top: 18px;
+  border-top: 3px solid #1e4d3a;
+}
+
+.ayarUstAlan {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(17, 23, 19, 0.2);
+}
+
+.ayarUstAlan span {
+  color: #1e4d3a;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ayarUstAlan h2 {
+  margin: 7px 0 0;
+  font-size: 24px;
+  letter-spacing: -0.04em;
+}
+
+.ayarUstAlan button {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(17, 23, 19, 0.2);
+  background: transparent;
+  cursor: pointer;
+}
+
+.siraIslemleri {
+  display: flex;
+  gap: 7px;
+  margin-top: 15px;
+}
+
+.siraIslemleri button {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border: 1px solid rgba(17, 23, 19, 0.2);
+  background: transparent;
+  color: #626a64;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.siraIslemleri button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.silButonu {
+  margin-left: auto;
+  color: #a62d27 !important;
+}
+
+.formGrubu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 19px;
+}
+
+.formGrubu label {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.formGrubu input,
+.formGrubu textarea,
+.listeElemani input,
+.listeElemani textarea {
+  width: 100%;
+  border: 1px solid rgba(17, 23, 19, 0.2);
+  border-radius: 0;
+  outline: none;
+  background: rgba(255, 255, 255, 0.4);
+  color: #111713;
+}
+
+.formGrubu input,
+.listeElemani input {
+  min-height: 45px;
+  padding: 0 12px;
+}
+
+.formGrubu textarea,
+.listeElemani textarea {
+  padding: 12px;
+  resize: vertical;
+}
+
+.formGrubu input:focus,
+.formGrubu textarea:focus,
+.listeElemani input:focus,
+.listeElemani textarea:focus {
+  border-color: #1e4d3a;
+  background: white;
+}
+
+.gorselBolumu {
+  margin-top: 27px;
+  padding-top: 17px;
+  border-top: 1px solid rgba(17, 23, 19, 0.2);
+}
+
+.gorselBasligi {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 13px;
+}
+
+.gorselBasligi > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gorselBasligi strong {
+  font-size: 12px;
+}
+
+.gorselBasligi button {
+  border: 0;
+  background: transparent;
+  color: #a62d27;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.gorselYukle {
+  min-height: 145px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed rgba(17, 23, 19, 0.35);
+  background: rgba(255, 255, 255, 0.26);
+  cursor: pointer;
+}
+
+.gorselYukle:hover {
+  border-color: #1e4d3a;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.gorselYukle span {
+  margin-top: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.gorselYukle small {
+  margin-top: 5px;
+  color: #737a75;
+  font-size: 10px;
+}
+
+.gorselYukle input,
+.kucukGorselYukle input {
+  display: none;
+}
+
+.yuklenenGorsel {
+  width: 100%;
+  max-height: 260px;
+  display: block;
+  object-fit: cover;
+}
+
+.listeAlani {
+  margin-top: 32px;
+  padding-top: 18px;
+  border-top: 2px solid #1e4d3a;
+}
+
+.listeUstAlan {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.listeUstAlan > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.listeUstAlan span {
+  color: #1e4d3a;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.listeUstAlan strong {
+  font-size: 11px;
+}
+
+.listeUstAlan button,
+.ilkElemanButonu {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border: 1px solid rgba(17, 23, 19, 0.2);
+  background: transparent;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.listeElemani {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 17px 0;
+  border-bottom: 1px solid rgba(17, 23, 19, 0.15);
+}
+
+.listeElemaniBasligi {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.listeElemaniBasligi span {
+  color: #1e4d3a;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.listeElemaniBasligi button {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(166, 45, 39, 0.3);
+  background: transparent;
+  color: #a62d27;
+  cursor: pointer;
+}
+
+.kucukGorselYukle {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px dashed rgba(17, 23, 19, 0.3);
+  color: #626a64;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.elemanGorselAlani {
+  position: relative;
+}
+
+.elemanGorselAlani img {
+  width: 100%;
+  max-height: 190px;
+  display: block;
+  object-fit: cover;
+}
+
+.elemanGorselAlani button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 0;
+  background: rgba(17, 23, 19, 0.85);
+  color: white;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.ilkElemanButonu {
+  width: 100%;
+  justify-content: center;
+  margin-top: 25px;
+}
+
+.kayitNotu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 28px;
+  padding: 14px 0;
+  border-top: 1px solid rgba(17, 23, 19, 0.2);
+  border-bottom: 1px solid rgba(17, 23, 19, 0.2);
+  color: #626a64;
+  font-size: 11px;
+}
+
+.hata {
+  margin: 18px 0 0;
+  color: #a62d27;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.bosAlan {
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #626a64;
+}
+
+.bosAlan p {
+  margin-top: 18px;
+}
+
+.durumSayfasi {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 7vw;
+  background: #f4f1e9;
+  color: #111713;
+}
+
+.durumSayfasi > span {
+  color: #1e4d3a;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+}
+
+.durumSayfasi h1 {
+  margin: 30px 0;
+  font-size: clamp(50px, 8vw, 105px);
+  line-height: 0.92;
+  letter-spacing: -0.07em;
+}
+
+.durumSayfasi a {
+  width: fit-content;
+  min-height: 54px;
+  display: inline-flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 20px;
+  background: #111713;
+  color: white;
+}
+
+@media (max-width: 1150px) {
+  .editorAlani {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .ayarPaneli {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 800px) {
+  .baslikAlani {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .onizlemeButonu {
+    width: 100%;
+  }
+
+  .editorAlani {
+    grid-template-columns: 1fr;
+  }
+
+  .sayfaPaneli,
+  .bolumPaneli {
+    overflow-x: auto;
+  }
+
+  .sayfaPaneli {
+    display: flex;
+  }
+
+  .sayfaPaneli .panelBasligi {
+    display: none;
+  }
+
+  .sayfaButonu {
+    min-width: 190px;
+    border-right: 1px solid rgba(17, 23, 19, 0.13);
+  }
+}
+
+@media (max-width: 650px) {
+  .sayfa {
+    padding: 0 18px 60px;
+  }
+
+  .ustAlan {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .geri {
+    font-size: 0;
+  }
+
+  .logo {
+    justify-self: center;
+  }
+
+  .logo small,
+  .kayitDurumu strong {
+    display: none;
+  }
+
+  .baslikAlani {
+    padding: 42px 0 35px;
+  }
+
+  .baslikAlani h1 {
+    font-size: clamp(45px, 14vw, 68px);
+  }
+
+  .editorAlani {
+    padding-top: 32px;
+  }
+
+  .siraIslemleri {
+    flex-wrap: wrap;
+  }
+
+  .silButonu {
+    margin-left: 0;
+  }
+}

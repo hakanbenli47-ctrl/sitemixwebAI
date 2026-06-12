@@ -1,0 +1,310 @@
+.sayfa {
+  min-height: 100vh;
+  padding: 0 5vw 100px;
+  background: #f4f1e9;
+  color: #111713;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.sayfa * {
+  box-sizing: border-box;
+}
+
+.ustAlan {
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid rgba(17, 23, 19, 0.18);
+}
+
+.geriDon,
+.yeniProje {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #111713;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.yeniProje {
+  min-height: 42px;
+  padding: 0 16px;
+  background: #111713;
+  color: #ffffff;
+}
+
+.baslikAlani {
+  padding: clamp(75px, 9vw, 140px) 0;
+  border-bottom: 1px solid rgba(17, 23, 19, 0.18);
+}
+
+.baslikAlani > span {
+  color: #1e4d3a;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+.baslikAlani h1 {
+  margin: 25px 0 20px;
+  font-size: clamp(70px, 12vw, 180px);
+  line-height: 0.82;
+  letter-spacing: -0.095em;
+}
+
+.baslikAlani p {
+  max-width: 690px;
+  margin: 0;
+  color: #626a64;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.projeListesi {
+  border-bottom: 1px solid rgba(17, 23, 19, 0.18);
+}
+
+.listeBasligi {
+  min-height: 55px;
+  display: grid;
+  grid-template-columns:
+    minmax(280px, 1.4fr)
+    minmax(160px, 0.6fr)
+    minmax(180px, 0.7fr)
+    minmax(320px, 1fr);
+  align-items: center;
+  gap: 25px;
+  color: #626a64;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+}
+
+.projeSatiri {
+  min-height: 145px;
+  display: grid;
+  grid-template-columns:
+    minmax(280px, 1.4fr)
+    minmax(160px, 0.6fr)
+    minmax(180px, 0.7fr)
+    minmax(320px, 1fr);
+  align-items: center;
+  gap: 25px;
+  padding: 28px 0;
+  border-top: 1px solid rgba(17, 23, 19, 0.18);
+}
+
+.projeBilgisi {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  align-items: start;
+  gap: 15px;
+}
+
+.sira {
+  padding-top: 6px;
+  color: #1e4d3a;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.projeBilgisi h2 {
+  margin: 0;
+  font-size: clamp(25px, 2.6vw, 42px);
+  line-height: 0.95;
+  letter-spacing: -0.055em;
+}
+
+.projeBilgisi p {
+  margin: 12px 0 0;
+  color: #626a64;
+  font-size: 11px;
+}
+
+.projeDurumu span {
+  width: fit-content;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.githubDurumu {
+  background: #dfeee5;
+  color: #17653e;
+}
+
+.taslakDurumu {
+  background: #e8e3d8;
+  color: #626a64;
+}
+
+.tarih {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.tarih span {
+  font-size: 11px;
+}
+
+.tarih small {
+  color: #626a64;
+  font-size: 9px;
+}
+
+.aksiyonlar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.aksiyonlar button,
+.aksiyonlar a {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 1px solid rgba(17, 23, 19, 0.2);
+  background: transparent;
+  color: #111713;
+  font-size: 9px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.aksiyonlar button:hover,
+.aksiyonlar a:hover {
+  background: #111713;
+  color: #ffffff;
+}
+
+.aksiyonlar .silButonu {
+  width: 38px;
+  padding: 0;
+  color: #a33434;
+}
+
+.aksiyonlar .silButonu:hover {
+  border-color: #a33434;
+  background: #a33434;
+  color: #ffffff;
+}
+
+.bosDurum {
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-bottom: 1px solid rgba(17, 23, 19, 0.18);
+}
+
+.bosDurum > span {
+  color: #1e4d3a;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.bosDurum h2 {
+  max-width: 900px;
+  margin: 25px 0 35px;
+  font-size: clamp(45px, 7vw, 100px);
+  line-height: 0.9;
+  letter-spacing: -0.075em;
+}
+
+.bosDurum a {
+  width: fit-content;
+  min-height: 50px;
+  display: inline-flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0 18px;
+  background: #111713;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+@media (max-width: 1100px) {
+  .listeBasligi {
+    display: none;
+  }
+
+  .projeSatiri {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .aksiyonlar {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 650px) {
+  .sayfa {
+    padding: 0 20px 70px;
+  }
+
+  .ustAlan {
+    min-height: 75px;
+  }
+
+  .geriDon {
+    font-size: 0;
+  }
+
+  .geriDon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .yeniProje {
+    font-size: 9px;
+  }
+
+  .baslikAlani {
+    padding: 75px 0;
+  }
+
+  .baslikAlani h1 {
+    font-size: clamp(68px, 23vw, 105px);
+  }
+
+  .baslikAlani p {
+    font-size: 14px;
+  }
+
+  .projeSatiri {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 35px 0;
+  }
+
+  .aksiyonlar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .aksiyonlar button,
+  .aksiyonlar a {
+    width: 100%;
+  }
+
+  .aksiyonlar .silButonu {
+    width: 100%;
+  }
+}

@@ -10,6 +10,9 @@ export interface ProjeVerisi {
   whatsapp: string;
   eposta: string;
   adres: string;
+  sehir: string;
+  ilce: string;
+  hizmetBolgesi?: string;
   slug: string;
   tema: string;
   sayfalar: SiteSayfasi[];
@@ -19,6 +22,9 @@ export interface ProjeVerisi {
   seoBaslik?: string;
   seoAciklama?: string;
   seoKelimeler?: string[];
+
+  otomatikIcerikOlusturulduMu?: boolean;
+  otomatikGorsellerOlusturulduMu?: boolean;
 
   githubAktarildiMi?: boolean;
   githubRepoAdi?: string;

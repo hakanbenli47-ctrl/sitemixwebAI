@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sitemix Studio — Ücretsiz Stok Görsel Güncellemesi
 
-## Getting Started
+## Değiştirilecek dosyalar
 
-First, run the development server:
+- `app/studio/yeni/page.tsx`
+- `app/api/github/aktar/route.ts`
+- `app/api/studio/otomatik-olustur/route.ts`
+- `components/site/SiteGorunumu.tsx`
+- `components/site/siteGorunumu.module.css`
+- `data/sektorSablonlari.ts`
+- `types/proje.ts`
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Eklenecek yeni dosya
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- `data/sektorStokGorselleri.ts`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Çalışma şekli
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Yeni projede firma, sektör, şehir, ilçe ve hizmet bölgesi girilir.
+2. Sektör ve konuma özel hazır içerikler oluşturulur.
+3. OpenAI ayarları eklenmişse mevcut içerikler daha ayrıntılı biçimde yeniden yazılır; zorunlu değildir.
+4. Kullanıcı görsel yüklediyse o görsel korunur.
+5. Boş görsel alanlarına sektör grubuna ait sabit ücretsiz stok görseller eklenir.
+6. Görseller için Pexels veya başka bir API anahtarı gerekmez.
+7. GitHub aktarımında uzaktaki stok görseller ve yüklenen görseller `public/images` klasörüne alınır.
+8. Müşteri değişiklik isterse içerik düzenleyicisinden istenen görsel veya metin değiştirilebilir.
 
-## Learn More
+## Ortam değişkenleri
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Görseller için ek ortam değişkeni yoktur. `.env.local.example` dosyasında yalnızca GitHub ayarları ve isteğe bağlı içerik ayarları bulunur.

@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
@@ -33,6 +34,13 @@ interface GitHubBlob {
 interface GitHubTree {
   sha: string;
 }
+
+interface DosyaIcerigi {
+  content: string;
+  encoding: "utf-8" | "base64";
+}
+
+type AktarilacakDosya = string | DosyaIcerigi;
 
 interface GitHubHataCevabi {
   message?: string;
@@ -280,17 +288,159 @@ async function kaynakDosyalariOku() {
   };
 }
 
+
+function mimeUzantisi(mime: string) {
+  const temizMime = mime.toLowerCase().split(";")[0].trim();
+
+  const uzantilar: Record<string, string> = {
+    "image/jpeg": "jpg",
+    "image/jpg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+    "image/gif": "gif",
+    "image/avif": "avif",
+  };
+
+  return uzantilar[temizMime] ?? "jpg";
+}
+
+function gorselDosyaAdiOlustur(
+  repoAdi: string,
+  kaynak: string,
+  uzanti: string,
+) {
+  const hash = createHash("sha1").update(kaynak).digest("hex").slice(0, 12);
+  return `${turkceSlugOlustur(repoAdi)}-${hash}.${uzanti}`;
+}
+
+async function gorseliIndir(gorsel: string) {
+  const dataUrlEslesmesi = gorsel.match(
+  /^data:(image\/[a-zA-Z0-9.+-]+);base64,([\s\S]+)$/,
+);
+
+  if (dataUrlEslesmesi) {
+    const [, mime, base64] = dataUrlEslesmesi;
+    return {
+      mime,
+      base64,
+    };
+  }
+
+  if (!/^https?:\/\//i.test(gorsel)) {
+    return null;
+  }
+
+  const cevap = await fetch(gorsel, {
+    headers: {
+      "User-Agent": "Sitemix-Studio/1.0",
+    },
+    cache: "no-store",
+  });
+
+  if (!cevap.ok) {
+    throw new Error(`Görsel indirilemedi: ${cevap.status}`);
+  }
+
+  const mime = cevap.headers.get("content-type") || "image/jpeg";
+
+  if (!mime.toLowerCase().startsWith("image/")) {
+    throw new Error("İndirilen bağlantı geçerli bir görsel değil.");
+  }
+
+  const tampon = Buffer.from(await cevap.arrayBuffer());
+
+  if (tampon.byteLength > 12 * 1024 * 1024) {
+    throw new Error("Görsel 12 MB sınırını aşıyor.");
+  }
+
+  return {
+    mime,
+    base64: tampon.toString("base64"),
+  };
+}
+
+async function gorselleriYerellestir(
+  proje: ProjeVerisi,
+  repoAdi: string,
+) {
+  const yayinProjesi = JSON.parse(JSON.stringify(proje)) as ProjeVerisi;
+  const gorselDosyalari: Record<string, DosyaIcerigi> = {};
+  const onbellek = new Map<string, string>();
+
+  async function gorseliYerellestir(gorsel: string) {
+    const temizGorsel = gorsel.trim();
+
+    if (!temizGorsel || temizGorsel.startsWith("/images/")) {
+      return temizGorsel;
+    }
+
+    const dahaOnceOlusturulan = onbellek.get(temizGorsel);
+
+    if (dahaOnceOlusturulan) {
+      return dahaOnceOlusturulan;
+    }
+
+    try {
+      const indirilen = await gorseliIndir(temizGorsel);
+
+      if (!indirilen) {
+        return temizGorsel;
+      }
+
+      const uzanti = mimeUzantisi(indirilen.mime);
+      const dosyaAdi = gorselDosyaAdiOlustur(
+        repoAdi,
+        temizGorsel,
+        uzanti,
+      );
+      const repoYolu = `public/images/${dosyaAdi}`;
+      const siteYolu = `/images/${dosyaAdi}`;
+
+      gorselDosyalari[repoYolu] = {
+        content: indirilen.base64,
+        encoding: "base64",
+      };
+      onbellek.set(temizGorsel, siteYolu);
+
+      return siteYolu;
+    } catch (error) {
+      console.warn("Görsel repoya alınamadı, mevcut bağlantı korunuyor:", error);
+      return temizGorsel;
+    }
+  }
+
+  for (const sayfa of yayinProjesi.sayfalar) {
+    for (const bolum of sayfa.bolumler) {
+      bolum.gorsel = await gorseliYerellestir(bolum.gorsel);
+      bolum.arkaPlanGorseli = await gorseliYerellestir(
+        bolum.arkaPlanGorseli,
+      );
+
+      for (const eleman of bolum.listeElemanlari) {
+        eleman.gorsel = await gorseliYerellestir(eleman.gorsel);
+      }
+    }
+  }
+
+  return {
+    proje: yayinProjesi,
+    gorselDosyalari,
+  };
+}
+
 async function aktarilacakDosyalariOlustur(
   proje: ProjeVerisi,
   repoAdi: string,
 ) {
   const kaynaklar = await kaynakDosyalariOku();
-  const siteUrl = siteAdresiniOlustur(proje, repoAdi);
-  const seoBasligi = seoBasligiOlustur(proje);
-  const seoAciklama = projeAciklamasiOlustur(proje);
-  const seoKelimeleri = seoKelimeleriOlustur(proje);
+  const yerelGorselSonucu = await gorselleriYerellestir(proje, repoAdi);
+  const yayinProjesi = yerelGorselSonucu.proje;
+  const siteUrl = siteAdresiniOlustur(yayinProjesi, repoAdi);
+  const seoBasligi = seoBasligiOlustur(yayinProjesi);
+  const seoAciklama = projeAciklamasiOlustur(yayinProjesi);
+  const seoKelimeleri = seoKelimeleriOlustur(yayinProjesi);
 
-  const guvenliProjeJson = JSON.stringify(proje, null, 2).replace(
+  const guvenliProjeJson = JSON.stringify(yayinProjesi, null, 2).replace(
     /</g,
     "\\u003c",
   );
@@ -333,7 +483,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     default: ${JSON.stringify(seoBasligi)},
-    template: ${JSON.stringify(`%s | ${proje.firmaAdi}`)},
+    template: ${JSON.stringify(`%s | ${yayinProjesi.firmaAdi}`)},
   },
   description: ${JSON.stringify(seoAciklama)},
   keywords: ${JSON.stringify(seoKelimeleri)},
@@ -344,7 +494,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "tr_TR",
     url: siteUrl,
-    siteName: ${JSON.stringify(proje.firmaAdi)},
+    siteName: ${JSON.stringify(yayinProjesi.firmaAdi)},
     title: ${JSON.stringify(seoBasligi)},
     description: ${JSON.stringify(seoAciklama)},
   },
@@ -577,7 +727,7 @@ node_modules
 *.log
 `;
 
-  const readme = `# ${proje.firmaAdi}
+  const readme = `# ${yayinProjesi.firmaAdi}
 
 Bu proje Sitemix Studio tarafından oluşturulmuştur.
 
@@ -618,6 +768,7 @@ npm run dev
     "data/sektorSablonlari.ts": kaynaklar.sektorSablonlari,
     "data/proje.ts": projeTs,
     "types/proje.ts": kaynaklar.projeTipi,
+    ...yerelGorselSonucu.gorselDosyalari,
   };
 }
 
@@ -633,7 +784,7 @@ async function dosyalariCommitEt({
   owner: string;
   repoAdi: string;
   branch: string;
-  dosyalar: Record<string, string>;
+  dosyalar: Record<string, AktarilacakDosya>;
   yeniOlusturuldu: boolean;
 }) {
   const referans = await branchReferansiniBekle({
@@ -653,7 +804,12 @@ async function dosyalariCommitEt({
   );
 
   const treeElemanlari = await Promise.all(
-    Object.entries(dosyalar).map(async ([dosyaYolu, icerik]) => {
+    Object.entries(dosyalar).map(async ([dosyaYolu, dosya]) => {
+      const icerik =
+        typeof dosya === "string"
+          ? { content: dosya, encoding: "utf-8" as const }
+          : dosya;
+
       const blob = await githubIstek<GitHubBlob>(
         `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(
           repoAdi,
@@ -662,8 +818,8 @@ async function dosyalariCommitEt({
         {
           method: "POST",
           body: JSON.stringify({
-            content: icerik,
-            encoding: "utf-8",
+            content: icerik.content,
+            encoding: icerik.encoding,
           }),
         },
       );

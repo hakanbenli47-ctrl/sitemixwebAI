@@ -14,7 +14,8 @@ export default function AnaSayfa() {
           <span>SITEMIX</span>
           <small>STUDIO</small>
         </Link>
-
+ 
+ 
         <div className="surum">
           Geliştirme sürümü
         </div>

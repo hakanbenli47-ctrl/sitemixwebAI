@@ -31,39 +31,86 @@ function tarihGoster(tarih?: string) {
     return "Tarih bulunamadı";
   }
 
-  return new Intl.DateTimeFormat("tr-TR", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(tarihNesnesi);
+  try {
+    return new Intl.DateTimeFormat("tr-TR", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(tarihNesnesi);
+  } catch {
+    return tarihNesnesi.toLocaleString("tr-TR");
+  }
+}
+
+function tarihDegeri(proje: ProjeVerisi) {
+  const tarih =
+    proje.sonGithubAktarimi ||
+    proje.guncellenmeTarihi ||
+    proje.olusturulmaTarihi;
+
+  if (!tarih) {
+    return 0;
+  }
+
+  const deger = new Date(tarih).getTime();
+
+  return Number.isNaN(deger) ? 0 : deger;
+}
+
+function gecerliProjeMi(veri: unknown): veri is ProjeVerisi {
+  if (!veri || typeof veri !== "object") {
+    return false;
+  }
+
+  const proje = veri as Partial<ProjeVerisi>;
+
+  return typeof proje.id === "string" && proje.id.length > 0;
 }
 
 function projeleriOku(): ProjeVerisi[] {
   try {
-    const kayit = localStorage.getItem(PROJELER_ANAHTARI);
+    const kayit = window.localStorage.getItem(PROJELER_ANAHTARI);
 
     if (!kayit) {
       return [];
     }
 
-    const veri = JSON.parse(kayit);
+    const veri: unknown = JSON.parse(kayit);
 
-    return Array.isArray(veri) ? (veri as ProjeVerisi[]) : [];
-  } catch {
+    if (!Array.isArray(veri)) {
+      return [];
+    }
+
+    return veri.filter(gecerliProjeMi);
+  } catch (error) {
+    console.error("Projeler okunamadı:", error);
     return [];
   }
 }
 
 function aktifProjeyiOku(): ProjeVerisi | null {
   try {
-    const kayit = localStorage.getItem(AKTIF_PROJE_ANAHTARI);
+    const kayit = window.localStorage.getItem(AKTIF_PROJE_ANAHTARI);
 
     if (!kayit) {
       return null;
     }
 
-    return JSON.parse(kayit) as ProjeVerisi;
-  } catch {
+    const veri: unknown = JSON.parse(kayit);
+
+    return gecerliProjeMi(veri) ? veri : null;
+  } catch (error) {
+    console.error("Aktif proje okunamadı:", error);
     return null;
+  }
+}
+
+function guvenliKaydet(anahtar: string, veri: unknown) {
+  try {
+    window.localStorage.setItem(anahtar, JSON.stringify(veri));
+    return true;
+  } catch (error) {
+    console.error("Tarayıcı depolama hatası:", error);
+    return false;
   }
 }
 
@@ -72,48 +119,48 @@ export default function ProjelerSayfasi() {
 
   const [projeler, setProjeler] = useState<ProjeVerisi[]>([]);
   const [yukleniyor, setYukleniyor] = useState(true);
+  const [depolamaHatasi, setDepolamaHatasi] = useState(false);
 
   useEffect(() => {
-    const kayitliProjeler = projeleriOku();
-    const aktifProje = aktifProjeyiOku();
+    try {
+      const kayitliProjeler = projeleriOku();
+      const aktifProje = aktifProjeyiOku();
 
-    let guncelProjeler = [...kayitliProjeler];
+      let guncelProjeler = [...kayitliProjeler];
 
-    if (aktifProje) {
-      const mevcutIndex = guncelProjeler.findIndex(
-        (proje) => proje.id === aktifProje.id,
+      if (aktifProje) {
+        const mevcutIndex = guncelProjeler.findIndex(
+          (proje) => proje.id === aktifProje.id,
+        );
+
+        if (mevcutIndex >= 0) {
+          guncelProjeler[mevcutIndex] = aktifProje;
+        } else {
+          guncelProjeler.unshift(aktifProje);
+        }
+      }
+
+      guncelProjeler = guncelProjeler
+        .filter(gecerliProjeMi)
+        .sort((a, b) => tarihDegeri(b) - tarihDegeri(a));
+
+      setProjeler(guncelProjeler);
+
+      const kaydedildi = guvenliKaydet(
+        PROJELER_ANAHTARI,
+        guncelProjeler,
       );
 
-      if (mevcutIndex >= 0) {
-        guncelProjeler[mevcutIndex] = aktifProje;
-      } else {
-        guncelProjeler.unshift(aktifProje);
+      if (!kaydedildi) {
+        setDepolamaHatasi(true);
       }
+    } catch (error) {
+      console.error("Projeler hazırlanamadı:", error);
+      setProjeler([]);
+      setDepolamaHatasi(true);
+    } finally {
+      setYukleniyor(false);
     }
-
-    guncelProjeler.sort((a, b) => {
-      const bTarih = new Date(
-        b.sonGithubAktarimi ||
-          b.guncellenmeTarihi ||
-          b.olusturulmaTarihi,
-      ).getTime();
-
-      const aTarih = new Date(
-        a.sonGithubAktarimi ||
-          a.guncellenmeTarihi ||
-          a.olusturulmaTarihi,
-      ).getTime();
-
-      return bTarih - aTarih;
-    });
-
-    localStorage.setItem(
-      PROJELER_ANAHTARI,
-      JSON.stringify(guncelProjeler),
-    );
-
-    setProjeler(guncelProjeler);
-    setYukleniyor(false);
   }, []);
 
   function projeyiAc(
@@ -123,10 +170,17 @@ export default function ProjelerSayfasi() {
       | "/studio/onizleme"
       | "/studio/yayin",
   ) {
-    localStorage.setItem(
+    const kaydedildi = guvenliKaydet(
       AKTIF_PROJE_ANAHTARI,
-      JSON.stringify(proje),
+      proje,
     );
+
+    if (!kaydedildi) {
+      window.alert(
+        "Proje tarayıcıya kaydedilemedi. Depolama alanı dolmuş olabilir. Eski proje kayıtlarını veya site verilerini temizleyip tekrar deneyin.",
+      );
+      return;
+    }
 
     router.push(hedef);
   }
@@ -144,15 +198,24 @@ export default function ProjelerSayfasi() {
       (proje) => proje.id !== projeId,
     );
 
-    localStorage.setItem(
+    const kaydedildi = guvenliKaydet(
       PROJELER_ANAHTARI,
-      JSON.stringify(guncelProjeler),
+      guncelProjeler,
     );
+
+    if (!kaydedildi) {
+      window.alert("Proje kaydı güncellenemedi.");
+      return;
+    }
 
     const aktifProje = aktifProjeyiOku();
 
     if (aktifProje?.id === projeId) {
-      localStorage.removeItem(AKTIF_PROJE_ANAHTARI);
+      try {
+        window.localStorage.removeItem(AKTIF_PROJE_ANAHTARI);
+      } catch (error) {
+        console.error("Aktif proje silinemedi:", error);
+      }
     }
 
     setProjeler(guncelProjeler);
@@ -181,6 +244,17 @@ export default function ProjelerSayfasi() {
         </p>
       </section>
 
+      {depolamaHatasi && (
+        <section className={styles.bosDurum}>
+          <span>DEPOLAMA UYARISI</span>
+          <h2>Bazı proje kayıtları tarayıcıya kaydedilemedi.</h2>
+          <p>
+            Proje görselleri tarayıcı depolama alanını doldurmuş
+            olabilir.
+          </p>
+        </section>
+      )}
+
       {yukleniyor ? (
         <section className={styles.bosDurum}>
           <span>PROJELER YÜKLENİYOR</span>
@@ -206,16 +280,19 @@ export default function ProjelerSayfasi() {
           </div>
 
           {projeler.map((proje, index) => (
-            <article key={proje.id} className={styles.projeSatiri}>
+            <article
+              key={proje.id || `proje-${index}`}
+              className={styles.projeSatiri}
+            >
               <div className={styles.projeBilgisi}>
                 <span className={styles.sira}>
                   {String(index + 1).padStart(2, "0")}
                 </span>
 
                 <div>
-                  <h2>{proje.firmaAdi}</h2>
+                  <h2>{proje.firmaAdi || "İsimsiz proje"}</h2>
                   <p>
-                    {proje.sektorAdi} ·{" "}
+                    {proje.sektorAdi || "Sektör belirtilmedi"} ·{" "}
                     {proje.siteTipi === "tek-sayfa"
                       ? "Tek sayfa"
                       : "Çok sayfa"}
@@ -230,7 +307,9 @@ export default function ProjelerSayfasi() {
                     GitHub’a aktarıldı
                   </span>
                 ) : (
-                  <span className={styles.taslakDurumu}>Taslak</span>
+                  <span className={styles.taslakDurumu}>
+                    Taslak
+                  </span>
                 )}
               </div>
 
@@ -238,7 +317,8 @@ export default function ProjelerSayfasi() {
                 <span>
                   {tarihGoster(
                     proje.sonGithubAktarimi ||
-                      proje.guncellenmeTarihi,
+                      proje.guncellenmeTarihi ||
+                      proje.olusturulmaTarihi,
                   )}
                 </span>
 
@@ -250,7 +330,9 @@ export default function ProjelerSayfasi() {
               <div className={styles.aksiyonlar}>
                 <button
                   type="button"
-                  onClick={() => projeyiAc(proje, "/studio/icerik")}
+                  onClick={() =>
+                    projeyiAc(proje, "/studio/icerik")
+                  }
                 >
                   <FilePenLine size={16} />
                   Düzenle
@@ -258,7 +340,9 @@ export default function ProjelerSayfasi() {
 
                 <button
                   type="button"
-                  onClick={() => projeyiAc(proje, "/studio/onizleme")}
+                  onClick={() =>
+                    projeyiAc(proje, "/studio/onizleme")
+                  }
                 >
                   <Eye size={16} />
                   Önizle
@@ -266,7 +350,9 @@ export default function ProjelerSayfasi() {
 
                 <button
                   type="button"
-                  onClick={() => projeyiAc(proje, "/studio/yayin")}
+                  onClick={() =>
+                    projeyiAc(proje, "/studio/yayin")
+                  }
                 >
                   <Globe2 size={16} />
                   Yayın ayarları
@@ -276,7 +362,7 @@ export default function ProjelerSayfasi() {
                   <a
                     href={proje.githubUrl}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                   >
                     <ExternalLink size={16} />
                     GitHub

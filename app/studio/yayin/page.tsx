@@ -20,7 +20,9 @@ const PROJELER_ANAHTARI = "sitemix-projeler";
 function adresiTemizle(deger: string) {
   return deger
     .trim()
+    .toLocaleLowerCase("tr-TR")
     .replace(/^https?:\/\//i, "")
+    .replace(/^www\./i, "")
     .replace(/\/+$/g, "");
 }
 
@@ -34,60 +36,126 @@ function alanAdiGecerliMi(deger: string) {
   );
 }
 
-function projeListesiniGuncelle(guncelProje: ProjeVerisi) {
+function guvenliKaydet(anahtar: string, veri: unknown) {
   try {
-    const kayit = localStorage.getItem(PROJELER_ANAHTARI);
-    const projeler = kayit ? (JSON.parse(kayit) as ProjeVerisi[]) : [];
-
-    const guncelListe = Array.isArray(projeler)
-      ? projeler.some((proje) => proje.id === guncelProje.id)
-        ? projeler.map((proje) =>
-            proje.id === guncelProje.id ? guncelProje : proje,
-          )
-        : [guncelProje, ...projeler]
-      : [guncelProje];
-
-    localStorage.setItem(PROJELER_ANAHTARI, JSON.stringify(guncelListe));
-  } catch {
-    localStorage.setItem(
-      PROJELER_ANAHTARI,
-      JSON.stringify([guncelProje]),
+    window.localStorage.setItem(
+      anahtar,
+      JSON.stringify(veri),
     );
+
+    return true;
+  } catch (error) {
+    console.error(
+      `${anahtar} tarayıcıya kaydedilemedi:`,
+      error,
+    );
+
+    return false;
   }
+}
+
+function projeListesiniOku(): ProjeVerisi[] {
+  try {
+    const kayit = window.localStorage.getItem(
+      PROJELER_ANAHTARI,
+    );
+
+    if (!kayit) {
+      return [];
+    }
+
+    const veri: unknown = JSON.parse(kayit);
+
+    return Array.isArray(veri)
+      ? (veri as ProjeVerisi[])
+      : [];
+  } catch (error) {
+    console.error("Proje listesi okunamadı:", error);
+    return [];
+  }
+}
+
+function projeListesiniGuncelle(
+  guncelProje: ProjeVerisi,
+) {
+  const projeler = projeListesiniOku();
+
+  const mevcutIndex = projeler.findIndex(
+    (kayitliProje) =>
+      kayitliProje.id === guncelProje.id,
+  );
+
+  const guncelListe = [...projeler];
+
+  if (mevcutIndex >= 0) {
+    guncelListe[mevcutIndex] = guncelProje;
+  } else {
+    guncelListe.unshift(guncelProje);
+  }
+
+  return guvenliKaydet(
+    PROJELER_ANAHTARI,
+    guncelListe,
+  );
 }
 
 export default function YayinAyarlariSayfasi() {
   const router = useRouter();
 
-  const [proje, setProje] = useState<ProjeVerisi | null>(null);
+  const [proje, setProje] =
+    useState<ProjeVerisi | null>(null);
+
   const [domain, setDomain] = useState("");
   const [vercelUrl, setVercelUrl] = useState("");
   const [seoBaslik, setSeoBaslik] = useState("");
-  const [seoAciklama, setSeoAciklama] = useState("");
-  const [seoKelimeler, setSeoKelimeler] = useState("");
+  const [seoAciklama, setSeoAciklama] =
+    useState("");
+  const [seoKelimeler, setSeoKelimeler] =
+    useState("");
+
   const [hata, setHata] = useState("");
-  const [kaydedildi, setKaydedildi] = useState(false);
-  const [yukleniyor, setYukleniyor] = useState(true);
+  const [kaydedildi, setKaydedildi] =
+    useState(false);
+  const [yukleniyor, setYukleniyor] =
+    useState(true);
+  const [kaydediliyor, setKaydediliyor] =
+    useState(false);
 
   useEffect(() => {
-    const kayit = localStorage.getItem(AKTIF_PROJE_ANAHTARI);
-
-    if (!kayit) {
-      setYukleniyor(false);
-      return;
-    }
-
     try {
-      const projeVerisi = JSON.parse(kayit) as ProjeVerisi;
+      const kayit =
+        window.localStorage.getItem(
+          AKTIF_PROJE_ANAHTARI,
+        );
+
+      if (!kayit) {
+        return;
+      }
+
+      const projeVerisi =
+        JSON.parse(kayit) as ProjeVerisi;
 
       setProje(projeVerisi);
       setDomain(projeVerisi.domain ?? "");
       setVercelUrl(projeVerisi.vercelUrl ?? "");
       setSeoBaslik(projeVerisi.seoBaslik ?? "");
-      setSeoAciklama(projeVerisi.seoAciklama ?? "");
-      setSeoKelimeler((projeVerisi.seoKelimeler ?? []).join(", "));
+      setSeoAciklama(
+        projeVerisi.seoAciklama ?? "",
+      );
+      setSeoKelimeler(
+        (projeVerisi.seoKelimeler ?? []).join(
+          ", ",
+        ),
+      );
     } catch (error) {
-      console.error("Yayın ayarları yüklenemedi:", error);
+      console.error(
+        "Yayın ayarları yüklenemedi:",
+        error,
+      );
+
+      setHata(
+        "Yayın ayarları yüklenirken bir hata oluştu.",
+      );
     } finally {
       setYukleniyor(false);
     }
@@ -95,7 +163,8 @@ export default function YayinAyarlariSayfasi() {
 
   const kullanilacakAdres = useMemo(() => {
     const ozelDomain = adresiTemizle(domain);
-    const demoAdresi = adresiTemizle(vercelUrl);
+    const demoAdresi =
+      adresiTemizle(vercelUrl);
 
     if (ozelDomain) {
       return `https://${ozelDomain}`;
@@ -110,24 +179,59 @@ export default function YayinAyarlariSayfasi() {
     }
 
     return "Domain henüz belirlenmedi";
-  }, [domain, proje?.githubRepoAdi, vercelUrl]);
+  }, [
+    domain,
+    vercelUrl,
+    proje?.githubRepoAdi,
+  ]);
 
-  function kaydet() {
+  function alanDegisti() {
+    setHata("");
+    setKaydedildi(false);
+  }
+
+  function kaydet(): boolean {
     if (!proje) {
-      return;
+      setHata("Aktif proje bulunamadı.");
+      setKaydedildi(false);
+      return false;
     }
 
-    const temizDomain = adresiTemizle(domain);
-    const temizVercelUrl = adresiTemizle(vercelUrl);
+    setKaydediliyor(true);
+    setHata("");
+    setKaydedildi(false);
+
+    const temizDomain =
+      adresiTemizle(domain);
+
+    const temizVercelUrl =
+      adresiTemizle(vercelUrl);
+
+    if (!temizDomain && !temizVercelUrl) {
+      setHata(
+        "Özel domain veya Vercel demo adresinden en az birini yazmalısınız.",
+      );
+      setKaydediliyor(false);
+      return false;
+    }
 
     if (!alanAdiGecerliMi(temizDomain)) {
-      setHata("Özel domain geçerli görünmüyor. Örnek: firmaadi.com");
-      return;
+      setHata(
+        "Özel domain geçerli görünmüyor. Örnek: haskoyshellaracbakim.com.tr",
+      );
+      setKaydediliyor(false);
+      return false;
     }
 
-    if (temizVercelUrl && !alanAdiGecerliMi(temizVercelUrl)) {
-      setHata("Vercel adresi geçerli görünmüyor. Örnek: firmaadi.vercel.app");
-      return;
+    if (
+      temizVercelUrl &&
+      !alanAdiGecerliMi(temizVercelUrl)
+    ) {
+      setHata(
+        "Vercel adresi geçerli görünmüyor. Örnek: firmaadi.vercel.app",
+      );
+      setKaydediliyor(false);
+      return false;
     }
 
     const anahtarKelimeler = seoKelimeler
@@ -138,31 +242,68 @@ export default function YayinAyarlariSayfasi() {
     const guncelProje: ProjeVerisi = {
       ...proje,
       domain: temizDomain || undefined,
-      vercelUrl: temizVercelUrl || undefined,
-      seoBaslik: seoBaslik.trim() || undefined,
-      seoAciklama: seoAciklama.trim() || undefined,
+      vercelUrl:
+        temizVercelUrl || undefined,
+      seoBaslik:
+        seoBaslik.trim() || undefined,
+      seoAciklama:
+        seoAciklama.trim() || undefined,
       seoKelimeler:
-        anahtarKelimeler.length > 0 ? anahtarKelimeler : undefined,
-      guncellenmeTarihi: new Date().toISOString(),
+        anahtarKelimeler.length > 0
+          ? anahtarKelimeler
+          : undefined,
+      guncellenmeTarihi:
+        new Date().toISOString(),
     };
 
-    localStorage.setItem(
-      AKTIF_PROJE_ANAHTARI,
-      JSON.stringify(guncelProje),
-    );
+    const aktifProjeKaydedildi =
+      guvenliKaydet(
+        AKTIF_PROJE_ANAHTARI,
+        guncelProje,
+      );
 
-    projeListesiniGuncelle(guncelProje);
+    if (!aktifProjeKaydedildi) {
+      setHata(
+        "Proje kaydedilemedi. Tarayıcı depolama alanı dolmuş olabilir. Büyük görselleri azaltıp tekrar deneyin.",
+      );
+      setKaydediliyor(false);
+      return false;
+    }
+
+    const projeListesiKaydedildi =
+      projeListesiniGuncelle(guncelProje);
+
+    if (!projeListesiKaydedildi) {
+      setHata(
+        "Aktif proje kaydedildi ancak proje listesi güncellenemedi. Tarayıcı depolama alanı dolmuş olabilir.",
+      );
+
+      setDomain(temizDomain);
+      setVercelUrl(temizVercelUrl);
+      setProje(guncelProje);
+      setKaydediliyor(false);
+
+      return false;
+    }
+
+    setDomain(temizDomain);
+    setVercelUrl(temizVercelUrl);
     setProje(guncelProje);
     setHata("");
     setKaydedildi(true);
+    setKaydediliyor(false);
+
+    return true;
   }
 
   function kaydetVeOnizle() {
-    kaydet();
+    const basariliMi = kaydet();
 
-    window.setTimeout(() => {
-      router.push("/studio/onizleme");
-    }, 50);
+    if (!basariliMi) {
+      return;
+    }
+
+    router.push("/studio/onizleme");
   }
 
   if (yukleniyor) {
@@ -179,7 +320,10 @@ export default function YayinAyarlariSayfasi() {
       <main className={styles.durumSayfasi}>
         <span>SITEMIX STUDIO</span>
         <h1>Aktif proje bulunamadı.</h1>
-        <Link href="/studio/projeler">Projelere dön</Link>
+
+        <Link href="/studio/projeler">
+          Projelere dön
+        </Link>
       </main>
     );
   }
@@ -187,7 +331,10 @@ export default function YayinAyarlariSayfasi() {
   return (
     <main className={styles.sayfa}>
       <header className={styles.ustAlan}>
-        <Link href="/studio/projeler" className={styles.geri}>
+        <Link
+          href="/studio/projeler"
+          className={styles.geri}
+        >
           <ArrowLeft size={18} />
           Projelere dön
         </Link>
@@ -197,12 +344,15 @@ export default function YayinAyarlariSayfasi() {
           <small>STUDIO</small>
         </Link>
 
-        <strong className={styles.adim}>YAYIN AYARLARI</strong>
+        <strong className={styles.adim}>
+          YAYIN AYARLARI
+        </strong>
       </header>
 
       <section className={styles.baslikAlani}>
         <div>
           <span>DOMAIN VE SEO</span>
+
           <h1>
             Canlı sitenin
             <br />
@@ -221,6 +371,7 @@ export default function YayinAyarlariSayfasi() {
         <div className={styles.formBolumu}>
           <div className={styles.bolumBasligi}>
             <Globe2 size={21} />
+
             <div>
               <span>01</span>
               <h2>Domain bilgileri</h2>
@@ -229,32 +380,46 @@ export default function YayinAyarlariSayfasi() {
 
           <label className={styles.alan}>
             <span>Özel domain</span>
+
             <input
+              type="text"
               value={domain}
               onChange={(event) => {
                 setDomain(event.target.value);
-                setKaydedildi(false);
+                alanDegisti();
               }}
-              placeholder="firmaadi.com"
+              placeholder="haskoyshellaracbakim.com.tr"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
             />
+
             <small>
-              Domaini önce Vercel projesine elle bağla. Buraya yalnızca alan
-              adını yaz; https:// ekleme.
+              Domaini önce Vercel projesine
+              bağla. Buraya yalnızca alan adını
+              yaz; https:// ekleme.
             </small>
           </label>
 
           <label className={styles.alan}>
             <span>Vercel demo adresi</span>
+
             <input
+              type="text"
               value={vercelUrl}
               onChange={(event) => {
                 setVercelUrl(event.target.value);
-                setKaydedildi(false);
+                alanDegisti();
               }}
-              placeholder="firmaadi.vercel.app"
+              placeholder="haskoy-sheel-arac-bakim1.vercel.app"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
             />
+
             <small>
-              Özel domain boşsa canonical ve sitemap için bu adres kullanılır.
+              Özel domain boşsa canonical ve
+              sitemap için bu adres kullanılır.
             </small>
           </label>
         </div>
@@ -262,6 +427,7 @@ export default function YayinAyarlariSayfasi() {
         <div className={styles.formBolumu}>
           <div className={styles.bolumBasligi}>
             <Search size={21} />
+
             <div>
               <span>02</span>
               <h2>SEO bilgileri</h2>
@@ -270,92 +436,150 @@ export default function YayinAyarlariSayfasi() {
 
           <label className={styles.alan}>
             <span>SEO başlığı</span>
+
             <input
+              type="text"
               value={seoBaslik}
               onChange={(event) => {
-                setSeoBaslik(event.target.value);
-                setKaydedildi(false);
+                setSeoBaslik(
+                  event.target.value,
+                );
+                alanDegisti();
               }}
               placeholder={`${proje.firmaAdi} | ${proje.sektorAdi}`}
               maxLength={65}
             />
-            <small>{seoBaslik.length}/65 karakter</small>
+
+            <small>
+              {seoBaslik.length}/65 karakter
+            </small>
           </label>
 
           <label className={styles.alan}>
             <span>SEO açıklaması</span>
+
             <textarea
               value={seoAciklama}
               onChange={(event) => {
-                setSeoAciklama(event.target.value);
-                setKaydedildi(false);
+                setSeoAciklama(
+                  event.target.value,
+                );
+                alanDegisti();
               }}
               placeholder={`${proje.firmaAdi}, ${proje.sektorAdi} alanında profesyonel hizmet sunar.`}
               maxLength={170}
               rows={5}
             />
-            <small>{seoAciklama.length}/170 karakter</small>
+
+            <small>
+              {seoAciklama.length}/170 karakter
+            </small>
           </label>
 
           <label className={styles.alan}>
             <span>Anahtar kelimeler</span>
+
             <input
+              type="text"
               value={seoKelimeler}
               onChange={(event) => {
-                setSeoKelimeler(event.target.value);
-                setKaydedildi(false);
+                setSeoKelimeler(
+                  event.target.value,
+                );
+                alanDegisti();
               }}
               placeholder="firma adı, sektör, şehir, hizmet"
             />
-            <small>Kelimeleri virgülle ayır.</small>
+
+            <small>
+              Kelimeleri virgülle ayır.
+            </small>
           </label>
         </div>
 
         <aside className={styles.sagAlan}>
           <span>OLUŞACAK ADRESLER</span>
+
           <h2>{kullanilacakAdres}</h2>
 
           <div className={styles.adresListesi}>
             <div>
               <small>Ana sayfa</small>
-              <strong>{kullanilacakAdres}</strong>
+              <strong>
+                {kullanilacakAdres}
+              </strong>
             </div>
+
             <div>
               <small>Sitemap</small>
-              <strong>{kullanilacakAdres}/sitemap.xml</strong>
+              <strong>
+                {kullanilacakAdres ===
+                "Domain henüz belirlenmedi"
+                  ? "Domain henüz belirlenmedi"
+                  : `${kullanilacakAdres}/sitemap.xml`}
+              </strong>
             </div>
+
             <div>
               <small>Robots</small>
-              <strong>{kullanilacakAdres}/robots.txt</strong>
+              <strong>
+                {kullanilacakAdres ===
+                "Domain henüz belirlenmedi"
+                  ? "Domain henüz belirlenmedi"
+                  : `${kullanilacakAdres}/robots.txt`}
+              </strong>
             </div>
           </div>
 
           {proje.githubUrl && (
-            <a href={proje.githubUrl} target="_blank" rel="noreferrer">
+            <a
+              href={proje.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Repository’yi aç
               <ExternalLink size={15} />
             </a>
           )}
 
-          {hata && <p className={styles.hata}>{hata}</p>}
+          {hata && (
+            <p className={styles.hata}>
+              {hata}
+            </p>
+          )}
 
           {kaydedildi && (
             <p className={styles.basarili}>
               <CheckCircle2 size={17} />
-              Ayarlar kaydedildi. Önizlemede GitHub’ı Güncelle’ye bas.
+              Ayarlar kaydedildi. Önizleme
+              sayfasında GitHub’ı Güncelle
+              butonuna bas.
             </p>
           )}
 
-          <button type="button" className={styles.kaydet} onClick={kaydet}>
-            Ayarları kaydet
+          <button
+            type="button"
+            className={styles.kaydet}
+            onClick={kaydet}
+            disabled={kaydediliyor}
+          >
+            {kaydediliyor
+              ? "Kaydediliyor..."
+              : "Ayarları kaydet"}
           </button>
 
           <button
             type="button"
             className={styles.onizle}
             onClick={kaydetVeOnizle}
+            disabled={kaydediliyor}
           >
-            Kaydet ve önizle
+            <span>
+              {kaydediliyor
+                ? "Kaydediliyor..."
+                : "Kaydet ve önizle"}
+            </span>
+
             <ArrowRight size={18} />
           </button>
         </aside>

@@ -33,51 +33,29 @@ import type {
   SiteBolumu,
   SiteSayfasi,
 } from "@/data/sektorSablonlari";
-
-interface ProjeVerisi {
-  id: string;
-  firmaAdi: string;
-  sektor: string;
-  sektorAdi: string;
-  siteTipi: "tek-sayfa" | "cok-sayfa";
-  telefon: string;
-  whatsapp: string;
-  eposta: string;
-  adres: string;
-  slug: string;
-  tema: string;
-  sayfalar: SiteSayfasi[];
-  olusturulmaTarihi: string;
-  guncellenmeTarihi: string;
-}
+import type { ProjeVerisi } from "@/types/proje";
 
 const sayfaOncelikleri: Record<string, number> = {
   "": 0,
   ana: 0,
   anasayfa: 0,
   "ana-sayfa": 0,
-
   hakkimizda: 10,
-
   hizmetler: 20,
   hizmetlerimiz: 20,
   menu: 20,
   urunler: 20,
   ilanlar: 20,
   odalar: 20,
-
   uzmanlarimiz: 30,
   uzmanlar: 30,
   ekip: 30,
   ekibimiz: 30,
-
   galeri: 40,
   projeler: 40,
   portfolyo: 40,
-
   randevu: 50,
   rezervasyon: 50,
-
   iletisim: 90,
   "bize-ulasin": 90,
 };
@@ -100,6 +78,68 @@ const bolumOncelikleri: Record<SiteBolumu["tur"], number> = {
   video: 130,
   ozel: 140,
 };
+
+const listeDestekleyenBolumler: SiteBolumu["tur"][] = [
+  "hizmetler",
+  "urunler",
+  "galeri",
+  "ekip",
+  "yorumlar",
+  "fiyatlar",
+  "sss",
+  "neden-biz",
+  "istatistik",
+];
+
+const topluIcerikSablonu = `Sayfa: Ana Sayfa
+Bölüm: Açılış alanı
+Küçük başlık: Antalya web tasarım ve dijital sistem
+Ana başlık: İşletmenize özel hızlı ve güvenilir web sitesi
+Açıklama: Firmanız için mobil uyumlu, WhatsApp bağlantılı ve müşterinin kolayca iletişime geçebileceği profesyonel web sitesi hazırlanır.
+Buton: WhatsApp'tan bilgi al | https://wa.me/905000000000
+Buton: Hizmetleri incele | /hizmetler
+
+Sayfa: Ana Sayfa
+Bölüm: Hakkımızda
+Küçük başlık: Hakkımızda
+Ana başlık: İşletmenizi internette daha güçlü gösteriyoruz
+Açıklama: Sizi doğru anlatan, güven veren ve ziyaretçiyi iletişime yönlendiren sade ama etkili web siteleri hazırlarız.
+
+Sayfa: Hizmetler
+Bölüm: Hizmetler
+Ana başlık: Hizmetlerimiz
+Açıklama: İşletmenizin ihtiyacına göre hazırlanan temel hizmetleri inceleyin.
+Hizmetler:
+- Tek sayfa web sitesi | Küçük işletmeler için hızlı, mobil uyumlu ve net tanıtım sitesi.
+- Çok sayfalı web sitesi | Hizmet, galeri, hakkımızda ve iletişim sayfalarıyla daha kapsamlı yapı.
+- WhatsApp ve arama butonları | Ziyaretçinin tek dokunuşla size ulaşmasını sağlar.
+- Google uyumlu temel yapı | Başlık, açıklama ve sayfa düzeni arama görünürlüğü düşünülerek hazırlanır.
+
+Sayfa: İletişim
+Bölüm: İletişim
+Ana başlık: Hemen iletişime geçin
+Açıklama: Web sitesi, demo çalışma veya fiyat bilgisi için bize WhatsApp üzerinden yazabilirsiniz.`;
+
+interface TopluIcerikBloku {
+  sayfa?: string;
+  bolum?: string;
+  alanlar: Partial<
+    Pick<SiteBolumu, "ustBaslik" | "baslik" | "aciklama">
+  >;
+  butonlar: Array<Pick<ButonVerisi, "metin" | "baglanti">>;
+  listeElemanlari: Array<
+    Pick<ListeElemani, "baslik" | "aciklama" | "baglanti">
+  >;
+}
+
+interface GorselHedefi {
+  sayfaId: string;
+  bolumId: string;
+  elemanId?: string;
+  alan: "gorsel" | "arkaPlanGorseli" | "listeGorseli";
+  etiket: string;
+  dolu: boolean;
+}
 
 function idOlustur() {
   if (
@@ -244,9 +284,7 @@ function anaSayfaButonlariniOlustur(
     butonlar.unshift({
       id: idOlustur(),
       metin: "WhatsApp’tan ulaşın",
-      baglanti: `https://wa.me/${whatsappTemizle(
-        proje.whatsapp,
-      )}`,
+      baglanti: `https://wa.me/${whatsappTemizle(proje.whatsapp)}`,
     });
   }
 
@@ -297,12 +335,10 @@ function anaSayfaButonlariniOlustur(
 }
 
 function projeyiDuzenle(proje: ProjeVerisi): ProjeVerisi {
-  const siraliSayfalar = sayfalariSirala(proje.sayfalar).map(
-    (sayfa) => ({
-      ...sayfa,
-      bolumler: bolumleriSirala(sayfa.bolumler),
-    }),
-  );
+  const siraliSayfalar = sayfalariSirala(proje.sayfalar).map((sayfa) => ({
+    ...sayfa,
+    bolumler: bolumleriSirala(sayfa.bolumler),
+  }));
 
   const anaSayfa =
     siraliSayfalar.find((sayfa) => sayfa.anaSayfa) ??
@@ -315,8 +351,7 @@ function projeyiDuzenle(proje: ProjeVerisi): ProjeVerisi {
     }
 
     const heroBolumu =
-      sayfa.bolumler.find((bolum) => bolum.tur === "hero") ??
-      null;
+      sayfa.bolumler.find((bolum) => bolum.tur === "hero") ?? null;
 
     if (!heroBolumu) {
       return sayfa;
@@ -330,9 +365,7 @@ function projeyiDuzenle(proje: ProjeVerisi): ProjeVerisi {
               ...bolum,
               butonlar: anaSayfaButonlariniOlustur(
                 proje,
-                Array.isArray(bolum.butonlar)
-                  ? bolum.butonlar
-                  : [],
+                Array.isArray(bolum.butonlar) ? bolum.butonlar : [],
               ),
             }
           : bolum,
@@ -388,7 +421,6 @@ async function gorseliKucult(file: File): Promise<string> {
         }
 
         context.drawImage(resim, 0, 0, genislik, yukseklik);
-
         resolve(canvas.toDataURL("image/jpeg", 0.78));
       };
 
@@ -407,6 +439,382 @@ async function gorseliKucult(file: File): Promise<string> {
   });
 }
 
+function blokBosMu(blok: TopluIcerikBloku) {
+  return (
+    !blok.sayfa?.trim() &&
+    !blok.bolum?.trim() &&
+    !blok.alanlar.ustBaslik?.trim() &&
+    !blok.alanlar.baslik?.trim() &&
+    !blok.alanlar.aciklama?.trim() &&
+    blok.butonlar.length === 0 &&
+    blok.listeElemanlari.length === 0
+  );
+}
+
+function yeniTopluBlok(
+  sayfa?: string,
+  bolum?: string,
+): TopluIcerikBloku {
+  return {
+    sayfa,
+    bolum,
+    alanlar: {},
+    butonlar: [],
+    listeElemanlari: [],
+  };
+}
+
+function parcalariAyir(deger: string) {
+  return deger
+    .split("|")
+    .map((parca) => parca.trim())
+    .filter(Boolean);
+}
+
+function listeElemaniCoz(deger: string) {
+  const temiz = deger.replace(/^[-•*]\s*/, "").trim();
+  const [baslik = "", aciklama = "", baglanti = ""] = parcalariAyir(temiz);
+
+  if (!baslik.trim()) {
+    return null;
+  }
+
+  return {
+    baslik: baslik.trim(),
+    aciklama: aciklama.trim(),
+    baglanti: baglanti.trim(),
+  };
+}
+
+function butonCoz(deger: string) {
+  const [metin = "", baglanti = ""] = parcalariAyir(deger);
+
+  if (!metin.trim()) {
+    return null;
+  }
+
+  return {
+    metin: metin.trim(),
+    baglanti: baglanti.trim(),
+  };
+}
+
+function topluIcerigiCozumle(metin: string) {
+  const bloklar: TopluIcerikBloku[] = [];
+  let aktifBlok = yeniTopluBlok();
+  let listeModu = false;
+
+  function aktifBlokuBitir() {
+    if (!blokBosMu(aktifBlok)) {
+      bloklar.push(aktifBlok);
+    }
+  }
+
+  metin
+    .split("\n")
+    .map((satir) => satir.trim())
+    .forEach((satir) => {
+      if (!satir) {
+        return;
+      }
+
+      const ayiriciIndex = satir.indexOf(":");
+      const hamAnahtar = ayiriciIndex >= 0 ? satir.slice(0, ayiriciIndex) : "";
+      const deger = ayiriciIndex >= 0 ? satir.slice(ayiriciIndex + 1).trim() : satir;
+      const anahtar = slugOlustur(hamAnahtar);
+
+      if (["sayfa", "page"].includes(anahtar)) {
+        if (!blokBosMu(aktifBlok) && aktifBlok.bolum) {
+          aktifBlokuBitir();
+          aktifBlok = yeniTopluBlok(deger);
+        } else {
+          aktifBlok.sayfa = deger;
+        }
+
+        listeModu = false;
+        return;
+      }
+
+      if (["bolum", "bolum-adi", "alan", "section"].includes(anahtar)) {
+        if (!blokBosMu(aktifBlok) && aktifBlok.bolum) {
+          const oncekiSayfa = aktifBlok.sayfa;
+          aktifBlokuBitir();
+          aktifBlok = yeniTopluBlok(oncekiSayfa, deger);
+        } else {
+          aktifBlok.bolum = deger;
+        }
+
+        listeModu = false;
+        return;
+      }
+
+      if (["kucuk-baslik", "ust-baslik", "etiket"].includes(anahtar)) {
+        aktifBlok.alanlar.ustBaslik = deger;
+        listeModu = false;
+        return;
+      }
+
+      if (["baslik", "ana-baslik", "title"].includes(anahtar)) {
+        aktifBlok.alanlar.baslik = deger;
+        listeModu = false;
+        return;
+      }
+
+      if (["aciklama", "metin", "paragraf", "description"].includes(anahtar)) {
+        aktifBlok.alanlar.aciklama = deger;
+        listeModu = false;
+        return;
+      }
+
+      if (["buton", "button", "cta"].includes(anahtar)) {
+        const buton = butonCoz(deger);
+
+        if (buton) {
+          aktifBlok.butonlar.push(buton);
+        }
+
+        listeModu = false;
+        return;
+      }
+
+      if (
+        [
+          "liste",
+          "icerikler",
+          "icerik",
+          "hizmetler",
+          "hizmet",
+          "urunler",
+          "urun",
+          "galeri",
+          "referanslar",
+          "yorumlar",
+          "ekip",
+          "fiyatlar",
+          "sss",
+        ].includes(anahtar)
+      ) {
+        const eleman = listeElemaniCoz(deger);
+
+        if (eleman) {
+          aktifBlok.listeElemanlari.push(eleman);
+        }
+
+        listeModu = true;
+        return;
+      }
+
+      if (satir.startsWith("-") || satir.startsWith("•") || listeModu) {
+        const eleman = listeElemaniCoz(satir);
+
+        if (eleman) {
+          aktifBlok.listeElemanlari.push(eleman);
+        }
+      }
+    });
+
+  aktifBlokuBitir();
+
+  return bloklar;
+}
+
+function sayfaEslesir(sayfa: SiteSayfasi, aranan: string) {
+  const arananAnahtar = slugOlustur(aranan);
+
+  if (!arananAnahtar) {
+    return sayfa.anaSayfa || !sayfa.slug.trim();
+  }
+
+  if (
+    ["ana", "anasayfa", "ana-sayfa", "home"].includes(arananAnahtar) &&
+    (sayfa.anaSayfa || !sayfa.slug.trim())
+  ) {
+    return true;
+  }
+
+  return [sayfa.ad, sayfa.menuBasligi, sayfa.slug]
+    .map((deger) => slugOlustur(deger || ""))
+    .includes(arananAnahtar);
+}
+
+function bolumEslesir(bolum: SiteBolumu, aranan: string) {
+  const arananAnahtar = slugOlustur(aranan);
+
+  if (!arananAnahtar) {
+    return false;
+  }
+
+  const dogrudanAnahtarlar = [
+    bolum.tur,
+    bolumAdi(bolum.tur),
+    bolum.ustBaslik,
+    bolum.baslik,
+    bolum.varyasyon,
+  ].map((deger) => slugOlustur(deger || ""));
+
+  if (dogrudanAnahtarlar.includes(arananAnahtar)) {
+    return true;
+  }
+
+  if (["acilis", "acilis-alani", "hero", "giris", "ilk-alan"].includes(arananAnahtar)) {
+    return bolum.tur === "hero";
+  }
+
+  if (["hakkimizda", "metin", "metin-alani"].includes(arananAnahtar)) {
+    return bolum.tur === "metin";
+  }
+
+  if (["hizmet", "hizmetler", "hizmetlerimiz"].includes(arananAnahtar)) {
+    return bolum.tur === "hizmetler";
+  }
+
+  if (["urun", "urunler", "menu", "ilan", "ilanlar", "odalar"].includes(arananAnahtar)) {
+    return bolum.tur === "urunler";
+  }
+
+  if (["neden-biz", "neden", "avantajlar"].includes(arananAnahtar)) {
+    return bolum.tur === "neden-biz";
+  }
+
+  if (["iletisim", "bize-ulasin", "ulasim"].includes(arananAnahtar)) {
+    return bolum.tur === "iletisim";
+  }
+
+  return false;
+}
+
+function gelenButonlariUygula(
+  mevcutButonlar: ButonVerisi[],
+  gelenButonlar: Array<Pick<ButonVerisi, "metin" | "baglanti">>,
+) {
+  if (gelenButonlar.length === 0) {
+    return mevcutButonlar;
+  }
+
+  return gelenButonlar.map((buton, index) => ({
+    id: mevcutButonlar[index]?.id ?? idOlustur(),
+    metin: buton.metin,
+    baglanti: buton.baglanti,
+  }));
+}
+
+function gelenListeyiUygula(
+  mevcutListe: ListeElemani[],
+  gelenListe: Array<Pick<ListeElemani, "baslik" | "aciklama" | "baglanti">>,
+) {
+  if (gelenListe.length === 0) {
+    return mevcutListe;
+  }
+
+  return gelenListe.map((eleman, index) => ({
+    id: mevcutListe[index]?.id ?? idOlustur(),
+    baslik: eleman.baslik,
+    aciklama: eleman.aciklama,
+    baglanti: eleman.baglanti,
+    gorsel: mevcutListe[index]?.gorsel ?? "",
+  }));
+}
+
+function gorselHedefleriniOlustur(
+  proje: ProjeVerisi,
+  sadeceBosAlanlar: boolean,
+  sayfaId?: string,
+  bolumId?: string,
+) {
+  const hedefler: GorselHedefi[] = [];
+
+  sayfalariSirala(proje.sayfalar).forEach((sayfa) => {
+    if (sayfaId && sayfa.id !== sayfaId) {
+      return;
+    }
+
+    bolumleriSirala(sayfa.bolumler).forEach((bolum) => {
+      if (bolumId && bolum.id !== bolumId) {
+        return;
+      }
+
+      const sayfaAdi = sayfa.ad || "Sayfa";
+      const bolumEtiketi = bolum.baslik || bolumAdi(bolum.tur);
+
+      if (bolum.tur === "hero" || bolum.tur === "metin") {
+        hedefler.push({
+          sayfaId: sayfa.id,
+          bolumId: bolum.id,
+          alan: "arkaPlanGorseli",
+          etiket: `${sayfaAdi} / ${bolumEtiketi} / arka plan`,
+          dolu: Boolean(bolum.arkaPlanGorseli),
+        });
+      }
+
+      hedefler.push({
+        sayfaId: sayfa.id,
+        bolumId: bolum.id,
+        alan: "gorsel",
+        etiket: `${sayfaAdi} / ${bolumEtiketi} / ana görsel`,
+        dolu: Boolean(bolum.gorsel),
+      });
+
+      bolum.listeElemanlari.forEach((eleman, index) => {
+        hedefler.push({
+          sayfaId: sayfa.id,
+          bolumId: bolum.id,
+          elemanId: eleman.id,
+          alan: "listeGorseli",
+          etiket: `${sayfaAdi} / ${bolumEtiketi} / ${eleman.baslik || `${index + 1}. içerik`}`,
+          dolu: Boolean(eleman.gorsel),
+        });
+      });
+    });
+  });
+
+  return sadeceBosAlanlar
+    ? hedefler.filter((hedef) => !hedef.dolu)
+    : hedefler;
+}
+
+function gorseliHedefeYerlestir(
+  proje: ProjeVerisi,
+  hedef: GorselHedefi,
+  gorsel: string,
+): ProjeVerisi {
+  return {
+    ...proje,
+    sayfalar: proje.sayfalar.map((sayfa) => {
+      if (sayfa.id !== hedef.sayfaId) {
+        return sayfa;
+      }
+
+      return {
+        ...sayfa,
+        bolumler: sayfa.bolumler.map((bolum) => {
+          if (bolum.id !== hedef.bolumId) {
+            return bolum;
+          }
+
+          if (hedef.alan === "listeGorseli") {
+            return {
+              ...bolum,
+              listeElemanlari: bolum.listeElemanlari.map((eleman) =>
+                eleman.id === hedef.elemanId
+                  ? {
+                      ...eleman,
+                      gorsel,
+                    }
+                  : eleman,
+              ),
+            };
+          }
+
+          return {
+            ...bolum,
+            [hedef.alan]: gorsel,
+          };
+        }),
+      };
+    }),
+  };
+}
+
 export default function KolayIcerikDuzenleyici() {
   const router = useRouter();
 
@@ -416,6 +824,8 @@ export default function KolayIcerikDuzenleyici() {
   const [yukleniyor, setYukleniyor] = useState(true);
   const [kaydedildi, setKaydedildi] = useState(false);
   const [hata, setHata] = useState("");
+  const [topluIcerik, setTopluIcerik] = useState("");
+  const [topluBilgi, setTopluBilgi] = useState("");
 
   useEffect(() => {
     const kayit = localStorage.getItem("sitemix-aktif-proje");
@@ -457,19 +867,31 @@ export default function KolayIcerikDuzenleyici() {
 
   const secilenSayfa = useMemo(() => {
     return (
-      proje?.sayfalar.find(
-        (sayfa) => sayfa.id === secilenSayfaId,
-      ) ?? null
+      proje?.sayfalar.find((sayfa) => sayfa.id === secilenSayfaId) ?? null
     );
   }, [proje, secilenSayfaId]);
 
   const secilenBolum = useMemo(() => {
     return (
-      secilenSayfa?.bolumler.find(
-        (bolum) => bolum.id === secilenBolumId,
-      ) ?? null
+      secilenSayfa?.bolumler.find((bolum) => bolum.id === secilenBolumId) ??
+      null
     );
   }, [secilenSayfa, secilenBolumId]);
+
+  const bosGorselHedefleri = useMemo(() => {
+    return proje ? gorselHedefleriniOlustur(proje, true) : [];
+  }, [proje]);
+
+  const seciliBolumBosGorselHedefleri = useMemo(() => {
+    return proje && secilenSayfa && secilenBolum
+      ? gorselHedefleriniOlustur(
+          proje,
+          true,
+          secilenSayfa.id,
+          secilenBolum.id,
+        )
+      : [];
+  }, [proje, secilenSayfa, secilenBolum]);
 
   function projeyiKaydet(guncelProje: ProjeVerisi) {
     const kaydedilecek = {
@@ -502,9 +924,7 @@ export default function KolayIcerikDuzenleyici() {
     setSecilenSayfaId(sayfaId);
     setHata("");
 
-    const sayfa = proje?.sayfalar.find(
-      (item) => item.id === sayfaId,
-    );
+    const sayfa = proje?.sayfalar.find((item) => item.id === sayfaId);
 
     const ilkBolum = sayfa?.bolumler
       .slice()
@@ -556,10 +976,7 @@ export default function KolayIcerikDuzenleyici() {
       baglanti: "",
     };
 
-    bolumGuncelle("butonlar", [
-      ...secilenBolum.butonlar,
-      yeniButon,
-    ]);
+    bolumGuncelle("butonlar", [...secilenBolum.butonlar, yeniButon]);
   }
 
   function hizliWhatsappButonuEkle() {
@@ -573,15 +990,10 @@ export default function KolayIcerikDuzenleyici() {
     const whatsappButonu: ButonVerisi = {
       id: idOlustur(),
       metin: "WhatsApp’tan ulaşın",
-      baglanti: `https://wa.me/${whatsappTemizle(
-        proje.whatsapp,
-      )}`,
+      baglanti: `https://wa.me/${whatsappTemizle(proje.whatsapp)}`,
     };
 
-    bolumGuncelle("butonlar", [
-      ...secilenBolum.butonlar,
-      whatsappButonu,
-    ]);
+    bolumGuncelle("butonlar", [...secilenBolum.butonlar, whatsappButonu]);
   }
 
   function hizliTelefonButonuEkle() {
@@ -598,10 +1010,7 @@ export default function KolayIcerikDuzenleyici() {
       baglanti: `tel:${telefonTemizle(proje.telefon)}`,
     };
 
-    bolumGuncelle("butonlar", [
-      ...secilenBolum.butonlar,
-      telefonButonu,
-    ]);
+    bolumGuncelle("butonlar", [...secilenBolum.butonlar, telefonButonu]);
   }
 
   function butonGuncelle(
@@ -633,9 +1042,7 @@ export default function KolayIcerikDuzenleyici() {
 
     bolumGuncelle(
       "butonlar",
-      secilenBolum.butonlar.filter(
-        (buton) => buton.id !== butonId,
-      ),
+      secilenBolum.butonlar.filter((buton) => buton.id !== butonId),
     );
   }
 
@@ -655,11 +1062,7 @@ export default function KolayIcerikDuzenleyici() {
       const gorsel = await gorseliKucult(file);
       bolumGuncelle(alan, gorsel);
     } catch (error) {
-      setHata(
-        error instanceof Error
-          ? error.message
-          : "Görsel yüklenemedi.",
-      );
+      setHata(error instanceof Error ? error.message : "Görsel yüklenemedi.");
     }
 
     event.target.value = "";
@@ -699,14 +1102,9 @@ export default function KolayIcerikDuzenleyici() {
 
     try {
       const gorsel = await gorseliKucult(file);
-
       listeElemaniGuncelle(elemanId, "gorsel", gorsel);
     } catch (error) {
-      setHata(
-        error instanceof Error
-          ? error.message
-          : "Görsel yüklenemedi.",
-      );
+      setHata(error instanceof Error ? error.message : "Görsel yüklenemedi.");
     }
 
     event.target.value = "";
@@ -753,20 +1151,14 @@ export default function KolayIcerikDuzenleyici() {
       (a, b) => a.sira - b.sira,
     );
 
-    const index = bolumler.findIndex(
-      (bolum) => bolum.id === secilenBolum.id,
-    );
-
+    const index = bolumler.findIndex((bolum) => bolum.id === secilenBolum.id);
     const hedef = yon === "yukari" ? index - 1 : index + 1;
 
     if (hedef < 0 || hedef >= bolumler.length) {
       return;
     }
 
-    [bolumler[index], bolumler[hedef]] = [
-      bolumler[hedef],
-      bolumler[index],
-    ];
+    [bolumler[index], bolumler[hedef]] = [bolumler[hedef], bolumler[index]];
 
     const yeniBolumler = bolumler.map((bolum, sira) => ({
       ...bolum,
@@ -791,9 +1183,7 @@ export default function KolayIcerikDuzenleyici() {
       return;
     }
 
-    const onay = window.confirm(
-      "Bu bölümü silmek istediğine emin misin?",
-    );
+    const onay = window.confirm("Bu bölümü silmek istediğine emin misin?");
 
     if (!onay) {
       return;
@@ -819,6 +1209,136 @@ export default function KolayIcerikDuzenleyici() {
     });
 
     setSecilenBolumId(bolumler[0]?.id ?? "");
+  }
+
+  function topluIcerigiUygula() {
+    if (!proje) {
+      return;
+    }
+
+    const bloklar = topluIcerigiCozumle(topluIcerik);
+
+    if (bloklar.length === 0) {
+      setHata("Toplu içerik alanına uygulanacak metin bulunamadı.");
+      return;
+    }
+
+    let uygulananSayisi = 0;
+    let ilkUygulananSayfaId = "";
+    let ilkUygulananBolumId = "";
+
+    const sayfalar = proje.sayfalar.map((sayfa) => ({
+      ...sayfa,
+      bolumler: sayfa.bolumler.map((bolum) => ({
+        ...bolum,
+        butonlar: [...bolum.butonlar],
+        listeElemanlari: [...bolum.listeElemanlari],
+      })),
+    }));
+
+    bloklar.forEach((blok) => {
+      const hedefSayfa = blok.sayfa?.trim()
+        ? sayfalar.find((sayfa) => sayfaEslesir(sayfa, blok.sayfa || ""))
+        : sayfalar.find((sayfa) => sayfa.id === secilenSayfaId) ?? sayfalar[0];
+
+      if (!hedefSayfa) {
+        return;
+      }
+
+      const hedefBolum = blok.bolum?.trim()
+        ? hedefSayfa.bolumler.find((bolum) =>
+            bolumEslesir(bolum, blok.bolum || ""),
+          )
+        : hedefSayfa.bolumler.find((bolum) => bolum.id === secilenBolumId) ??
+          hedefSayfa.bolumler[0];
+
+      if (!hedefBolum) {
+        return;
+      }
+
+      Object.assign(hedefBolum, {
+        ...hedefBolum,
+        ...blok.alanlar,
+        butonlar: gelenButonlariUygula(hedefBolum.butonlar, blok.butonlar),
+        listeElemanlari: gelenListeyiUygula(
+          hedefBolum.listeElemanlari,
+          blok.listeElemanlari,
+        ),
+      });
+
+      uygulananSayisi += 1;
+
+      if (!ilkUygulananSayfaId) {
+        ilkUygulananSayfaId = hedefSayfa.id;
+        ilkUygulananBolumId = hedefBolum.id;
+      }
+    });
+
+    if (uygulananSayisi === 0) {
+      setHata(
+        "İçerik okundu ama eşleşen sayfa veya bölüm bulunamadı. Sayfa ve bölüm adlarını mevcut paneldeki adlarla yaz.",
+      );
+      return;
+    }
+
+    projeyiKaydet({
+      ...proje,
+      sayfalar,
+    });
+
+    if (ilkUygulananSayfaId) {
+      setSecilenSayfaId(ilkUygulananSayfaId);
+      setSecilenBolumId(ilkUygulananBolumId);
+    }
+
+    setTopluBilgi(`${uygulananSayisi} bölüm toplu içerikle güncellendi.`);
+    setHata("");
+  }
+
+  async function topluGorselYukle(
+    event: ChangeEvent<HTMLInputElement>,
+    hedefler: GorselHedefi[],
+    yalnizSeciliBolum: boolean,
+  ) {
+    if (!proje) {
+      return;
+    }
+
+    const dosyalar = Array.from(event.target.files ?? []);
+
+    if (dosyalar.length === 0) {
+      return;
+    }
+
+    if (hedefler.length === 0) {
+      setHata("Görsel yerleştirilecek boş alan bulunamadı.");
+      event.target.value = "";
+      return;
+    }
+
+    let guncelProje = proje;
+    let yuklenenSayisi = 0;
+
+    try {
+      for (let index = 0; index < dosyalar.length && index < hedefler.length; index += 1) {
+        const gorsel = await gorseliKucult(dosyalar[index]);
+        guncelProje = gorseliHedefeYerlestir(guncelProje, hedefler[index], gorsel);
+        yuklenenSayisi += 1;
+      }
+
+      projeyiKaydet(guncelProje);
+
+      setTopluBilgi(
+        yalnizSeciliBolum
+          ? `${yuklenenSayisi} görsel seçili bölüme sırayla yerleştirildi.`
+          : `${yuklenenSayisi} görsel boş alanlara sırayla yerleştirildi.`,
+      );
+      setHata("");
+    } catch (error) {
+      setHata(error instanceof Error ? error.message : "Toplu görsel yükleme tamamlanamadı.");
+    }
+
+    event.target.value = "";
   }
 
   if (yukleniyor) {
@@ -847,9 +1367,7 @@ export default function KolayIcerikDuzenleyici() {
   const sayfalar = sayfalariSirala(proje.sayfalar);
 
   const bolumler = secilenSayfa
-    ? [...secilenSayfa.bolumler].sort(
-        (a, b) => a.sira - b.sira,
-      )
+    ? [...secilenSayfa.bolumler].sort((a, b) => a.sira - b.sira)
     : [];
 
   const seciliIndex = bolumler.findIndex(
@@ -887,9 +1405,9 @@ export default function KolayIcerikDuzenleyici() {
           <h1>{proje.firmaAdi}</h1>
 
           <p>
-            Sayfalar ve içerikler doğru sıraya getirildi. İlk
-            açılış alanına WhatsApp, telefon ve hizmetler
-            butonları otomatik eklendi.
+            Sayfalar ve içerikler doğru sıraya getirildi. İstersen tek tek
+            düzenle, istersen toplu içerik alanına hazır metni yapıştırıp
+            bütün bölümlere tek seferde uygula.
           </p>
         </div>
 
@@ -901,6 +1419,76 @@ export default function KolayIcerikDuzenleyici() {
           Siteyi önizle
           <ArrowRight size={18} />
         </button>
+      </section>
+
+      <section className={styles.topluPanel}>
+        <div className={styles.topluBaslik}>
+          <div>
+            <span>TOPLU DOLDURMA</span>
+            <h2>İçerikleri tek tek yazmadan yerleştir</h2>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setTopluIcerik(topluIcerikSablonu);
+              setTopluBilgi("Örnek şablon hazırlandı. Üzerini değiştirip uygula.");
+            }}
+          >
+            Örnek şablonu getir
+          </button>
+        </div>
+
+        <textarea
+          value={topluIcerik}
+          onChange={(event) => setTopluIcerik(event.target.value)}
+          placeholder="ChatGPT’den aldığın içerik metnini buraya yapıştır. Sayfa, Bölüm, Küçük başlık, Ana başlık, Açıklama, Buton ve Hizmetler satırlarını okuyup doğru alanlara yerleştirir."
+          rows={12}
+        />
+
+        <div className={styles.topluAksiyonlar}>
+          <button type="button" onClick={topluIcerigiUygula}>
+            <FileText size={17} />
+            Toplu içeriği uygula
+          </button>
+
+          <label>
+            <Upload size={17} />
+            Tüm görselleri sırayla yükle
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(event) =>
+                topluGorselYukle(event, bosGorselHedefleri, false)
+              }
+            />
+          </label>
+        </div>
+
+        <div className={styles.gorselSiraKutusu}>
+          <strong>Boş görsel yeri: {bosGorselHedefleri.length}</strong>
+          <p>
+            Toplu görsel seçersen dosyalar aşağıdaki sıraya göre yerleşir. Önce
+            mevcut boş alanlar doldurulur, dolu görsellerin üzerine yazılmaz.
+          </p>
+
+          {bosGorselHedefleri.length > 0 && (
+            <ol>
+              {bosGorselHedefleri.slice(0, 8).map((hedef) => (
+                <li key={`${hedef.sayfaId}-${hedef.bolumId}-${hedef.elemanId ?? hedef.alan}`}>
+                  {hedef.etiket}
+                </li>
+              ))}
+
+              {bosGorselHedefleri.length > 8 && (
+                <li>+{bosGorselHedefleri.length - 8} görsel alanı daha</li>
+              )}
+            </ol>
+          )}
+        </div>
+
+        {topluBilgi && <p className={styles.topluBilgi}>{topluBilgi}</p>}
       </section>
 
       <section className={styles.editorAlani}>
@@ -915,9 +1503,7 @@ export default function KolayIcerikDuzenleyici() {
               key={sayfa.id}
               type="button"
               className={`${styles.sayfaButonu} ${
-                sayfa.id === secilenSayfaId
-                  ? styles.aktifSayfa
-                  : ""
+                sayfa.id === secilenSayfaId ? styles.aktifSayfa : ""
               }`}
               onClick={() => sayfaSec(sayfa.id)}
             >
@@ -942,27 +1528,18 @@ export default function KolayIcerikDuzenleyici() {
               key={bolum.id}
               type="button"
               className={`${styles.bolumButonu} ${
-                bolum.id === secilenBolumId
-                  ? styles.aktifBolum
-                  : ""
+                bolum.id === secilenBolumId ? styles.aktifBolum : ""
               }`}
               onClick={() => setSecilenBolumId(bolum.id)}
             >
               <span>{String(index + 1).padStart(2, "0")}</span>
 
               <div>
-                <strong>
-                  {bolum.baslik || bolumAdi(bolum.tur)}
-                </strong>
-
+                <strong>{bolum.baslik || bolumAdi(bolum.tur)}</strong>
                 <small>{bolumAdi(bolum.tur)}</small>
               </div>
 
-              {bolum.aktif ? (
-                <Eye size={16} />
-              ) : (
-                <EyeOff size={16} />
-              )}
+              {bolum.aktif ? <Eye size={16} /> : <EyeOff size={16} />}
             </button>
           ))}
         </section>
@@ -979,26 +1556,14 @@ export default function KolayIcerikDuzenleyici() {
                 <div>
                   <span>{bolumAdi(secilenBolum.tur)}</span>
 
-                  <h2>
-                    {secilenBolum.baslik ||
-                      "Bölüm içeriğini düzenleyin"}
-                  </h2>
+                  <h2>{secilenBolum.baslik || "Bölüm içeriğini düzenleyin"}</h2>
                 </div>
 
                 <button
                   type="button"
-                  onClick={() =>
-                    bolumGuncelle(
-                      "aktif",
-                      !secilenBolum.aktif,
-                    )
-                  }
+                  onClick={() => bolumGuncelle("aktif", !secilenBolum.aktif)}
                 >
-                  {secilenBolum.aktif ? (
-                    <Eye size={17} />
-                  ) : (
-                    <EyeOff size={17} />
-                  )}
+                  {secilenBolum.aktif ? <Eye size={17} /> : <EyeOff size={17} />}
                 </button>
               </div>
 
@@ -1015,14 +1580,30 @@ export default function KolayIcerikDuzenleyici() {
                 <button
                   type="button"
                   disabled={
-                    seciliIndex === -1 ||
-                    seciliIndex === bolumler.length - 1
+                    seciliIndex === -1 || seciliIndex === bolumler.length - 1
                   }
                   onClick={() => bolumTasi("asagi")}
                 >
                   <ArrowDown size={16} />
                   Aşağı
                 </button>
+
+                <label className={styles.bolumTopluGorselButonu}>
+                  <Upload size={16} />
+                  Bu bölümün görselleri
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(event) =>
+                      topluGorselYukle(
+                        event,
+                        seciliBolumBosGorselHedefleri,
+                        true,
+                      )
+                    }
+                  />
+                </label>
 
                 <button
                   type="button"
@@ -1041,10 +1622,7 @@ export default function KolayIcerikDuzenleyici() {
                   type="text"
                   value={secilenBolum.ustBaslik}
                   onChange={(event) =>
-                    bolumGuncelle(
-                      "ustBaslik",
-                      event.target.value,
-                    )
+                    bolumGuncelle("ustBaslik", event.target.value)
                   }
                 />
               </div>
@@ -1055,12 +1633,7 @@ export default function KolayIcerikDuzenleyici() {
                 <input
                   type="text"
                   value={secilenBolum.baslik}
-                  onChange={(event) =>
-                    bolumGuncelle(
-                      "baslik",
-                      event.target.value,
-                    )
-                  }
+                  onChange={(event) => bolumGuncelle("baslik", event.target.value)}
                 />
               </div>
 
@@ -1071,10 +1644,7 @@ export default function KolayIcerikDuzenleyici() {
                   rows={5}
                   value={secilenBolum.aciklama}
                   onChange={(event) =>
-                    bolumGuncelle(
-                      "aciklama",
-                      event.target.value,
-                    )
+                    bolumGuncelle("aciklama", event.target.value)
                   }
                 />
               </div>
@@ -1087,12 +1657,7 @@ export default function KolayIcerikDuzenleyici() {
                   </div>
 
                   {secilenBolum.gorsel && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        bolumGuncelle("gorsel", "")
-                      }
-                    >
+                    <button type="button" onClick={() => bolumGuncelle("gorsel", "")}> 
                       Kaldır
                     </button>
                   )}
@@ -1113,16 +1678,13 @@ export default function KolayIcerikDuzenleyici() {
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(event) =>
-                        anaGorselYukle(event, "gorsel")
-                      }
+                      onChange={(event) => anaGorselYukle(event, "gorsel")}
                     />
                   </label>
                 )}
               </div>
 
-              {(secilenBolum.tur === "hero" ||
-                secilenBolum.tur === "metin") && (
+              {(secilenBolum.tur === "hero" || secilenBolum.tur === "metin") && (
                 <div className={styles.gorselBolumu}>
                   <div className={styles.gorselBasligi}>
                     <div>
@@ -1133,12 +1695,7 @@ export default function KolayIcerikDuzenleyici() {
                     {secilenBolum.arkaPlanGorseli && (
                       <button
                         type="button"
-                        onClick={() =>
-                          bolumGuncelle(
-                            "arkaPlanGorseli",
-                            "",
-                          )
-                        }
+                        onClick={() => bolumGuncelle("arkaPlanGorseli", "")}
                       >
                         Kaldır
                       </button>
@@ -1160,10 +1717,7 @@ export default function KolayIcerikDuzenleyici() {
                         type="file"
                         accept="image/*"
                         onChange={(event) =>
-                          anaGorselYukle(
-                            event,
-                            "arkaPlanGorseli",
-                          )
+                          anaGorselYukle(event, "arkaPlanGorseli")
                         }
                       />
                     </label>
@@ -1175,9 +1729,7 @@ export default function KolayIcerikDuzenleyici() {
                 <div className={styles.listeUstAlan}>
                   <div>
                     <span>BUTONLAR</span>
-                    <strong>
-                      {secilenBolum.butonlar.length}
-                    </strong>
+                    <strong>{secilenBolum.butonlar.length}</strong>
                   </div>
 
                   <button type="button" onClick={butonEkle}>
@@ -1210,58 +1762,35 @@ export default function KolayIcerikDuzenleyici() {
                   </div>
                 )}
 
-                {secilenBolum.butonlar.map(
-                  (buton, index) => (
-                    <article
-                      key={buton.id}
-                      className={styles.listeElemani}
-                    >
-                      <div
-                        className={
-                          styles.listeElemaniBasligi
-                        }
-                      >
-                        <span>
-                          BUTON{" "}
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
+                {secilenBolum.butonlar.map((buton, index) => (
+                  <article key={buton.id} className={styles.listeElemani}>
+                    <div className={styles.listeElemaniBasligi}>
+                      <span>BUTON {String(index + 1).padStart(2, "0")}</span>
 
-                        <button
-                          type="button"
-                          onClick={() => butonSil(buton.id)}
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
+                      <button type="button" onClick={() => butonSil(buton.id)}>
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
 
-                      <input
-                        type="text"
-                        value={buton.metin}
-                        onChange={(event) =>
-                          butonGuncelle(
-                            buton.id,
-                            "metin",
-                            event.target.value,
-                          )
-                        }
-                        placeholder="Buton yazısı"
-                      />
+                    <input
+                      type="text"
+                      value={buton.metin}
+                      onChange={(event) =>
+                        butonGuncelle(buton.id, "metin", event.target.value)
+                      }
+                      placeholder="Buton yazısı"
+                    />
 
-                      <input
-                        type="text"
-                        value={buton.baglanti}
-                        onChange={(event) =>
-                          butonGuncelle(
-                            buton.id,
-                            "baglanti",
-                            event.target.value,
-                          )
-                        }
-                        placeholder="/hizmetler, tel: veya https://..."
-                      />
-                    </article>
-                  ),
-                )}
+                    <input
+                      type="text"
+                      value={buton.baglanti}
+                      onChange={(event) =>
+                        butonGuncelle(buton.id, "baglanti", event.target.value)
+                      }
+                      placeholder="/hizmetler, tel: veya https://..."
+                    />
+                  </article>
+                ))}
               </div>
 
               {secilenBolum.listeElemanlari.length > 0 && (
@@ -1269,150 +1798,99 @@ export default function KolayIcerikDuzenleyici() {
                   <div className={styles.listeUstAlan}>
                     <div>
                       <span>İÇERİKLER</span>
-                      <strong>
-                        {secilenBolum.listeElemanlari.length}
-                      </strong>
+                      <strong>{secilenBolum.listeElemanlari.length}</strong>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={listeElemaniEkle}
-                    >
+                    <button type="button" onClick={listeElemaniEkle}>
                       <Plus size={15} />
                       Yeni ekle
                     </button>
                   </div>
 
-                  {secilenBolum.listeElemanlari.map(
-                    (eleman, index) => (
-                      <article
-                        key={eleman.id}
-                        className={styles.listeElemani}
-                      >
-                        <div
-                          className={
-                            styles.listeElemaniBasligi
-                          }
+                  {secilenBolum.listeElemanlari.map((eleman, index) => (
+                    <article key={eleman.id} className={styles.listeElemani}>
+                      <div className={styles.listeElemaniBasligi}>
+                        <span>{String(index + 1).padStart(2, "0")}</span>
+
+                        <button
+                          type="button"
+                          onClick={() => listeElemaniSil(eleman.id)}
                         >
-                          <span>
-                            {String(index + 1).padStart(
-                              2,
-                              "0",
-                            )}
-                          </span>
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+
+                      <input
+                        type="text"
+                        value={eleman.baslik}
+                        onChange={(event) =>
+                          listeElemaniGuncelle(
+                            eleman.id,
+                            "baslik",
+                            event.target.value,
+                          )
+                        }
+                        placeholder="Başlık"
+                      />
+
+                      <textarea
+                        rows={3}
+                        value={eleman.aciklama}
+                        onChange={(event) =>
+                          listeElemaniGuncelle(
+                            eleman.id,
+                            "aciklama",
+                            event.target.value,
+                          )
+                        }
+                        placeholder="Açıklama"
+                      />
+
+                      <input
+                        type="text"
+                        value={eleman.baglanti}
+                        onChange={(event) =>
+                          listeElemaniGuncelle(
+                            eleman.id,
+                            "baglanti",
+                            event.target.value,
+                          )
+                        }
+                        placeholder="Bağlantı — isteğe bağlı"
+                      />
+
+                      {eleman.gorsel ? (
+                        <div className={styles.elemanGorselAlani}>
+                          <img src={eleman.gorsel} alt="" />
 
                           <button
                             type="button"
                             onClick={() =>
-                              listeElemaniSil(eleman.id)
+                              listeElemaniGuncelle(eleman.id, "gorsel", "")
                             }
                           >
-                            <Trash2 size={15} />
+                            Kaldır
                           </button>
                         </div>
+                      ) : (
+                        <label className={styles.kucukGorselYukle}>
+                          <Upload size={18} />
+                          Görsel yükle
 
-                        <input
-                          type="text"
-                          value={eleman.baslik}
-                          onChange={(event) =>
-                            listeElemaniGuncelle(
-                              eleman.id,
-                              "baslik",
-                              event.target.value,
-                            )
-                          }
-                          placeholder="Başlık"
-                        />
-
-                        <textarea
-                          rows={3}
-                          value={eleman.aciklama}
-                          onChange={(event) =>
-                            listeElemaniGuncelle(
-                              eleman.id,
-                              "aciklama",
-                              event.target.value,
-                            )
-                          }
-                          placeholder="Açıklama"
-                        />
-
-                        <input
-                          type="text"
-                          value={eleman.baglanti}
-                          onChange={(event) =>
-                            listeElemaniGuncelle(
-                              eleman.id,
-                              "baglanti",
-                              event.target.value,
-                            )
-                          }
-                          placeholder="Bağlantı — isteğe bağlı"
-                        />
-
-                        {eleman.gorsel ? (
-                          <div
-                            className={
-                              styles.elemanGorselAlani
-                            }
-                          >
-                            <img
-                              src={eleman.gorsel}
-                              alt=""
-                            />
-
-                            <button
-                              type="button"
-                              onClick={() =>
-                                listeElemaniGuncelle(
-                                  eleman.id,
-                                  "gorsel",
-                                  "",
-                                )
-                              }
-                            >
-                              Kaldır
-                            </button>
-                          </div>
-                        ) : (
-                          <label
-                            className={
-                              styles.kucukGorselYukle
-                            }
-                          >
-                            <Upload size={18} />
-                            Görsel yükle
-
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(event) =>
-                                listeGorseliYukle(
-                                  event,
-                                  eleman.id,
-                                )
-                              }
-                            />
-                          </label>
-                        )}
-                      </article>
-                    ),
-                  )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(event) => listeGorseliYukle(event, eleman.id)}
+                          />
+                        </label>
+                      )}
+                    </article>
+                  ))}
                 </div>
               )}
 
               {secilenBolum.listeElemanlari.length === 0 &&
-                [
-                  "hizmetler",
-                  "urunler",
-                  "galeri",
-                  "ekip",
-                  "yorumlar",
-                  "fiyatlar",
-                  "sss",
-                  "neden-biz",
-                  "istatistik",
-                ].includes(secilenBolum.tur) && (
+                listeDestekleyenBolumler.includes(secilenBolum.tur) && (
                   <button
                     type="button"
                     className={styles.ilkElemanButonu}

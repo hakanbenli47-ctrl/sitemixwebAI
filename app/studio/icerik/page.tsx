@@ -8,11 +8,14 @@ import {
   ArrowRight,
   ArrowUp,
   Check,
+  Copy,
   Eye,
   EyeOff,
   FileImage,
   FileText,
   ImagePlus,
+  Images,
+  Layers,
   MessageCircle,
   Phone,
   Plus,
@@ -106,11 +109,22 @@ interface TopluIcerikBloku {
 
 interface GorselHedefi {
   sayfaId: string;
+  sayfaAdi: string;
   bolumId: string;
+  bolumAdi: string;
   elemanId?: string;
   alan: "gorsel" | "arkaPlanGorseli" | "listeGorseli";
   etiket: string;
+  oneri: string;
+  oran: string;
+  mevcutGorsel: string;
   dolu: boolean;
+}
+
+interface SayfaGorselGrubu {
+  sayfaId: string;
+  sayfaAdi: string;
+  hedefler: GorselHedefi[];
 }
 
 function idOlustur() {
@@ -666,6 +680,69 @@ function gelenListeyiUygula(
   }));
 }
 
+function anaGorselKullanir(bolum: SiteBolumu) {
+  return ["metin", "video", "ozel"].includes(bolum.tur);
+}
+
+function arkaPlanGorseliKullanir(bolum: SiteBolumu) {
+  return bolum.tur === "hero";
+}
+
+function listeGorseliKullanir(bolum: SiteBolumu) {
+  return ["hizmetler", "urunler", "galeri", "ekip"].includes(bolum.tur);
+}
+
+function gorselHedefiAnahtari(hedef: GorselHedefi) {
+  return `${hedef.sayfaId}-${hedef.bolumId}-${hedef.elemanId ?? hedef.alan}`;
+}
+
+function gorselOnerisiOlustur(
+  proje: ProjeVerisi,
+  sayfa: SiteSayfasi,
+  bolum: SiteBolumu,
+  eleman?: ListeElemani,
+) {
+  const konu =
+    eleman?.baslik.trim() ||
+    bolum.baslik.trim() ||
+    bolum.ustBaslik.trim() ||
+    proje.sektorAdi;
+  const projeMetni = proje.sayfalar
+    .flatMap((sayfaVerisi) =>
+      sayfaVerisi.bolumler.flatMap((bolumVerisi) => [
+        bolumVerisi.ustBaslik,
+        bolumVerisi.baslik,
+        ...bolumVerisi.listeElemanlari.map((item) => item.baslik),
+      ]),
+    )
+    .join(" ");
+  const aracKaplamaMi = /araç kaplama|cam filmi|ppf|krom karartma/i.test(
+    projeMetni,
+  );
+  const temizlikMi = proje.sektor === "temizlik";
+
+  let cekimTarifi = `${proje.sektorAdi} alanını gerçekçi biçimde anlatan profesyonel işletme fotoğrafı`;
+
+  if (aracKaplamaMi) {
+    cekimTarifi =
+      bolum.tur === "hero"
+        ? "temiz ve modern bir araç kaplama atölyesinde uygulaması tamamlanmış otomobil"
+        : eleman
+          ? `${konu} uygulamasını açıkça gösteren gerçek otomobil ve işçilik detayı`
+          : "araç kaplama filmi uygulanırken yüzey hazırlığını ve işçilik detayını gösteren gerçek çalışma anı";
+  } else if (temizlikMi) {
+    cekimTarifi = eleman
+      ? `${konu} hizmetini gösteren temiz, aydınlık ve gerçek kullanım alanı`
+      : "profesyonel temizlik çalışmasını ve temizlenmiş alanı doğal biçimde gösteren gerçek fotoğraf";
+  } else if (eleman) {
+    cekimTarifi = `${konu} hizmetini veya ürününü tek bakışta anlatan gerçek uygulama fotoğrafı`;
+  }
+
+  const kadraj = bolum.tur === "hero" ? "geniş yatay kadraj" : "yatay kadraj";
+
+  return `${proje.firmaAdi} web sitesi, ${sayfa.ad} sayfası, ${konu} için ${cekimTarifi}; ${kadraj}, doğal ışık, gerçekçi renkler, temiz kompozisyon, üzerinde yazı, logo veya filigran olmadan.`;
+}
+
 function gorselHedefleriniOlustur(
   proje: ProjeVerisi,
   sadeceBosAlanlar: boolean,
@@ -687,34 +764,53 @@ function gorselHedefleriniOlustur(
       const sayfaAdi = sayfa.ad || "Sayfa";
       const bolumEtiketi = bolum.baslik || bolumAdi(bolum.tur);
 
-      if (bolum.tur === "hero" || bolum.tur === "metin") {
+      if (arkaPlanGorseliKullanir(bolum)) {
         hedefler.push({
           sayfaId: sayfa.id,
+          sayfaAdi,
           bolumId: bolum.id,
+          bolumAdi: bolumEtiketi,
           alan: "arkaPlanGorseli",
-          etiket: `${sayfaAdi} / ${bolumEtiketi} / arka plan`,
+          etiket: `${bolumEtiketi} · Açılış arka planı`,
+          oneri: gorselOnerisiOlustur(proje, sayfa, bolum),
+          oran: "Geniş yatay · 16:9",
+          mevcutGorsel: bolum.arkaPlanGorseli,
           dolu: Boolean(bolum.arkaPlanGorseli),
         });
       }
 
-      hedefler.push({
-        sayfaId: sayfa.id,
-        bolumId: bolum.id,
-        alan: "gorsel",
-        etiket: `${sayfaAdi} / ${bolumEtiketi} / ana görsel`,
-        dolu: Boolean(bolum.gorsel),
-      });
-
-      bolum.listeElemanlari.forEach((eleman, index) => {
+      if (anaGorselKullanir(bolum)) {
         hedefler.push({
           sayfaId: sayfa.id,
+          sayfaAdi,
           bolumId: bolum.id,
-          elemanId: eleman.id,
-          alan: "listeGorseli",
-          etiket: `${sayfaAdi} / ${bolumEtiketi} / ${eleman.baslik || `${index + 1}. içerik`}`,
-          dolu: Boolean(eleman.gorsel),
+          bolumAdi: bolumEtiketi,
+          alan: "gorsel",
+          etiket: `${bolumEtiketi} · Bölüm görseli`,
+          oneri: gorselOnerisiOlustur(proje, sayfa, bolum),
+          oran: "Yatay · 4:3",
+          mevcutGorsel: bolum.gorsel,
+          dolu: Boolean(bolum.gorsel),
         });
-      });
+      }
+
+      if (listeGorseliKullanir(bolum)) {
+        bolum.listeElemanlari.forEach((eleman, index) => {
+          hedefler.push({
+            sayfaId: sayfa.id,
+            sayfaAdi,
+            bolumId: bolum.id,
+            bolumAdi: bolumEtiketi,
+            elemanId: eleman.id,
+            alan: "listeGorseli",
+            etiket: eleman.baslik || `${index + 1}. içerik`,
+            oneri: gorselOnerisiOlustur(proje, sayfa, bolum, eleman),
+            oran: bolum.tur === "galeri" ? "Yatay · 4:3" : "Yatay veya kare",
+            mevcutGorsel: eleman.gorsel,
+            dolu: Boolean(eleman.gorsel),
+          });
+        });
+      }
     });
   });
 
@@ -777,49 +873,57 @@ export default function KolayIcerikDuzenleyici() {
   const [hata, setHata] = useState("");
   const [topluIcerik, setTopluIcerik] = useState("");
   const [topluBilgi, setTopluBilgi] = useState("");
+  const [acikGorselSayfalari, setAcikGorselSayfalari] = useState<string[]>([]);
 
   useEffect(() => {
-    const kayit = localStorage.getItem("sitemix-aktif-proje");
+    const yuklemeZamanlayicisi = window.setTimeout(() => {
+      const kayit = localStorage.getItem("sitemix-aktif-proje");
 
-    if (!kayit) {
-      setYukleniyor(false);
-      return;
-    }
-
-    try {
-      const hamProje = JSON.parse(kayit) as ProjeVerisi;
-      const duzenlenmisProje = projeyiDuzenle(hamProje);
-
-      setProje(duzenlenmisProje);
-      setTopluIcerik(projeyeOzelTopluIcerikOlustur(duzenlenmisProje));
-      setTopluBilgi(
-        `${duzenlenmisProje.sektorAdi} ve ${
-          duzenlenmisProje.siteTipi === "tek-sayfa" ? "tek sayfa" : "çok sayfa"
-        } yapısı için işletme bilgileriyle hazırlandı.`,
-      );
-
-      localStorage.setItem(
-        "sitemix-aktif-proje",
-        JSON.stringify(duzenlenmisProje),
-      );
-
-      const ilkSayfa = duzenlenmisProje.sayfalar[0];
-
-      if (ilkSayfa) {
-        setSecilenSayfaId(ilkSayfa.id);
-
-        const ilkBolum = ilkSayfa.bolumler[0];
-
-        if (ilkBolum) {
-          setSecilenBolumId(ilkBolum.id);
-        }
+      if (!kayit) {
+        setYukleniyor(false);
+        return;
       }
-    } catch (error) {
-      console.error("Proje yüklenemedi:", error);
-      localStorage.removeItem("sitemix-aktif-proje");
-    } finally {
-      setYukleniyor(false);
-    }
+
+      try {
+        const hamProje = JSON.parse(kayit) as ProjeVerisi;
+        const duzenlenmisProje = projeyiDuzenle(hamProje);
+
+        setProje(duzenlenmisProje);
+        setTopluIcerik(projeyeOzelTopluIcerikOlustur(duzenlenmisProje));
+        setTopluBilgi(
+          `${duzenlenmisProje.sektorAdi} ve ${
+            duzenlenmisProje.siteTipi === "tek-sayfa"
+              ? "tek sayfa"
+              : "çok sayfa"
+          } yapısı için işletme bilgileriyle hazırlandı.`,
+        );
+
+        localStorage.setItem(
+          "sitemix-aktif-proje",
+          JSON.stringify(duzenlenmisProje),
+        );
+
+        const ilkSayfa = duzenlenmisProje.sayfalar[0];
+
+        if (ilkSayfa) {
+          setSecilenSayfaId(ilkSayfa.id);
+          setAcikGorselSayfalari([ilkSayfa.id]);
+
+          const ilkBolum = ilkSayfa.bolumler[0];
+
+          if (ilkBolum) {
+            setSecilenBolumId(ilkBolum.id);
+          }
+        }
+      } catch (error) {
+        console.error("Proje yüklenemedi:", error);
+        localStorage.removeItem("sitemix-aktif-proje");
+      } finally {
+        setYukleniyor(false);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(yuklemeZamanlayicisi);
   }, []);
 
   const secilenSayfa = useMemo(() => {
@@ -835,8 +939,58 @@ export default function KolayIcerikDuzenleyici() {
     );
   }, [secilenSayfa, secilenBolumId]);
 
+  const tumGorselHedefleri = useMemo(() => {
+    return proje ? gorselHedefleriniOlustur(proje, false) : [];
+  }, [proje]);
+
   const bosGorselHedefleri = useMemo(() => {
-    return proje ? gorselHedefleriniOlustur(proje, true) : [];
+    return tumGorselHedefleri.filter((hedef) => !hedef.dolu);
+  }, [tumGorselHedefleri]);
+
+  const sayfaGorselGruplari = useMemo(() => {
+    return tumGorselHedefleri.reduce<SayfaGorselGrubu[]>((gruplar, hedef) => {
+      const mevcutGrup = gruplar.find(
+        (grup) => grup.sayfaId === hedef.sayfaId,
+      );
+
+      if (mevcutGrup) {
+        mevcutGrup.hedefler.push(hedef);
+        return gruplar;
+      }
+
+      gruplar.push({
+        sayfaId: hedef.sayfaId,
+        sayfaAdi: hedef.sayfaAdi,
+        hedefler: [hedef],
+      });
+
+      return gruplar;
+    }, []);
+  }, [tumGorselHedefleri]);
+
+  const icerikOzeti = useMemo(() => {
+    if (!proje) {
+      return { bolum: 0, kelime: 0 };
+    }
+
+    const bolumler = proje.sayfalar.flatMap((sayfa) => sayfa.bolumler);
+    const metin = bolumler
+      .flatMap((bolum) => [
+        bolum.ustBaslik,
+        bolum.baslik,
+        bolum.aciklama,
+        ...bolum.listeElemanlari.flatMap((eleman) => [
+          eleman.baslik,
+          eleman.aciklama,
+        ]),
+      ])
+      .join(" ")
+      .trim();
+
+    return {
+      bolum: bolumler.length,
+      kelime: metin ? metin.split(/\s+/).length : 0,
+    };
   }, [proje]);
 
   const seciliBolumBosGorselHedefleri = useMemo(() => {
@@ -888,6 +1042,22 @@ export default function KolayIcerikDuzenleyici() {
       .sort((a, b) => a.sira - b.sira)[0];
 
     setSecilenBolumId(ilkBolum?.id ?? "");
+  }
+
+  function gorselSayfaGrubuDegistir(sayfaId: string, acik: boolean) {
+    setAcikGorselSayfalari((mevcutSayfalar) => {
+      const zatenAcik = mevcutSayfalar.includes(sayfaId);
+
+      if (acik && !zatenAcik) {
+        return [...mevcutSayfalar, sayfaId];
+      }
+
+      if (!acik && zatenAcik) {
+        return mevcutSayfalar.filter((id) => id !== sayfaId);
+      }
+
+      return mevcutSayfalar;
+    });
   }
 
   function bolumGuncelle<K extends keyof SiteBolumu>(
@@ -1255,7 +1425,7 @@ export default function KolayIcerikDuzenleyici() {
   async function topluGorselYukle(
     event: ChangeEvent<HTMLInputElement>,
     hedefler: GorselHedefi[],
-    yalnizSeciliBolum: boolean,
+    hedefAciklamasi: string,
   ) {
     if (!proje) {
       return;
@@ -1286,9 +1456,7 @@ export default function KolayIcerikDuzenleyici() {
       projeyiKaydet(guncelProje);
 
       setTopluBilgi(
-        yalnizSeciliBolum
-          ? `${yuklenenSayisi} görsel seçili bölüme sırayla yerleştirildi.`
-          : `${yuklenenSayisi} görsel boş alanlara sırayla yerleştirildi.`,
+        `${yuklenenSayisi} görsel ${hedefAciklamasi} sırayla yerleştirildi.`,
       );
       setHata("");
     } catch (error) {
@@ -1296,6 +1464,51 @@ export default function KolayIcerikDuzenleyici() {
     }
 
     event.target.value = "";
+  }
+
+  async function hizliGorselYukle(
+    event: ChangeEvent<HTMLInputElement>,
+    hedef: GorselHedefi,
+  ) {
+    if (!proje) {
+      return;
+    }
+
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    try {
+      const gorsel = await gorseliKucult(file);
+      projeyiKaydet(gorseliHedefeYerlestir(proje, hedef, gorsel));
+      setTopluBilgi(`${hedef.sayfaAdi} / ${hedef.etiket} güncellendi.`);
+      setHata("");
+    } catch (error) {
+      setHata(error instanceof Error ? error.message : "Görsel yüklenemedi.");
+    }
+
+    event.target.value = "";
+  }
+
+  function hizliGorselKaldir(hedef: GorselHedefi) {
+    if (!proje) {
+      return;
+    }
+
+    projeyiKaydet(gorseliHedefeYerlestir(proje, hedef, ""));
+    setTopluBilgi(`${hedef.sayfaAdi} / ${hedef.etiket} kaldırıldı.`);
+  }
+
+  async function gorselOnerisiniKopyala(hedef: GorselHedefi) {
+    try {
+      await navigator.clipboard.writeText(hedef.oneri);
+      setTopluBilgi(`${hedef.etiket} için görsel tarifi kopyalandı.`);
+      setHata("");
+    } catch {
+      setHata("Görsel tarifi panoya kopyalanamadı.");
+    }
   }
 
   if (yukleniyor) {
@@ -1378,11 +1591,48 @@ export default function KolayIcerikDuzenleyici() {
         </button>
       </section>
 
+      <section className={styles.projeOzeti}>
+        <article>
+          <Layers size={19} />
+          <div>
+            <strong>{proje.sayfalar.length}</strong>
+            <span>{proje.siteTipi === "tek-sayfa" ? "Tek sayfa" : "Sayfa"}</span>
+          </div>
+        </article>
+
+        <article>
+          <FileText size={19} />
+          <div>
+            <strong>{icerikOzeti.bolum}</strong>
+            <span>Düzenli bölüm</span>
+          </div>
+        </article>
+
+        <article>
+          <Check size={19} />
+          <div>
+            <strong>{icerikOzeti.kelime}</strong>
+            <span>İçerik kelimesi</span>
+          </div>
+        </article>
+
+        <article>
+          <Images size={19} />
+          <div>
+            <strong>
+              {tumGorselHedefleri.length - bosGorselHedefleri.length}/
+              {tumGorselHedefleri.length}
+            </strong>
+            <span>Doğru görsel alanı</span>
+          </div>
+        </article>
+      </section>
+
       <section className={styles.topluPanel}>
         <div className={styles.topluBaslik}>
           <div>
-            <span>TOPLU DOLDURMA</span>
-            <h2>İçerikleri tek tek yazmadan yerleştir</h2>
+            <span>İÇERİK MERKEZİ</span>
+            <h2>Hazır içeriği gözden geçir ve uygula</h2>
           </div>
 
           <button
@@ -1402,7 +1652,7 @@ export default function KolayIcerikDuzenleyici() {
           value={topluIcerik}
           onChange={(event) => setTopluIcerik(event.target.value)}
           placeholder="İşletmeye özel sayfa ve bölüm içerikleri burada hazırlanır. Metinleri kontrol edip doğrudan uygulayabilirsin."
-          rows={12}
+          rows={10}
         />
 
         <div className={styles.topluAksiyonlar}>
@@ -1410,44 +1660,208 @@ export default function KolayIcerikDuzenleyici() {
             <FileText size={17} />
             Toplu içeriği uygula
           </button>
-
-          <label>
-            <Upload size={17} />
-            Tüm görselleri sırayla yükle
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={(event) =>
-                topluGorselYukle(event, bosGorselHedefleri, false)
-              }
-            />
-          </label>
-        </div>
-
-        <div className={styles.gorselSiraKutusu}>
-          <strong>Boş görsel yeri: {bosGorselHedefleri.length}</strong>
-          <p>
-            Toplu görsel seçersen dosyalar aşağıdaki sıraya göre yerleşir. Önce
-            mevcut boş alanlar doldurulur, dolu görsellerin üzerine yazılmaz.
-          </p>
-
-          {bosGorselHedefleri.length > 0 && (
-            <ol>
-              {bosGorselHedefleri.slice(0, 8).map((hedef) => (
-                <li key={`${hedef.sayfaId}-${hedef.bolumId}-${hedef.elemanId ?? hedef.alan}`}>
-                  {hedef.etiket}
-                </li>
-              ))}
-
-              {bosGorselHedefleri.length > 8 && (
-                <li>+{bosGorselHedefleri.length - 8} görsel alanı daha</li>
-              )}
-            </ol>
-          )}
         </div>
 
         {topluBilgi && <p className={styles.topluBilgi}>{topluBilgi}</p>}
+      </section>
+
+      <section className={styles.hizliGorselPaneli}>
+        <div className={styles.hizliGorselBasligi}>
+          <div>
+            <span>HIZLI GÖRSEL PLANI</span>
+            <h2>Doğru görseli doğru yere ekle</h2>
+            <p>
+              Plan; seçtiğin tek veya çok sayfa yapısına, mevcut bölüm ve
+              hizmet başlıklarına göre hazırlandı. Dosyalarını aşağıdaki
+              sırayla seçmen yeterli.
+            </p>
+          </div>
+
+          <div className={styles.gorselIlerleme}>
+            <strong>
+              {tumGorselHedefleri.length - bosGorselHedefleri.length}/
+              {tumGorselHedefleri.length}
+            </strong>
+            <span>görsel hazır</span>
+          </div>
+        </div>
+
+        <div className={styles.hizliGorselAksiyonlari}>
+          {bosGorselHedefleri.length > 0 ? (
+            <label>
+              <Upload size={17} />
+              Yalnızca boşları sırayla doldur
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={(event) =>
+                  topluGorselYukle(
+                    event,
+                    bosGorselHedefleri,
+                    "boş görsel alanlarına",
+                  )
+                }
+              />
+            </label>
+          ) : (
+            <span className={styles.gorsellerTamam}>
+              <Check size={16} />
+              Bütün görsel alanları dolu
+            </span>
+          )}
+
+          {tumGorselHedefleri.length > 0 && (
+            <label className={styles.ikincilGorselAksiyonu}>
+              <Images size={17} />
+              Tümünü baştan sırayla değiştir
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={(event) =>
+                  topluGorselYukle(
+                    event,
+                    tumGorselHedefleri,
+                    "bütün görsel alanlarına",
+                  )
+                }
+              />
+            </label>
+          )}
+        </div>
+
+        <p className={styles.dosyaSirasiNotu}>
+          Hızlı toplu yükleme için dosyaları 01, 02, 03 şeklinde adlandır;
+          ekrandaki numaralarla aynı sıraya yerleşir.
+        </p>
+
+        <div className={styles.gorselSayfaGruplari}>
+          {sayfaGorselGruplari.map((grup, grupIndex) => {
+            const bosHedefler = grup.hedefler.filter((hedef) => !hedef.dolu);
+
+            return (
+              <details
+                key={grup.sayfaId}
+                className={styles.gorselSayfaGrubu}
+                open={acikGorselSayfalari.includes(grup.sayfaId)}
+                onToggle={(event) =>
+                  gorselSayfaGrubuDegistir(
+                    grup.sayfaId,
+                    event.currentTarget.open,
+                  )
+                }
+              >
+                <summary>
+                  <div>
+                    <span>{String(grupIndex + 1).padStart(2, "0")}</span>
+                    <strong>{grup.sayfaAdi}</strong>
+                  </div>
+
+                  <small>
+                    {grup.hedefler.length - bosHedefler.length}/
+                    {grup.hedefler.length} hazır
+                  </small>
+                </summary>
+
+                <div className={styles.sayfaGorselAksiyonlari}>
+                  {bosHedefler.length > 0 && (
+                    <label>
+                      <Upload size={15} />
+                      Bu sayfanın boşlarını doldur
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={(event) =>
+                          topluGorselYukle(
+                            event,
+                            bosHedefler,
+                            `${grup.sayfaAdi} sayfasına`,
+                          )
+                        }
+                      />
+                    </label>
+                  )}
+
+                  <label>
+                    <Images size={15} />
+                    Sayfadaki görselleri değiştir
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(event) =>
+                        topluGorselYukle(
+                          event,
+                          grup.hedefler,
+                          `${grup.sayfaAdi} sayfasına`,
+                        )
+                      }
+                    />
+                  </label>
+                </div>
+
+                <div className={styles.gorselKartlari}>
+                  {grup.hedefler.map((hedef, hedefIndex) => (
+                    <article
+                      key={gorselHedefiAnahtari(hedef)}
+                      className={styles.gorselKarti}
+                    >
+                      <div className={styles.gorselOnizleme}>
+                        {hedef.mevcutGorsel ? (
+                          <img src={hedef.mevcutGorsel} alt={hedef.etiket} />
+                        ) : (
+                          <FileImage size={30} />
+                        )}
+
+                        <span>{String(hedefIndex + 1).padStart(2, "0")}</span>
+                      </div>
+
+                      <div className={styles.gorselKartiIcerik}>
+                        <small>{hedef.bolumAdi}</small>
+                        <strong>{hedef.etiket}</strong>
+                        <em>{hedef.oran}</em>
+                        <p>{hedef.oneri}</p>
+                      </div>
+
+                      <div className={styles.gorselKartiAksiyonlari}>
+                        <label>
+                          <Upload size={15} />
+                          {hedef.dolu ? "Değiştir" : "Yükle"}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(event) => hizliGorselYukle(event, hedef)}
+                          />
+                        </label>
+
+                        <button
+                          type="button"
+                          onClick={() => gorselOnerisiniKopyala(hedef)}
+                        >
+                          <Copy size={15} />
+                          Tarifi kopyala
+                        </button>
+
+                        {hedef.dolu && (
+                          <button
+                            type="button"
+                            className={styles.gorselKaldirButonu}
+                            onClick={() => hizliGorselKaldir(hedef)}
+                          >
+                            <Trash2 size={15} />
+                            Kaldır
+                          </button>
+                        )}
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </details>
+            );
+          })}
+        </div>
       </section>
 
       <section className={styles.editorAlani}>
@@ -1547,22 +1961,24 @@ export default function KolayIcerikDuzenleyici() {
                   Aşağı
                 </button>
 
-                <label className={styles.bolumTopluGorselButonu}>
-                  <Upload size={16} />
-                  Bu bölümün görselleri
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={(event) =>
-                      topluGorselYukle(
-                        event,
-                        seciliBolumBosGorselHedefleri,
-                        true,
-                      )
-                    }
-                  />
-                </label>
+                {seciliBolumBosGorselHedefleri.length > 0 && (
+                  <label className={styles.bolumTopluGorselButonu}>
+                    <Upload size={16} />
+                    Bu bölümün görselleri
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(event) =>
+                        topluGorselYukle(
+                          event,
+                          seciliBolumBosGorselHedefleri,
+                          "seçili bölüme",
+                        )
+                      }
+                    />
+                  </label>
+                )}
 
                 <button
                   type="button"
@@ -1608,42 +2024,47 @@ export default function KolayIcerikDuzenleyici() {
                 />
               </div>
 
-              <div className={styles.gorselBolumu}>
-                <div className={styles.gorselBasligi}>
-                  <div>
-                    <ImagePlus size={18} />
-                    <strong>Ana görsel</strong>
+              {anaGorselKullanir(secilenBolum) && (
+                <div className={styles.gorselBolumu}>
+                  <div className={styles.gorselBasligi}>
+                    <div>
+                      <ImagePlus size={18} />
+                      <strong>Bölüm görseli</strong>
+                    </div>
+
+                    {secilenBolum.gorsel && (
+                      <button
+                        type="button"
+                        onClick={() => bolumGuncelle("gorsel", "")}
+                      >
+                        Kaldır
+                      </button>
+                    )}
                   </div>
 
-                  {secilenBolum.gorsel && (
-                    <button type="button" onClick={() => bolumGuncelle("gorsel", "")}> 
-                      Kaldır
-                    </button>
+                  {secilenBolum.gorsel ? (
+                    <img
+                      src={secilenBolum.gorsel}
+                      alt=""
+                      className={styles.yuklenenGorsel}
+                    />
+                  ) : (
+                    <label className={styles.gorselYukle}>
+                      <Upload size={24} />
+                      <span>Bu bölüme görsel yükleyin</span>
+                      <small>Önerilen yatay görsel · JPG, PNG veya WEBP</small>
+
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(event) => anaGorselYukle(event, "gorsel")}
+                      />
+                    </label>
                   )}
                 </div>
+              )}
 
-                {secilenBolum.gorsel ? (
-                  <img
-                    src={secilenBolum.gorsel}
-                    alt=""
-                    className={styles.yuklenenGorsel}
-                  />
-                ) : (
-                  <label className={styles.gorselYukle}>
-                    <Upload size={24} />
-                    <span>Görsel yükleyin</span>
-                    <small>JPG, PNG veya WEBP</small>
-
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(event) => anaGorselYukle(event, "gorsel")}
-                    />
-                  </label>
-                )}
-              </div>
-
-              {(secilenBolum.tur === "hero" || secilenBolum.tur === "metin") && (
+              {arkaPlanGorseliKullanir(secilenBolum) && (
                 <div className={styles.gorselBolumu}>
                   <div className={styles.gorselBasligi}>
                     <div>
@@ -1670,7 +2091,8 @@ export default function KolayIcerikDuzenleyici() {
                   ) : (
                     <label className={styles.gorselYukle}>
                       <Upload size={24} />
-                      <span>Arka plan yükleyin</span>
+                      <span>Açılış arka planını yükleyin</span>
+                      <small>Önerilen geniş yatay görsel · 16:9</small>
 
                       <input
                         type="file"
@@ -1818,7 +2240,8 @@ export default function KolayIcerikDuzenleyici() {
                         placeholder="Bağlantı — isteğe bağlı"
                       />
 
-                      {eleman.gorsel ? (
+                      {listeGorseliKullanir(secilenBolum) &&
+                      (eleman.gorsel ? (
                         <div className={styles.elemanGorselAlani}>
                           <img src={eleman.gorsel} alt="" />
 
@@ -1842,7 +2265,7 @@ export default function KolayIcerikDuzenleyici() {
                             onChange={(event) => listeGorseliYukle(event, eleman.id)}
                           />
                         </label>
-                      )}
+                      ))}
                     </article>
                   ))}
                 </div>

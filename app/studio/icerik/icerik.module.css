@@ -113,6 +113,45 @@
   border-color: #1e4d3a;
 }
 
+.projeOzeti {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 24px;
+  padding: 1px;
+  background: rgba(17, 23, 19, 0.18);
+}
+
+.projeOzeti article {
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 17px;
+  background: #f4f1e9;
+}
+
+.projeOzeti article > svg {
+  flex: 0 0 auto;
+  color: #1e4d3a;
+}
+
+.projeOzeti strong,
+.projeOzeti span {
+  display: block;
+}
+
+.projeOzeti strong {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.projeOzeti span {
+  margin-top: 7px;
+  color: #737a75;
+  font-size: 10px;
+}
+
 .topluPanel {
   margin-top: 34px;
   padding: 24px;
@@ -236,6 +275,311 @@
   color: #1e4d3a;
   font-size: 12px;
   font-weight: 700;
+}
+
+.hizliGorselPaneli {
+  margin-top: 20px;
+  padding: 28px;
+  background: #13271e;
+  color: #f7f4ec;
+}
+
+.hizliGorselBasligi {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 35px;
+}
+
+.hizliGorselBasligi > div:first-child {
+  max-width: 760px;
+}
+
+.hizliGorselBasligi span {
+  display: block;
+  color: #9ec3ae;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+}
+
+.hizliGorselBasligi h2 {
+  margin: 10px 0 0;
+  font-size: clamp(28px, 3.2vw, 46px);
+  line-height: 1;
+  letter-spacing: -0.055em;
+}
+
+.hizliGorselBasligi p {
+  max-width: 690px;
+  margin: 15px 0 0;
+  color: rgba(247, 244, 236, 0.68);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.gorselIlerleme {
+  min-width: 126px;
+  padding: 16px;
+  border: 1px solid rgba(247, 244, 236, 0.23);
+  text-align: right;
+}
+
+.gorselIlerleme strong,
+.gorselIlerleme span {
+  display: block;
+}
+
+.gorselIlerleme strong {
+  font-size: 24px;
+  letter-spacing: -0.04em;
+}
+
+.gorselIlerleme span {
+  margin-top: 7px;
+  color: rgba(247, 244, 236, 0.6);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+
+.hizliGorselAksiyonlari,
+.sayfaGorselAksiyonlari {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.hizliGorselAksiyonlari {
+  margin-top: 22px;
+}
+
+.hizliGorselAksiyonlari label,
+.sayfaGorselAksiyonlari label,
+.gorsellerTamam {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 1px solid #f7f4ec;
+  background: #f7f4ec;
+  color: #13271e;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.hizliGorselAksiyonlari input,
+.sayfaGorselAksiyonlari input,
+.gorselKartiAksiyonlari input {
+  display: none;
+}
+
+.hizliGorselAksiyonlari .ikincilGorselAksiyonu {
+  border-color: rgba(247, 244, 236, 0.35);
+  background: transparent;
+  color: #f7f4ec;
+}
+
+.gorsellerTamam {
+  border-color: #9ec3ae;
+  background: transparent;
+  color: #bfe2ce;
+  cursor: default;
+}
+
+.dosyaSirasiNotu {
+  margin: 12px 0 0;
+  color: rgba(247, 244, 236, 0.58);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.gorselSayfaGruplari {
+  display: grid;
+  gap: 10px;
+  margin-top: 27px;
+}
+
+.gorselSayfaGrubu {
+  border: 1px solid rgba(247, 244, 236, 0.2);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.gorselSayfaGrubu summary {
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 13px 16px;
+  list-style: none;
+  cursor: pointer;
+}
+
+.gorselSayfaGrubu summary::-webkit-details-marker {
+  display: none;
+}
+
+.gorselSayfaGrubu summary > div {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.gorselSayfaGrubu summary span {
+  color: #9ec3ae;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.gorselSayfaGrubu summary strong {
+  font-size: 13px;
+}
+
+.gorselSayfaGrubu summary small {
+  color: rgba(247, 244, 236, 0.58);
+  font-size: 10px;
+}
+
+.sayfaGorselAksiyonlari {
+  padding: 13px 16px;
+  border-top: 1px solid rgba(247, 244, 236, 0.16);
+}
+
+.sayfaGorselAksiyonlari label {
+  min-height: 36px;
+  border-color: rgba(247, 244, 236, 0.3);
+  background: transparent;
+  color: #f7f4ec;
+}
+
+.gorselKartlari {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(265px, 1fr));
+  gap: 1px;
+  padding: 1px;
+  background: rgba(247, 244, 236, 0.15);
+}
+
+.gorselKarti {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: #f4f1e9;
+  color: #111713;
+}
+
+.gorselOnizleme {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #dfe2da;
+  color: #6d766f;
+}
+
+.gorselOnizleme img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.gorselOnizleme > span {
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  min-width: 30px;
+  min-height: 26px;
+  display: grid;
+  place-items: center;
+  background: rgba(17, 23, 19, 0.88);
+  color: white;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.gorselKartiIcerik {
+  flex: 1;
+  padding: 15px;
+}
+
+.gorselKartiIcerik small,
+.gorselKartiIcerik strong,
+.gorselKartiIcerik em {
+  display: block;
+}
+
+.gorselKartiIcerik small {
+  overflow: hidden;
+  color: #1e4d3a;
+  font-size: 9px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gorselKartiIcerik strong {
+  margin-top: 7px;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.gorselKartiIcerik em {
+  margin-top: 8px;
+  color: #737a75;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.gorselKartiIcerik p {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 12px 0 0;
+  color: #626a64;
+  font-size: 10px;
+  line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
+
+.gorselKartiAksiyonlari {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  padding-top: 1px;
+  background: rgba(17, 23, 19, 0.13);
+}
+
+.gorselKartiAksiyonlari label,
+.gorselKartiAksiyonlari button {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 9px;
+  border: 0;
+  background: #ebe9e1;
+  color: #172019;
+  font-size: 9px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.gorselKartiAksiyonlari label:hover,
+.gorselKartiAksiyonlari button:hover {
+  background: white;
+  color: #1e4d3a;
+}
+
+.gorselKartiAksiyonlari .gorselKaldirButonu {
+  grid-column: 1 / -1;
+  color: #a62d27;
 }
 
 .editorAlani {
@@ -720,6 +1064,10 @@
 }
 
 @media (max-width: 1150px) {
+  .projeOzeti {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .editorAlani {
     grid-template-columns: 220px minmax(0, 1fr);
   }
@@ -731,7 +1079,8 @@
 
 @media (max-width: 800px) {
   .baslikAlani,
-  .topluBaslik {
+  .topluBaslik,
+  .hizliGorselBasligi {
     align-items: stretch;
     flex-direction: column;
   }
@@ -739,6 +1088,11 @@
   .onizlemeButonu,
   .topluBaslik button {
     width: 100%;
+  }
+
+  .gorselIlerleme {
+    width: 100%;
+    text-align: left;
   }
 
   .editorAlani {
@@ -798,13 +1152,30 @@
     padding: 18px;
   }
 
+  .hizliGorselPaneli {
+    padding: 20px;
+  }
+
+  .projeOzeti article {
+    min-height: 78px;
+    padding: 13px;
+  }
+
   .editorAlani {
     padding-top: 32px;
   }
 
   .siraIslemleri,
-  .topluAksiyonlar {
+  .topluAksiyonlar,
+  .hizliGorselAksiyonlari,
+  .sayfaGorselAksiyonlari {
     flex-wrap: wrap;
+  }
+
+  .hizliGorselAksiyonlari label,
+  .hizliGorselAksiyonlari .gorsellerTamam,
+  .sayfaGorselAksiyonlari label {
+    width: 100%;
   }
 
   .silButonu {

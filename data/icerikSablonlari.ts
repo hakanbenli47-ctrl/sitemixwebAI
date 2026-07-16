@@ -1,4 +1,8 @@
 import { sektorler } from "@/data/sektorler";
+import {
+  hizmetDetayiniGetir,
+  sektorIcerikProfiliniGetir,
+} from "@/data/sektorIcerikProfilleri";
 import type {
   ButonVerisi,
   ListeElemani,
@@ -295,6 +299,37 @@ function anaSayfaButonlari(proje: ProjeVerisi): HazirButon[] {
   return butonlar.slice(0, 2);
 }
 
+function iletisimButonlari(proje: ProjeVerisi): HazirButon[] {
+  const butonlar: HazirButon[] = [];
+  const telefon = telefonNumarasi(proje.telefon);
+  const whatsapp = whatsappNumarasi(proje.whatsapp);
+
+  if (telefon) {
+    butonlar.push({
+      metin: proje.telefon.trim()
+        ? `Telefon: ${proje.telefon.trim()}`
+        : "Telefonla arayın",
+      baglanti: `tel:${telefon}`,
+    });
+  }
+
+  if (whatsapp) {
+    butonlar.push({
+      metin: "WhatsApp’tan yazın",
+      baglanti: `https://wa.me/${whatsapp}`,
+    });
+  }
+
+  if (proje.eposta.trim()) {
+    butonlar.push({
+      metin: "E-posta gönderin",
+      baglanti: `mailto:${proje.eposta.trim()}`,
+    });
+  }
+
+  return butonlar;
+}
+
 function temizlikIcerigi(
   proje: ProjeVerisi,
   sayfa: SiteSayfasi,
@@ -472,7 +507,7 @@ function temizlikIcerigi(
       aciklama: anaSayfaMi
         ? "Temizlik türünü, yaklaşık alanı, konumu ve uygun olduğunuz zamanı paylaşın; kapsam ve uygunluk hakkında size bilgi verelim."
         : `Temizlik türünü, yaklaşık alanı, bulunduğunuz konumu ve tercih ettiğiniz zamanı paylaşın. ${proje.firmaAdi} olarak talebinizi inceleyip hizmet kapsamı ve uygunluk hakkında size bilgi verelim.`,
-      butonlar: [],
+      butonlar: iletisimButonlari(proje),
     };
   }
 
@@ -504,67 +539,205 @@ function genelIcerik(
   const ton = kategoriTonunuGetir(proje);
   const bolge = hizmetBolgesiMetni(proje);
   const anaSayfaMi = sayfa.anaSayfa || !String(sayfa.slug ?? "").trim();
+  const sayfaAnahtari = metniKucult(sayfa.slug || sayfa.ad);
+  const mevcutIcerik = proje.sayfalar
+    .flatMap((sayfaVerisi) =>
+      sayfaVerisi.bolumler.flatMap((bolumVerisi) => [
+        bolumVerisi.ustBaslik,
+        bolumVerisi.baslik,
+        bolumVerisi.aciklama,
+        ...bolumVerisi.listeElemanlari.map((eleman) => eleman.baslik),
+      ]),
+    )
+    .join(" ");
+  const profil = sektorIcerikProfiliniGetir(proje.sektor, mevcutIcerik);
+  const yerMetni = bolge ? `${bolge} ve çevresinde` : "hizmet bölgenizde";
 
   if (bolum.tur === "hero" && anaSayfaMi) {
     return {
       ustBaslik: bolge ? `${proje.sektorAdi} · ${bolge}` : proje.sektorAdi,
-      baslik: ton.anaBaslik,
-      aciklama: `${proje.firmaAdi}${bolge ? `, ${bolge} bölgesinde` : ""}. ${ton.anaAciklama}`,
+      baslik: profil.heroBaslik || ton.anaBaslik,
+      aciklama: `${proje.firmaAdi}, ${yerMetni} hizmet verir. ${profil.odakMetni}`,
       butonlar: anaSayfaButonlari(proje),
+    };
+  }
+
+  if (bolum.tur === "hero") {
+    if (sayfaAnahtari.includes("hakk")) {
+      return {
+        ustBaslik: "Hakkımızda",
+        baslik: profil.yaklasimBaslik,
+        aciklama: profil.detayliYaklasim,
+      };
+    }
+
+    if (
+      ["hizmet", "menu", "urun", "ilan", "oda"].some((anahtar) =>
+        sayfaAnahtari.includes(anahtar),
+      )
+    ) {
+      return {
+        ustBaslik: bolum.ustBaslik || sayfa.ad,
+        baslik:
+          bolum.baslik && !bolum.baslik.includes(proje.firmaAdi)
+            ? bolum.baslik
+            : `${proje.sektorAdi} seçeneklerini ayrıntılı inceleyin`,
+        aciklama: `${profil.kararOlcutleri} Aşağıdaki seçenekleri inceleyerek ihtiyacınıza en yakın hizmet hakkında bilgi alabilirsiniz.`,
+      };
+    }
+
+    if (sayfaAnahtari.includes("galeri") || sayfaAnahtari.includes("proje")) {
+      return {
+        ustBaslik: "Çalışmalarımız",
+        baslik: "Uygulama ve hizmet ayrıntılarını yakından inceleyin",
+        aciklama: `${proje.firmaAdi} tarafından sunulan hizmetlerin çalışma biçimini, öne çıkan detaylarını ve farklı ihtiyaçlara nasıl uyarlandığını görseller üzerinden inceleyin.`,
+      };
+    }
+
+    return {
+      ustBaslik: bolum.ustBaslik || sayfa.ad,
+      baslik: bolum.baslik || profil.heroBaslik,
+      aciklama: bolum.aciklama || profil.odakMetni,
     };
   }
 
   if (bolum.tur === "metin") {
     return {
-      ustBaslik: "Hakkımızda",
-      baslik: ton.hakkimizdaBaslik,
-      aciklama: `${proje.firmaAdi} olarak ${ton.hakkimizdaMetni.charAt(0).toLocaleLowerCase("tr-TR")}${ton.hakkimizdaMetni.slice(1)}${bolge ? ` ${bolge} ve çevresindeki taleplere kolay iletişimle yanıt veriyoruz.` : ""}`,
-      butonlar:
-        anaSayfaMi && proje.siteTipi === "cok-sayfa"
+      ustBaslik: anaSayfaMi ? "Çalışma yaklaşımımız" : "Nasıl çalışıyoruz?",
+      baslik: profil.yaklasimBaslik || ton.hakkimizdaBaslik,
+      aciklama: anaSayfaMi
+        ? `${profil.kisaYaklasim} ${proje.firmaAdi}, ${yerMetni} taleplere düzenli iletişimle yanıt verir.`
+        : profil.detayliYaklasim,
+      butonlar: anaSayfaMi
+        ? proje.siteTipi === "cok-sayfa"
           ? [{ metin: "Bizi daha yakından tanıyın", baglanti: "/hakkimizda" }]
-          : [],
+          : []
+        : [{ metin: "Hizmetleri inceleyin", baglanti: hizmetHedefi(proje) }],
     };
   }
 
   if (bolum.tur === "hizmetler" || bolum.tur === "urunler") {
     return {
       ustBaslik: bolum.tur === "urunler" ? bolum.ustBaslik : "Hizmetler",
-      baslik: bolum.baslik || `${proje.firmaAdi} hizmetleri`,
-      aciklama: ton.hizmetAciklamasi,
+      baslik: anaSayfaMi
+        ? "İhtiyacınıza uygun seçenekleri keşfedin"
+        : bolum.baslik || `${proje.firmaAdi} hizmetleri`,
+      aciklama: anaSayfaMi
+        ? `${profil.kararOlcutleri} Temel hizmetleri inceleyin; ayrıntılı kapsam için kısa bilgi paylaşmanız yeterlidir.`
+        : `${profil.kararOlcutleri} Her seçeneğin kapsamı mevcut durum ve beklentiye göre netleştirilir; başlamadan önce süreç hakkında açık bilgi verilir.`,
       listeElemanlari: bolum.listeElemanlari.map((eleman) => ({
         baslik: eleman.baslik,
-        aciklama: `${eleman.baslik} için ${ton.hizmetDetayi.charAt(0).toLocaleLowerCase("tr-TR")}${ton.hizmetDetayi.slice(1)}`,
+        aciklama: hizmetDetayiniGetir(profil, eleman.baslik, !anaSayfaMi),
         baglanti: eleman.baglanti,
       })),
-      butonlar: [{ metin: "Bilgi ve uygunluk alın", baglanti: iletisimHedefi(proje) }],
+      butonlar: anaSayfaMi && proje.siteTipi === "cok-sayfa"
+        ? [{ metin: "Tüm hizmetleri inceleyin", baglanti: hizmetHedefi(proje) }]
+        : [{ metin: profil.ctaMetni, baglanti: iletisimHedefi(proje) }],
     };
   }
 
   if (bolum.tur === "neden-biz") {
     return {
-      ustBaslik: bolum.ustBaslik || "Neden biz?",
-      baslik: bolum.baslik || "Açık iletişim, düzenli süreç, ihtiyaca uygun yaklaşım",
-      aciklama:
-        bolum.aciklama || "İhtiyacı doğru anlamaya ve sürecin her adımını açık biçimde paylaşmaya önem veriyoruz.",
+      ustBaslik: anaSayfaMi ? "Neden bizi tercih etmelisiniz?" : "Çalışma ilkelerimiz",
+      baslik: anaSayfaMi
+        ? "Karar vermenizi kolaylaştıran açık ve düzenli süreç"
+        : "İhtiyacı doğru anlayan, ayrıntıları baştan netleştiren yaklaşım",
+      aciklama: "Güvenin yalnızca sonuçla değil; doğru bilgilendirme, açık kapsam ve süreç boyunca ulaşılabilir olmakla kurulduğuna inanıyoruz.",
+      listeElemanlari: [
+        {
+          baslik: "Doğru ön değerlendirme",
+          aciklama: profil.kararOlcutleri,
+          baglanti: "",
+        },
+        {
+          baslik: "Açık ve planlı süreç",
+          aciklama: profil.kisaYaklasim,
+          baglanti: "",
+        },
+        {
+          baslik: "Kontrollü tamamlama",
+          aciklama: profil.sonKontrol,
+          baglanti: "",
+        },
+        {
+          baslik: "Kolay iletişim",
+          aciklama: profil.iletisimIstegi,
+          baglanti: "",
+        },
+      ],
     };
   }
 
   if (bolum.tur === "galeri") {
     return {
-      ustBaslik: bolum.ustBaslik || "Galeri",
-      baslik: bolum.baslik || "Çalışmalarımızdan görüntüler",
-      aciklama:
-        bolum.aciklama || `${proje.firmaAdi} tarafından sunulan hizmetlerden öne çıkan ayrıntıları inceleyin.`,
-      butonlar: [{ metin: "Detaylı bilgi alın", baglanti: iletisimHedefi(proje) }],
+      ustBaslik: anaSayfaMi ? "Öne çıkan çalışmalar" : "Uygulama galerisi",
+      baslik: anaSayfaMi
+        ? "Hizmetlerimizi gerçek ayrıntılarıyla inceleyin"
+        : "Farklı ihtiyaçlar için çalışma örnekleri",
+      aciklama: anaSayfaMi
+        ? `${proje.firmaAdi} hizmetlerinin çalışma yaklaşımını ve öne çıkan ayrıntılarını görseller üzerinden keşfedin.`
+        : "Görselleri yalnızca sonuç olarak değil, hizmetin kapsamını ve uygulama detaylarını anlamanıza yardımcı olacak örnekler olarak inceleyebilirsiniz.",
+      listeElemanlari: bolum.listeElemanlari.map((eleman) => ({
+        baslik: eleman.baslik,
+        aciklama: `${hizmetDetayiniGetir(profil, eleman.baslik, false)} Çalışmadan öne çıkan ayrıntı.`,
+        baglanti: eleman.baglanti,
+      })),
+      butonlar: anaSayfaMi && proje.siteTipi === "cok-sayfa"
+        ? [{ metin: "Tüm çalışmaları inceleyin", baglanti: "/galeri" }]
+        : [{ metin: profil.ctaMetni, baglanti: iletisimHedefi(proje) }],
     };
   }
 
   if (bolum.tur === "iletisim") {
     return {
-      ustBaslik: "İletişim",
-      baslik: `${proje.firmaAdi} ile iletişime geçin`,
-      aciklama: `İhtiyacınızı ve bulunduğunuz konumu paylaşın; hizmet kapsamı, uygunluk ve sonraki adımlar hakkında size bilgi verelim.`,
-      butonlar: [],
+      ustBaslik: anaSayfaMi ? "Bilgi ve planlama" : "İletişim",
+      baslik: anaSayfaMi ? profil.ctaMetni : `${proje.firmaAdi} ile iletişime geçin`,
+      aciklama: `${profil.iletisimIstegi} Telefon veya WhatsApp üzerinden kısa bilgi paylaşarak hizmet kapsamını kolayca netleştirebilirsiniz.`,
+      butonlar: iletisimButonlari(proje),
+    };
+  }
+
+  if (bolum.tur === "harita") {
+    return {
+      ustBaslik: "Konum ve hizmet bölgesi",
+      baslik: bolge ? `${bolge} bölgesinde hizmet` : "Bizi nerede bulabilirsiniz?",
+      aciklama: proje.adres
+        ? `${proje.adres}. Ziyaret veya hizmet uygunluğu için gelmeden önce telefon ya da WhatsApp üzerinden kısa bilgi alabilirsiniz.`
+        : `${yerMetni} hizmet veriyoruz. Konum ve uygunluk bilgisi için bize ulaşabilirsiniz.`,
+    };
+  }
+
+  if (bolum.tur === "form") {
+    const randevuSayfasiMi =
+      sayfaAnahtari.includes("randevu") ||
+      sayfaAnahtari.includes("rezervasyon");
+
+    return {
+      ustBaslik: randevuSayfasiMi ? "Talep oluşturun" : "Kısa bilgi bırakın",
+      baslik: randevuSayfasiMi
+        ? profil.ctaMetni
+        : "İhtiyacınızı birkaç bilgiyle anlatın",
+      aciklama: `${profil.iletisimIstegi} İletişim bilgilerinizi bıraktığınızda uygunluk ve sonraki adımlar hakkında dönüş yapılabilir.`,
+    };
+  }
+
+  if (bolum.tur === "ekip") {
+    return {
+      ustBaslik: "Ekip yaklaşımı ve sorumluluklar",
+      baslik: "Değerlendirmeden takibe düzenli ekip çalışması",
+      aciklama: "Her başvurunun doğru anlaşılması, uygun hizmet planının oluşturulması ve gerekli takip adımlarının açıklanması için görevler belirli bir sorumluluk düzeniyle yürütülür.",
+      listeElemanlari: [
+        {
+          baslik: "Değerlendirme ve planlama",
+          aciklama: `${profil.kararOlcutleri} Başvuru bilgileri değerlendirilerek uygun hizmet ve sonraki adımlar açıklanır.`,
+          baglanti: "",
+        },
+        {
+          baslik: "Uygulama ve takip",
+          aciklama: `${profil.sonKontrol} Süreçle ilgili sorular için iletişim kanalları açık tutulur.`,
+          baglanti: "",
+        },
+      ],
     };
   }
 
@@ -603,6 +776,40 @@ function satirEkle(satirlar: string[], etiket: string, deger: string) {
   if (temizDeger) {
     satirlar.push(`${etiket}: ${temizDeger}`);
   }
+}
+
+export function projeyeOzelIcerigiUygula(proje: ProjeVerisi): ProjeVerisi {
+  return {
+    ...proje,
+    sayfalar: proje.sayfalar.map((sayfa) => ({
+      ...sayfa,
+      bolumler: sayfa.bolumler.map((bolum) => {
+        const icerik = hazirBolumIcerigiOlustur(proje, sayfa, bolum);
+
+        return {
+          ...bolum,
+          ustBaslik: icerik.ustBaslik,
+          baslik: icerik.baslik,
+          aciklama: icerik.aciklama,
+          butonlar: icerik.butonlar.map((buton, index) => ({
+            id: bolum.butonlar[index]?.id ?? `${bolum.id}-buton-${index + 1}`,
+            metin: buton.metin,
+            baglanti: buton.baglanti,
+          })),
+          listeElemanlari: icerik.listeElemanlari.map((eleman, index) => ({
+            id:
+              bolum.listeElemanlari[index]?.id ??
+              `${bolum.id}-icerik-${index + 1}`,
+            baslik: eleman.baslik,
+            aciklama: eleman.aciklama,
+            baglanti: eleman.baglanti,
+            gorsel: bolum.listeElemanlari[index]?.gorsel ?? "",
+          })),
+        };
+      }),
+    })),
+    guncellenmeTarihi: new Date().toISOString(),
+  };
 }
 
 export function projeyeOzelTopluIcerikOlustur(proje: ProjeVerisi) {

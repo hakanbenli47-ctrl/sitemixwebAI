@@ -14,6 +14,7 @@ import {
   Phone,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { projeyeOzelIcerigiUygula } from "@/data/icerikSablonlari";
 import { sektorler } from "@/data/sektorler";
 import { sektorSayfalariOlustur } from "@/data/sektorSablonlari";
 import type { ProjeVerisi } from "@/types/proje";
@@ -212,7 +213,8 @@ export default function YeniProjeSayfasi() {
         guncellenmeTarihi: tarih,
       };
 
-      let kaydedilecekProje = temelProje;
+      const icerikliProje = projeyeOzelIcerigiUygula(temelProje);
+      let kaydedilecekProje = icerikliProje;
 
       try {
         const cevap = await fetch("/api/studio/otomatik-olustur", {
@@ -221,8 +223,8 @@ export default function YeniProjeSayfasi() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            proje: temelProje,
-            yalnizcaEksikleriDoldur: false,
+            proje: icerikliProje,
+            yalnizcaEksikleriDoldur: true,
           }),
         });
 

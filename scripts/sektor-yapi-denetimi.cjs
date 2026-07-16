@@ -455,6 +455,10 @@ const siteCss = fs.readFileSync(
   path.join(kok, "components/site/siteGorunumu.module.css"),
   "utf8",
 );
+const sektorSemaCss = fs.readFileSync(
+  path.join(kok, "components/site/sektorSemalari.module.css"),
+  "utf8",
+);
 const temaSecimCss = fs.readFileSync(
   path.join(kok, "app/studio/tema/tema.module.css"),
   "utf8",
@@ -547,6 +551,38 @@ for (const gerekliSinif of [
   }
 }
 
+for (const semantikRenk of [
+  "--site-panel-yazi",
+  "--site-ters-zemin",
+  "--site-ters-yazi",
+  "--site-vurgu-zemin",
+  "--site-vurgu-yazi",
+]) {
+  if (!siteCss.includes(semantikRenk)) {
+    sorunlar.push(`semantik kontrast rengi eksik: ${semantikRenk}`);
+  }
+}
+
+for (const sektor of sektorler.sektorler) {
+  if (!sektorSemaCss.includes(`[data-sektor="${sektor.id}"]`)) {
+    sorunlar.push(`${sektor.id}: sektöre özel sayfa şeması bulunamadı`);
+  }
+}
+
+for (const semaParcasi of [
+  "data-site-alani=\"hero\"",
+  "data-site-parcasi=\"hero-metin\"",
+  "data-site-parcasi=\"hero-gorsel\"",
+  "data-site-parcasi=\"liste\"",
+  "data-site-parcasi=\"kart\"",
+  "data-site-parcasi=\"galeri\"",
+  "data-site-parcasi=\"bolum-sahnesi\"",
+]) {
+  if (!siteBileseni.includes(semaParcasi)) {
+    sorunlar.push(`sektör şeması bağlantısı eksik: ${semaParcasi}`);
+  }
+}
+
 for (const veriNiteligi of [
   "data-tasarim-aile",
   "data-tasarim-duzen",
@@ -555,6 +591,7 @@ for (const veriNiteligi of [
   "data-gorsel-orani",
   "data-bolum-turu",
   "data-ana-sayfa",
+  "data-sektor",
 ]) {
   if (!siteBileseni.includes(veriNiteligi)) {
     sorunlar.push(`site görünümünde tasarım niteliği eksik: ${veriNiteligi}`);

@@ -6,6 +6,14 @@
   --site-vurgu: #1e4d3a;
   --site-cizgi: rgba(17, 23, 19, 0.18);
   --site-buton-yazi: #ffffff;
+  --site-yuzey-zemin: var(--site-arka-plan);
+  --site-yuzey-yazi: var(--site-yazi);
+  --site-panel-zemin: var(--site-ikinci-arka-plan);
+  --site-panel-yazi: var(--site-yazi);
+  --site-ters-zemin: var(--site-yazi);
+  --site-ters-yazi: var(--site-arka-plan);
+  --site-vurgu-zemin: var(--site-vurgu);
+  --site-vurgu-yazi: var(--site-buton-yazi);
 
   min-height: 100vh;
   overflow: clip;
@@ -242,7 +250,8 @@
 }
 
 .mobilMenu nav a > span {
-  color: var(--site-vurgu);
+  color: var(--site-ters-yazi);
+  opacity: 0.72;
   font-size: 10px;
 }
 
@@ -501,6 +510,10 @@
   color: #ffffff;
 }
 
+.gorselliHero .heroBilgiListesi li > span {
+  color: #ffffff;
+}
+
 .heroBolumu.varyasyon_kapak {
   min-height: calc(100svh - 92px);
   grid-template-columns: minmax(0, 980px);
@@ -701,6 +714,7 @@
 
 .alternatifBolum {
   background: var(--site-ikinci-arka-plan);
+  color: var(--site-panel-yazi);
 }
 
 .standartBolum[data-bolum-turu="hizmetler"] .bolumBasligi,
@@ -747,8 +761,8 @@
 .standartBolum[data-bolum-turu="istatistik"] {
   background:
     radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--site-vurgu) 28%, transparent), transparent 30%),
-    var(--site-yazi);
-  color: var(--site-arka-plan);
+    var(--site-ters-zemin);
+  color: var(--site-ters-yazi);
 }
 
 .standartBolum[data-bolum-turu="istatistik"] .bolumFiligran {
@@ -757,7 +771,7 @@
 
 .standartBolum[data-bolum-turu="istatistik"] .bolumBasligi p,
 .standartBolum[data-bolum-turu="istatistik"] .listeIcerik p {
-  color: color-mix(in srgb, var(--site-arka-plan) 68%, transparent);
+  color: color-mix(in srgb, var(--site-ters-yazi) 72%, transparent);
 }
 
 .standartBolum[data-bolum-turu="istatistik"] .varyasyon_kartli .listeSatiri,
@@ -769,7 +783,18 @@
 
 .standartBolum[data-bolum-turu="istatistik"] .listeIcerik h3,
 .standartBolum[data-bolum-turu="istatistik"] .listeIcerik a {
-  color: var(--site-arka-plan);
+  color: var(--site-ters-yazi);
+}
+
+.standartBolum[data-bolum-turu="istatistik"] .kucukBaslik,
+.standartBolum[data-bolum-turu="istatistik"] .bolumNumarasi,
+.standartBolum[data-bolum-turu="istatistik"] .listeNumara {
+  border-color: currentColor;
+  color: var(--site-ters-yazi);
+}
+
+.standartBolum[data-bolum-turu="istatistik"] .bolumNumarasi i {
+  background: var(--site-ters-yazi);
 }
 
 .standartBolum[data-bolum-turu="neden-biz"] .varyasyon_adimlar .liste {
@@ -792,8 +817,8 @@
 .standartBolum[data-bolum-turu="galeri"] {
   padding-right: 2vw;
   padding-left: 2vw;
-  background: var(--site-yazi);
-  color: var(--site-arka-plan);
+  background: var(--site-ters-zemin);
+  color: var(--site-ters-yazi);
 }
 
 .standartBolum[data-bolum-turu="galeri"] .bolumBasligi {
@@ -801,7 +826,7 @@
 }
 
 .standartBolum[data-bolum-turu="galeri"] .bolumBasligi p {
-  color: color-mix(in srgb, var(--site-arka-plan) 68%, transparent);
+  color: color-mix(in srgb, var(--site-ters-yazi) 72%, transparent);
 }
 
 .standartBolum[data-bolum-turu="galeri"] .galeri figure {
@@ -814,11 +839,31 @@
 }
 
 .standartBolum[data-bolum-turu="galeri"] .galeri figcaption span {
-  color: color-mix(in srgb, var(--site-arka-plan) 62%, transparent);
+  color: color-mix(in srgb, var(--site-ters-yazi) 68%, transparent);
 }
 
 .standartBolum[data-bolum-turu="galeri"] .butonlar {
   margin-left: 3vw;
+}
+
+.standartBolum[data-bolum-turu="galeri"] .kucukBaslik,
+.standartBolum[data-bolum-turu="galeri"] .bolumNumarasi,
+.standartBolum[data-bolum-turu="galeri"] .galeriSirasi {
+  border-color: currentColor;
+  color: var(--site-ters-yazi);
+}
+
+.standartBolum[data-bolum-turu="galeri"] .bolumNumarasi i {
+  background: var(--site-ters-yazi);
+}
+
+.standartBolum[data-bolum-turu="galeri"] .galeriSirasi {
+  background: var(--site-ters-zemin);
+}
+
+.standartBolum[data-bolum-turu="galeri"] .butonlar a:nth-child(even) {
+  border-color: var(--site-ters-yazi);
+  color: var(--site-ters-yazi);
 }
 
 .standartBolum[data-bolum-turu="sss"] .bolumIcerikSahnesi {
@@ -845,8 +890,8 @@
 
 .standartBolum[data-bolum-turu="iletisim"] {
   padding: 3vw;
-  background: var(--site-vurgu);
-  color: var(--site-buton-yazi);
+  background: var(--site-vurgu-zemin);
+  color: var(--site-vurgu-yazi);
 }
 
 .standartBolum[data-bolum-turu="iletisim"] .bolumIcerikSahnesi {
@@ -858,14 +903,25 @@
 .standartBolum[data-bolum-turu="iletisim"] .iletisimYerlesimi p,
 .standartBolum[data-bolum-turu="iletisim"] .iletisimListesi small {
   border-color: currentColor;
-  color: color-mix(in srgb, var(--site-buton-yazi) 72%, transparent);
+  color: color-mix(in srgb, var(--site-vurgu-yazi) 78%, transparent);
 }
 
 .standartBolum[data-bolum-turu="iletisim"] .iletisimListesi > a,
 .standartBolum[data-bolum-turu="iletisim"] .iletisimListesi > div,
 .standartBolum[data-bolum-turu="iletisim"] .iletisimListesi strong {
-  border-color: color-mix(in srgb, var(--site-buton-yazi) 28%, transparent);
-  color: var(--site-buton-yazi);
+  border-color: color-mix(in srgb, var(--site-vurgu-yazi) 32%, transparent);
+  color: var(--site-vurgu-yazi);
+}
+
+.standartBolum[data-bolum-turu="iletisim"] .bolumNumarasi,
+.standartBolum[data-bolum-turu="iletisim"] .iletisimListesi,
+.standartBolum[data-bolum-turu="iletisim"] .iletisimListesi svg {
+  border-color: currentColor;
+  color: var(--site-vurgu-yazi);
+}
+
+.standartBolum[data-bolum-turu="iletisim"] .bolumNumarasi i {
+  background: var(--site-vurgu-yazi);
 }
 
 .bolumNumarasi {
@@ -1362,6 +1418,7 @@
   padding: clamp(28px, 4vw, 52px);
   border: 1px solid var(--site-cizgi);
   background: color-mix(in srgb, var(--site-ikinci-arka-plan) 72%, transparent);
+  color: var(--site-panel-yazi);
 }
 
 .talepFormu label {
@@ -1514,7 +1571,7 @@
 }
 
 .footerFirma span {
-  color: var(--site-vurgu);
+  color: var(--site-ters-yazi);
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.16em;
@@ -1893,6 +1950,12 @@
 .site[data-tasarim-duzen="sinematik"] .heroBilgiListesi small,
 .site[data-tasarim-duzen="sinematik"] .heroKunye {
   color: rgba(255, 255, 255, 0.72);
+}
+
+.site[data-tasarim-duzen="sinematik"] .kucukBaslik,
+.site[data-tasarim-duzen="sinematik"] .heroBilgiListesi li > span {
+  border-color: #ffffff;
+  color: #ffffff;
 }
 
 .site[data-tasarim-duzen="sinematik"] .heroBilgiListesi,

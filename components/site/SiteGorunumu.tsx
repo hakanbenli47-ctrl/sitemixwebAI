@@ -517,7 +517,7 @@ function AnimasyonluBaslik({
       {ustBaslik.trim() && (
         <motion.span
           className={styles.kucukBaslik}
-          initial={{ opacity: 0, x: -25 }}
+          initial={false}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, amount: 0.7 }}
           transition={{ duration: 0.6 }}
@@ -528,7 +528,7 @@ function AnimasyonluBaslik({
 
       {baslik.trim() && (
         <motion.h2
-          initial={{ opacity: 0, y: 45 }}
+          initial={false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{
@@ -543,7 +543,7 @@ function AnimasyonluBaslik({
 
       {aciklama.trim() && (
         <motion.p
-          initial={{ opacity: 0, y: 25 }}
+          initial={false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.5 }}
           transition={{
@@ -577,7 +577,7 @@ function Butonlar({
     <motion.div
       className={styles.butonlar}
       variants={listeKapsayici}
-      initial="gizli"
+      initial={false}
       whileInView="gorunur"
       viewport={{ once: true, amount: 0.4 }}
     >
@@ -837,7 +837,7 @@ function MetinBolumu({
         className={styles.metinIcerigi}
         data-site-parcasi="hikaye-metin"
         variants={bolumGecisi}
-        initial="gizli"
+        initial={false}
         whileInView="gorunur"
         viewport={{
           once: true,
@@ -859,11 +859,7 @@ function MetinBolumu({
         <motion.div
           className={styles.metinGorseli}
           data-site-parcasi="hikaye-gorsel"
-          initial={{
-            opacity: 0,
-            scale: 0.93,
-            y: 60,
-          }}
+          initial={false}
           whileInView={{
             opacity: 1,
             scale: 1,
@@ -914,7 +910,7 @@ function ListeBolumu({
       <motion.div
         className={styles.sssListesi}
         variants={listeKapsayici}
-        initial="gizli"
+        initial={false}
         whileInView="gorunur"
         viewport={{ once: true, amount: 0.12 }}
       >
@@ -941,7 +937,7 @@ function ListeBolumu({
       className={styles.liste}
       data-site-parcasi="liste"
       variants={listeKapsayici}
-      initial="gizli"
+      initial={false}
       whileInView="gorunur"
       viewport={{
         once: true,
@@ -1035,7 +1031,7 @@ function GaleriBolumu({ bolum }: { bolum: SiteBolumu }) {
       className={styles.galeri}
       data-site-parcasi="galeri"
       variants={listeKapsayici}
-      initial="gizli"
+      initial={false}
       whileInView="gorunur"
       viewport={{
         once: true,
@@ -1142,7 +1138,7 @@ function IletisimBolumu({
     <div className={styles.iletisimYerlesimi}>
       <motion.div
         variants={bolumGecisi}
-        initial="gizli"
+        initial={false}
         whileInView="gorunur"
         viewport={{
           once: true,
@@ -1161,7 +1157,7 @@ function IletisimBolumu({
       <motion.div
         className={styles.iletisimListesi}
         variants={listeKapsayici}
-        initial="gizli"
+        initial={false}
         whileInView="gorunur"
         viewport={{
           once: true,
@@ -1283,7 +1279,7 @@ function FormBolumu({
       <motion.div
         className={styles.formTanitim}
         variants={bolumGecisi}
-        initial="gizli"
+        initial={false}
         whileInView="gorunur"
         viewport={{ once: true, amount: 0.25 }}
       >
@@ -1298,7 +1294,7 @@ function FormBolumu({
         className={styles.talepFormu}
         onSubmit={formuGonder}
         variants={listeKapsayici}
-        initial="gizli"
+        initial={false}
         whileInView="gorunur"
         viewport={{ once: true, amount: 0.2 }}
       >
@@ -1397,7 +1393,7 @@ function HaritaBolumu({
     <div className={styles.haritaAlani}>
       <motion.div
         variants={bolumGecisi}
-        initial="gizli"
+        initial={false}
         whileInView="gorunur"
         viewport={{ once: true }}
       >
@@ -1432,10 +1428,7 @@ function HaritaBolumu({
 
       <motion.div
         className={styles.haritaYerTutucu}
-        initial={{
-          opacity: 0,
-          scale: 0.94,
-        }}
+        initial={false}
         whileInView={{
           opacity: 1,
           scale: 1,
@@ -1547,7 +1540,7 @@ function BolumRender({
       } ${styles[`bolum_${bolum.tur}`] ?? ""} ${varyasyonSinifi(bolum.varyasyon)}`}
       data-bolum-turu={bolum.tur}
       data-bolum-sira={index}
-      initial="gizli"
+      initial={false}
       whileInView="gorunur"
       viewport={{
         once: true,
@@ -2127,10 +2120,7 @@ export default function SiteGorunumu({
       <footer className={styles.footer} data-site-alani="footer">
         <motion.div
           className={styles.footerFirma}
-          initial={{
-            opacity: 0,
-            y: 70,
-          }}
+          initial={false}
           whileInView={{
             opacity: 1,
             y: 0,

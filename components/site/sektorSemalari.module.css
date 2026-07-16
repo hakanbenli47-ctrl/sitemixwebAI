@@ -10,6 +10,11 @@
   isolation: isolate;
 }
 
+.sektorSemasi section[data-bolum-sira] {
+  visibility: visible;
+  opacity: 1 !important;
+}
+
 .sektorSemasi [data-site-parcasi="bolum-sahnesi"],
 .sektorSemasi [data-site-parcasi="hero-metin"],
 .sektorSemasi [data-site-parcasi="hero-gorsel"] {
@@ -98,8 +103,14 @@
 }
 
 .sektorSemasi[data-sektor="oto-yikama"] [data-site-alani="hero"] {
-  grid-template-columns: minmax(0, 0.82fr) minmax(480px, 1.18fr);
+  grid-template-columns: minmax(430px, 0.92fr) minmax(500px, 1.08fr);
   background-image: linear-gradient(118deg, color-mix(in srgb, var(--site-vurgu) 11%, transparent) 0 49%, transparent 49%);
+}
+
+.sektorSemasi[data-sektor="oto-yikama"] [data-site-parcasi="hero-metin"] h1 {
+  max-width: 720px;
+  font-size: clamp(58px, 6.6vw, 102px);
+  line-height: 0.9;
 }
 
 .sektorSemasi[data-sektor="oto-yikama"] [data-site-parcasi="hero-gorsel"] {
@@ -362,17 +373,37 @@
 
 /* 13 · Kuaför — moda dergisi kolonları */
 .sektorSemasi[data-sektor="kuafor"] [data-site-alani="hero"] {
-  grid-template-columns: minmax(310px, 0.58fr) minmax(560px, 1.42fr);
-  align-items: end;
-  padding-bottom: 3vw;
+  min-height: min(82svh, 880px);
+  grid-template-columns: minmax(450px, 0.94fr) minmax(480px, 1.06fr);
+  align-items: center;
+  gap: 5vw;
+  padding-top: clamp(70px, 7vw, 120px);
+  padding-bottom: clamp(70px, 7vw, 120px);
 }
 
 .sektorSemasi[data-sektor="kuafor"] [data-site-parcasi="hero-metin"] {
   z-index: 4;
   margin-right: 0;
-  padding: 38px;
-  border-left: 1px solid var(--site-vurgu);
-  background: color-mix(in srgb, var(--site-arka-plan) 92%, transparent);
+  padding: 0 0 0 28px;
+  border-left: 2px solid var(--site-vurgu);
+  background: transparent;
+}
+
+.sektorSemasi[data-sektor="kuafor"] [data-site-parcasi="hero-metin"] h1 {
+  max-width: 720px;
+  font-size: clamp(56px, 6.2vw, 96px);
+  line-height: 0.94;
+}
+
+.sektorSemasi[data-sektor="kuafor"] [data-site-parcasi="hero-gorsel"] {
+  max-width: 660px;
+  justify-self: end;
+  border-radius: 52% 52% 12px 12px;
+}
+
+.sektorSemasi[data-sektor="kuafor"] [data-site-parcasi="hero-gorsel"] img {
+  min-height: min(68svh, 690px);
+  border-radius: inherit;
 }
 
 .sektorSemasi[data-sektor="kuafor"] [data-site-parcasi="galeri"] {
@@ -880,7 +911,7 @@
 @media (max-width: 1240px) {
   .sektorSemasi [data-site-alani="hero"] {
     min-height: auto;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
     padding-right: 5vw;
     padding-left: 5vw;
     background-position: center;
@@ -897,7 +928,7 @@
     width: 100%;
     max-width: none;
     clip-path: none;
-    transform: none;
+    transform: none !important;
   }
 
   .sektorSemasi [data-site-parcasi="hero-gorsel"] img {
@@ -912,7 +943,7 @@
 
   .sektorSemasi[data-sektor="fotografci"] [data-site-alani="hero"],
   .sektorSemasi[data-sektor="mobilya"] [data-site-alani="hero"] {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
     padding-right: 5vw;
   }
 }
@@ -920,7 +951,7 @@
 @media (max-width: 1000px) {
   .sektorSemasi [data-site-alani="hero"] {
     min-height: auto;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
     padding-right: 5vw;
     padding-left: 5vw;
     background-position: center;
@@ -940,7 +971,7 @@
     max-width: none;
     aspect-ratio: auto;
     clip-path: none;
-    transform: none;
+    transform: none !important;
   }
 
   .sektorSemasi [data-site-parcasi="hero-gorsel"] img {

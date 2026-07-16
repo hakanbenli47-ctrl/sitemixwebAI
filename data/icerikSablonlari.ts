@@ -2,6 +2,7 @@ import { sektorler } from "@/data/sektorler";
 import {
   hizmetDetayiniGetir,
   sektorIcerikProfiliniGetir,
+  type SektorIcerikProfili,
 } from "@/data/sektorIcerikProfilleri";
 import { sektorDonusumProfiliniGetir } from "@/data/sektorDonusumProfilleri";
 import {
@@ -246,6 +247,35 @@ function metniKucult(metin: unknown) {
   return String(metin ?? "").trim().toLocaleLowerCase("tr-TR");
 }
 
+function ilkCumleyiAl(metin: string) {
+  const temizMetin = metin.replace(/\s+/g, " ").trim();
+  const ilkCumle = temizMetin.match(/^.*?[.!?](?=\s|$)/)?.[0];
+
+  return ilkCumle || temizMetin;
+}
+
+function heroOzetiniGetir(profil: SektorIcerikProfili) {
+  const ilkCumle = ilkCumleyiAl(profil.odakMetni);
+
+  if (ilkCumle.length > 190) {
+    const ilkParca = ilkCumle.split(/[;:]/)[0]?.trim();
+
+    if (ilkParca && ilkParca.length >= 60) {
+      return `${ilkParca.replace(/[.!?]+$/, "")}.`;
+    }
+  }
+
+  return ilkCumle.length >= 60 && ilkCumle.length <= 190
+    ? ilkCumle
+    : profil.kisaYaklasim;
+}
+
+function sayfaBasliginiAyir(sayfaAdi: string, bolumBasligi: string) {
+  return metniKucult(sayfaAdi) === metniKucult(bolumBasligi)
+    ? `${sayfaAdi} Rehberi`
+    : sayfaAdi;
+}
+
 function projeKategorisi(proje: ProjeVerisi) {
   return sektorler.find((sektor) => sektor.id === proje.sektor)?.kategori ?? "Diğer";
 }
@@ -418,6 +448,7 @@ function temizlikIcerigi(
           "Farklı alanlardaki çalışma düzenimizi ve özen gösterdiğimiz ayrıntıları galeri üzerinden inceleyin.",
       };
     }
+
   }
 
   if (bolum.tur === "metin") {
@@ -615,7 +646,7 @@ function genelIcerik(
     return {
       ustBaslik: bolge ? `${proje.sektorAdi} · ${bolge}` : proje.sektorAdi,
       baslik: donusum.heroBaslik || profil.heroBaslik || ton.anaBaslik,
-      aciklama: `${proje.firmaAdi}, ${yerMetni} hizmet verir. ${profil.odakMetni}`,
+      aciklama: heroOzetiniGetir(profil),
       butonlar: anaSayfaButonlari(proje),
     };
   }
@@ -624,7 +655,7 @@ function genelIcerik(
     if (sayfaRolu === "hakkimizda") {
       return {
         ustBaslik: "Hakkımızda",
-        baslik: donusum.hakkimizdaBaslik,
+        baslik: proje.firmaAdi,
         aciklama: profil.kisaYaklasim,
       };
     }
@@ -632,19 +663,30 @@ function genelIcerik(
     if (sayfaRolu === "hizmet") {
       return {
         ustBaslik: bolum.ustBaslik || sayfa.ad,
-        baslik:
-          bolum.baslik && !bolum.baslik.includes(proje.firmaAdi)
-            ? bolum.baslik
-            : donusum.hizmetlerBaslik,
-        aciklama: `${profil.kararOlcutleri} Aşağıdaki seçenekleri inceleyerek ihtiyacınıza en yakın hizmet hakkında bilgi alabilirsiniz.`,
+        baslik: sayfaBasliginiAyir(
+          sayfa.ad || donusum.hizmetlerBaslik,
+          donusum.hizmetlerBaslik,
+        ),
+        aciklama: `${profil.kararOlcutleri} Uygun seçeneği birlikte netleştirebiliriz.`,
       };
     }
 
     if (sayfaRolu === "galeri") {
       return {
         ustBaslik: "Çalışmalarımız",
-        baslik: donusum.galeriBaslik,
-        aciklama: `${proje.firmaAdi} tarafından sunulan hizmetlerin çalışma biçimini, öne çıkan detaylarını ve farklı ihtiyaçlara nasıl uyarlandığını görseller üzerinden inceleyin.`,
+        baslik: sayfaBasliginiAyir(
+          sayfa.ad || donusum.galeriBaslik,
+          donusum.galeriBaslik,
+        ),
+        aciklama: ilkCumleyiAl(profil.sonKontrol),
+      };
+    }
+
+    if (sayfaRolu === "aksiyon") {
+      return {
+        ustBaslik: bolum.ustBaslik || sayfa.ad,
+        baslik: sayfa.ad || donusum.iletisimBaslik,
+        aciklama: `${profil.iletisimIstegi} Formu doldurarak talebinizi doğrudan iletebilirsiniz.`,
       };
     }
 
@@ -660,7 +702,7 @@ function genelIcerik(
       ustBaslik: anaSayfaMi ? "Çalışma yaklaşımımız" : "Nasıl çalışıyoruz?",
       baslik: donusum.hakkimizdaBaslik || profil.yaklasimBaslik || ton.hakkimizdaBaslik,
       aciklama: anaSayfaMi
-        ? `${profil.kisaYaklasim} ${proje.firmaAdi}, ${yerMetni} taleplere düzenli iletişimle yanıt verir.`
+        ? ilkCumleyiAl(profil.detayliYaklasim)
         : profil.detayliYaklasim,
       butonlar: anaSayfaMi
         ? proje.siteTipi === "cok-sayfa"
@@ -677,8 +719,8 @@ function genelIcerik(
       ustBaslik: bolum.ustBaslik || sunum.hizmetUstBasligi,
       baslik: donusum.hizmetlerBaslik,
       aciklama: anaSayfaMi
-        ? `${profil.kararOlcutleri} Temel hizmetleri inceleyin; ayrıntılı kapsam için kısa bilgi paylaşmanız yeterlidir.`
-        : `${profil.kararOlcutleri} Her seçeneğin kapsamı mevcut durum ve beklentiye göre netleştirilir; başlamadan önce süreç hakkında açık bilgi verilir.`,
+        ? profil.kararOlcutleri
+        : `${profil.kararOlcutleri} Kapsam ve süreç başlamadan netleştirilir.`,
       listeElemanlari: bolum.listeElemanlari.map((eleman) => ({
         baslik: eleman.baslik,
         aciklama: hizmetDetayiniGetir(profil, eleman.baslik, !anaSayfaMi),
@@ -731,15 +773,12 @@ function genelIcerik(
     return {
       ustBaslik: bolum.ustBaslik || sunum.galeriSayfasiAdi,
       baslik: donusum.galeriBaslik,
-      aciklama: `${(anaSayfaMi
-        ? donusum.galeriBasliklari.slice(0, 3)
-        : donusum.galeriBasliklari.slice(3, 6)
-      ).join(", ")} başlıklarındaki görsel ayrıntıları inceleyin.`,
+      aciklama: anaSayfaMi
+        ? `${donusum.galeriBasliklari.slice(0, 2).join(" ve ")} örneklerini yakından inceleyin.`
+        : `${donusum.galeriBasliklari.slice(2, 4).join(" ve ")} ayrıntılarını tamamlanan çalışmalar üzerinden inceleyin.`,
       listeElemanlari: bolum.listeElemanlari.map((eleman, index) => ({
         baslik: donusum.galeriBasliklari[index % donusum.galeriBasliklari.length],
-        aciklama: anaSayfaMi
-          ? `${donusum.galeriBasliklari[index % donusum.galeriBasliklari.length]} için malzeme, uygulama veya kullanım ayrıntısını görsel üzerinden inceleyin.`
-          : `${donusum.galeriBasliklari[index % donusum.galeriBasliklari.length]} başlığında hazırlık, işçilik ve son kontrol noktalarını yakından değerlendirin.`,
+        aciklama: "",
         baglanti: eleman.baglanti,
       })),
       butonlar: anaSayfaMi && proje.siteTipi === "cok-sayfa"
@@ -769,8 +808,8 @@ function genelIcerik(
       ustBaslik: anaSayfaMi ? "Bilgi ve planlama" : "İletişim",
       baslik: donusum.iletisimBaslik,
       aciklama: anaSayfaMi
-        ? `${profil.iletisimIstegi} WhatsApp üzerinden kısa bilgi paylaşarak ilk adımı kolayca atabilirsiniz.`
-        : `${profil.iletisimIstegi} ${bolge ? `${bolge} için ` : ""}güncel uygunluk, konum ve sonraki adımları doğrudan sorabilirsiniz.`,
+        ? profil.iletisimIstegi
+        : `${profil.iletisimIstegi} Güncel uygunluk ve sonraki adımları doğrudan sorabilirsiniz.`,
       butonlar: iletisimButonlari(proje),
     };
   }
@@ -793,7 +832,7 @@ function genelIcerik(
       baslik: randevuSayfasiMi
         ? donusum.iletisimBaslik
         : "İhtiyacınızı birkaç bilgiyle anlatın",
-      aciklama: `${profil.iletisimIstegi} İletişim bilgilerinizi bıraktığınızda uygunluk ve sonraki adımlar hakkında dönüş yapılabilir.`,
+      aciklama: `${profil.iletisimIstegi} Paylaştığınız bilgiler yalnızca talebinize dönüş yapmak için kullanılır.`,
     };
   }
 

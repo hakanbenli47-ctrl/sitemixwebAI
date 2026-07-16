@@ -297,9 +297,57 @@ for (const sektor of sektorler.sektorler) {
     bolumSayisi += sonuc.sayfalar.flatMap((sayfa) => sayfa.bolumler).length;
 
     const anaSayfa = sonuc.sayfalar.find((sayfa) => sayfa.anaSayfa);
+    const anaSayfaBolumleri = anaSayfa?.bolumler || [];
     const anaSayfaTurleri = new Set(
-      (anaSayfa?.bolumler || []).map((bolum) => bolum.tur),
+      anaSayfaBolumleri.map((bolum) => bolum.tur),
     );
+
+    if (anaSayfaBolumleri.length < 7 || anaSayfaBolumleri.length > 9) {
+      sorunlar.push(`${sektor.id}/${siteTipi}: ana sayfa bölüm sayısı dengesiz`);
+    }
+
+    if (anaSayfaBolumleri[0]?.tur !== "hero") {
+      sorunlar.push(`${sektor.id}/${siteTipi}: ana sayfa açılış bölümüyle başlamıyor`);
+    }
+
+    if (anaSayfaBolumleri.at(-1)?.tur !== "iletisim") {
+      sorunlar.push(`${sektor.id}/${siteTipi}: iletişim bölümü ana sayfanın sonunda değil`);
+    }
+
+    const besinciBolum = anaSayfaBolumleri[4];
+    const besinciBolumDolu = Boolean(
+      besinciBolum &&
+        (besinciBolum.baslik.trim() ||
+          besinciBolum.aciklama.trim() ||
+          besinciBolum.gorsel.trim() ||
+          besinciBolum.arkaPlanGorseli.trim() ||
+          besinciBolum.listeElemanlari.some(
+            (eleman) => eleman.baslik.trim() || eleman.aciklama.trim(),
+          )),
+    );
+
+    if (!besinciBolumDolu) {
+      sorunlar.push(`${sektor.id}/${siteTipi}: beşinci bölüm görünür içerik taşımıyor`);
+    }
+
+    const heroBolumu = anaSayfaBolumleri[0];
+    if (
+      heroBolumu?.aciklama &&
+      (heroBolumu.aciklama.trim().length < 60 ||
+        heroBolumu.aciklama.trim().length > 190)
+    ) {
+      sorunlar.push(`${sektor.id}/${siteTipi}: hero açıklama yoğunluğu dengesiz`);
+    }
+
+    for (const bolum of anaSayfaBolumleri) {
+      if (bolum.baslik.trim().split(/\s+/).length > 6) {
+        sorunlar.push(`${sektor.id}/${siteTipi}: uzun ana sayfa başlığı: ${bolum.baslik}`);
+      }
+
+      if (bolum.tur !== "hero" && bolum.aciklama.trim().length > 210) {
+        sorunlar.push(`${sektor.id}/${siteTipi}: bölüm açıklaması fazla yoğun: ${bolum.baslik}`);
+      }
+    }
 
     for (const tur of [
       "hero",
@@ -344,6 +392,23 @@ for (const sektor of sektorler.sektorler) {
         sorunlar.push(`${sektor.id}/${siteTipi}: yinelenen slug: ${slug}`);
       }
       if (slug) sluglar.add(slug);
+
+      for (let index = 1; index < sayfa.bolumler.length; index += 1) {
+        const oncekiBaslik = sayfa.bolumler[index - 1].baslik
+          .toLocaleLowerCase("tr-TR")
+          .replace(/\s+/g, " ")
+          .trim();
+        const mevcutBaslik = sayfa.bolumler[index].baslik
+          .toLocaleLowerCase("tr-TR")
+          .replace(/\s+/g, " ")
+          .trim();
+
+        if (oncekiBaslik && oncekiBaslik === mevcutBaslik) {
+          sorunlar.push(
+            `${sektor.id}/${siteTipi}: ${sayfa.ad} sayfasında art arda aynı başlık kullanıldı: ${sayfa.bolumler[index].baslik}`,
+          );
+        }
+      }
     }
 
     if (sonuc.sablonSurumu !== sablonlar.GUNCEL_SABLON_SURUMU) {
@@ -427,6 +492,44 @@ for (const sektor of sektorler.sektorler) {
 
     const gorselliSonuc = gorselDoldurma.stokGorselleriDoldur(sonuc);
 
+    if (
+      process.env.DETAY_SEKTOR === sektor.id &&
+      (process.env.DETAY_SITE_TIPI || "cok-sayfa") === siteTipi
+    ) {
+      console.log(
+        JSON.stringify(
+          {
+            sektor: sektor.id,
+            siteTipi,
+            tasarim: gorselliSonuc.tasarim,
+            tema: gorselliSonuc.tema,
+            sayfalar: gorselliSonuc.sayfalar.map((sayfa) => ({
+              ad: sayfa.ad,
+              rol: sayfa.rol,
+              bolumler: sayfa.bolumler.map((bolum) => ({
+                tur: bolum.tur,
+                baslik: bolum.baslik,
+                aciklama: bolum.aciklama,
+              })),
+            })),
+            anaSayfa: gorselliSonuc.sayfalar
+              .find((sayfa) => sayfa.anaSayfa)
+              ?.bolumler.map((bolum, index) => ({
+                sira: index + 1,
+                tur: bolum.tur,
+                varyasyon: bolum.varyasyon,
+                baslik: bolum.baslik,
+                aciklamaUzunlugu: bolum.aciklama.trim().length,
+                gorsel: Boolean(bolum.gorsel || bolum.arkaPlanGorseli),
+                kart: bolum.listeElemanlari.length,
+              })),
+          },
+          null,
+          2,
+        ),
+      );
+    }
+
     for (const bolum of gorselliSonuc.sayfalar.flatMap(
       (sayfa) => sayfa.bolumler,
     )) {
@@ -500,6 +603,10 @@ const siteBileseni = fs.readFileSync(
   path.join(kok, "components/site/SiteGorunumu.tsx"),
   "utf8",
 );
+
+if (/initial="gizli"[\s\S]{0,120}whileInView=/.test(siteBileseni)) {
+  sorunlar.push("görünürlük viewport animasyonuna bağımlı; bölüm boş kalabilir");
+}
 const temaBlogu = siteBileseni
   .split("const temaRenkleri")[1]
   .split("const bolumGecisi")[0];
@@ -581,6 +688,10 @@ for (const guvenliYerlesimKurali of [
 
 if (!sektorSemaCss.includes("@media (max-width: 1240px)")) {
   sorunlar.push("dar masaüstü için güvenli sektör kırılımı eksik");
+}
+
+if (!sektorSemaCss.includes("section[data-bolum-sira]")) {
+  sorunlar.push("bölüm görünürlüğü için güvenli CSS kuralı eksik");
 }
 
 for (const sektor of sektorler.sektorler) {

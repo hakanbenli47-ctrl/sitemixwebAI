@@ -14,6 +14,13 @@
   --site-ters-yazi: var(--site-arka-plan);
   --site-vurgu-zemin: var(--site-vurgu);
   --site-vurgu-yazi: var(--site-buton-yazi);
+  --site-alan-yazi: var(--site-yazi);
+  --site-alan-soluk: var(--site-soluk-yazi);
+  --site-alan-cizgi: var(--site-cizgi);
+  --site-kutu-zemin: color-mix(in srgb, var(--site-ikinci-arka-plan) 72%, transparent);
+  --site-kutu-yazi: var(--site-yazi);
+  --site-kutu-soluk: var(--site-soluk-yazi);
+  --site-kutu-cizgi: var(--site-cizgi);
 
   min-height: 100vh;
   overflow: clip;
@@ -194,13 +201,17 @@
 }
 
 .mobilMenu {
+  --site-alan-yazi: var(--site-ters-yazi);
+  --site-alan-soluk: color-mix(in srgb, var(--site-ters-yazi) 72%, transparent);
+  --site-alan-cizgi: color-mix(in srgb, var(--site-ters-yazi) 22%, transparent);
+
   position: fixed;
   z-index: 100;
   inset: 0;
   padding: 30px 5vw;
   overflow-y: auto;
   background: var(--site-yazi);
-  color: var(--site-arka-plan);
+  color: var(--site-alan-yazi);
 }
 
 .mobilMenuUst {
@@ -224,7 +235,7 @@
 .mobilMenuUst button {
   border: 0;
   background: transparent;
-  color: var(--site-arka-plan);
+  color: var(--site-alan-yazi);
   cursor: pointer;
 }
 
@@ -243,7 +254,7 @@
       transparent
     );
   background: transparent;
-  color: var(--site-arka-plan);
+  color: var(--site-alan-yazi);
   text-align: left;
   cursor: pointer;
   text-decoration: none;
@@ -275,7 +286,7 @@
   justify-content: center;
   gap: 9px;
   border: 1px solid color-mix(in srgb, var(--site-arka-plan) 30%, transparent);
-  color: var(--site-arka-plan);
+  color: var(--site-alan-yazi);
   font-size: 12px;
   font-weight: 800;
   text-decoration: none;
@@ -339,6 +350,7 @@
   border-bottom: 1px solid var(--site-cizgi);
   background-position: center;
   background-size: cover;
+  isolation: isolate;
 }
 
 .site[data-ana-sayfa="true"] .heroBolumu {
@@ -409,7 +421,8 @@
 
 .heroMetni {
   position: relative;
-  z-index: 2;
+  z-index: 4;
+  min-width: 0;
 }
 
 .heroMetni h1 {
@@ -435,7 +448,8 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: clamp(42px, 5vw, 74px) 0 0;
   padding: 0;
-  border-top: 1px solid var(--site-cizgi);
+  border-top: 1px solid var(--site-alan-cizgi);
+  color: var(--site-alan-yazi);
   list-style: none;
 }
 
@@ -447,15 +461,17 @@
   align-items: center;
   gap: 10px;
   padding: 15px 14px 15px 0;
-  border-bottom: 1px solid var(--site-cizgi);
+  border-bottom: 1px solid var(--site-alan-cizgi);
+  background: color-mix(in srgb, var(--site-alan-yazi) 4%, transparent);
 }
 
 .heroBilgiListesi li:not(:last-child) {
-  border-right: 1px solid var(--site-cizgi);
+  border-right: 1px solid var(--site-alan-cizgi);
 }
 
 .heroBilgiListesi li > span {
-  color: var(--site-vurgu);
+  color: var(--site-alan-yazi);
+  opacity: 0.72;
   font-size: 8px;
   font-weight: 900;
 }
@@ -467,7 +483,7 @@
 }
 
 .heroBilgiListesi small {
-  color: var(--site-soluk-yazi);
+  color: var(--site-alan-soluk);
   font-size: 7px;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -480,9 +496,14 @@
   line-height: 1.35;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--site-alan-yazi);
 }
 
 .gorselliHero {
+  --site-alan-yazi: #ffffff;
+  --site-alan-soluk: rgba(255, 255, 255, 0.8);
+  --site-alan-cizgi: rgba(255, 255, 255, 0.3);
+
   min-height: calc(100vh - 46px);
   grid-template-columns: minmax(0, 950px);
   color: #ffffff;
@@ -560,8 +581,13 @@
 
 .heroGorseli {
   position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
   overflow: hidden;
+  isolation: isolate;
+  contain: paint;
 }
 
 .heroGorseli::before {
@@ -580,6 +606,7 @@
 
 .heroGorseli img {
   width: 100%;
+  max-width: 100%;
   min-height: min(68vh, 690px);
   display: block;
   object-fit: cover;
@@ -675,6 +702,14 @@
 }
 
 .standartBolum {
+  --site-alan-yazi: var(--site-yazi);
+  --site-alan-soluk: var(--site-soluk-yazi);
+  --site-alan-cizgi: var(--site-cizgi);
+  --site-kutu-zemin: color-mix(in srgb, var(--site-arka-plan) 88%, transparent);
+  --site-kutu-yazi: var(--site-yazi);
+  --site-kutu-soluk: var(--site-soluk-yazi);
+  --site-kutu-cizgi: var(--site-cizgi);
+
   position: relative;
   padding: clamp(100px, 9vw, 170px) 5vw;
   overflow: hidden;
@@ -759,6 +794,14 @@
 }
 
 .standartBolum[data-bolum-turu="istatistik"] {
+  --site-alan-yazi: var(--site-ters-yazi);
+  --site-alan-soluk: color-mix(in srgb, var(--site-ters-yazi) 72%, transparent);
+  --site-alan-cizgi: color-mix(in srgb, var(--site-ters-yazi) 24%, transparent);
+  --site-kutu-zemin: color-mix(in srgb, var(--site-ters-yazi) 8%, transparent);
+  --site-kutu-yazi: var(--site-ters-yazi);
+  --site-kutu-soluk: color-mix(in srgb, var(--site-ters-yazi) 72%, transparent);
+  --site-kutu-cizgi: color-mix(in srgb, var(--site-ters-yazi) 22%, transparent);
+
   background:
     radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--site-vurgu) 28%, transparent), transparent 30%),
     var(--site-ters-zemin);
@@ -815,6 +858,10 @@
 }
 
 .standartBolum[data-bolum-turu="galeri"] {
+  --site-alan-yazi: var(--site-ters-yazi);
+  --site-alan-soluk: color-mix(in srgb, var(--site-ters-yazi) 72%, transparent);
+  --site-alan-cizgi: color-mix(in srgb, var(--site-ters-yazi) 24%, transparent);
+
   padding-right: 2vw;
   padding-left: 2vw;
   background: var(--site-ters-zemin);
@@ -889,6 +936,10 @@
 }
 
 .standartBolum[data-bolum-turu="iletisim"] {
+  --site-alan-yazi: var(--site-vurgu-yazi);
+  --site-alan-soluk: color-mix(in srgb, var(--site-vurgu-yazi) 78%, transparent);
+  --site-alan-cizgi: color-mix(in srgb, var(--site-vurgu-yazi) 32%, transparent);
+
   padding: 3vw;
   background: var(--site-vurgu-zemin);
   color: var(--site-vurgu-yazi);
@@ -1003,6 +1054,8 @@
 .metinGorseli {
   position: relative;
   overflow: hidden;
+  isolation: isolate;
+  contain: paint;
 }
 
 .metinGorseli::after {
@@ -1020,6 +1073,7 @@
 
 .metinGorseli img {
   width: 100%;
+  max-width: 100%;
   min-height: 520px;
   display: block;
   object-fit: cover;
@@ -1060,8 +1114,9 @@
   flex-direction: column;
   align-items: flex-start;
   padding: clamp(26px, 3vw, 44px);
-  border: 1px solid var(--site-cizgi);
-  background: color-mix(in srgb, var(--site-arka-plan) 88%, transparent);
+  border: 1px solid var(--site-kutu-cizgi);
+  background: var(--site-kutu-zemin);
+  color: var(--site-kutu-yazi);
 }
 
 .varyasyon_adimlar .listeSatiri {
@@ -1137,7 +1192,8 @@
 .listeNumara {
   align-self: start;
   padding-top: 9px;
-  color: var(--site-vurgu);
+  color: var(--site-kutu-yazi);
+  opacity: 0.68;
   font-size: 10px;
   font-weight: 800;
 }
@@ -1152,12 +1208,13 @@
   font-size: clamp(28px, 3.5vw, 54px);
   line-height: 0.98;
   letter-spacing: -0.06em;
+  color: inherit;
 }
 
 .listeIcerik p {
   max-width: 680px;
   margin: 17px 0 0;
-  color: var(--site-soluk-yazi);
+  color: var(--site-kutu-soluk);
   font-size: 14px;
   line-height: 1.75;
 }
@@ -1170,7 +1227,7 @@
   margin-top: 18px;
   padding-bottom: 5px;
   border-bottom: 1px solid var(--site-vurgu);
-  color: var(--site-yazi);
+  color: var(--site-kutu-yazi);
   font-size: 10px;
   font-weight: 700;
   text-decoration: none;
@@ -1181,10 +1238,13 @@
   z-index: 2;
   min-width: 0;
   overflow: hidden;
+  isolation: isolate;
+  contain: paint;
 }
 
 .listeGorsel img {
   width: 100%;
+  max-width: 100%;
   height: 150px;
   display: block;
   object-fit: cover;
@@ -1205,6 +1265,9 @@
 .galeri figure {
   grid-column: span 4;
   margin: 0;
+  overflow: hidden;
+  isolation: isolate;
+  contain: paint;
 }
 
 .galeri figure:nth-child(5n + 1) {
@@ -1218,10 +1281,13 @@
 .galeriGorselSarma {
   position: relative;
   overflow: hidden;
+  isolation: isolate;
+  contain: paint;
 }
 
 .galeri img {
   width: 100%;
+  max-width: 100%;
   height: 410px;
   display: block;
   object-fit: cover;
@@ -1279,6 +1345,7 @@
 
 .varyasyon_dergi .galeri {
   gap: clamp(28px, 5vw, 72px) clamp(16px, 3vw, 38px);
+  padding-bottom: 45px;
 }
 
 .varyasyon_dergi .galeri figure:nth-child(odd) {
@@ -1309,7 +1376,8 @@
 }
 
 .sssOgesi summary > span {
-  color: var(--site-vurgu);
+  color: var(--site-alan-yazi);
+  opacity: 0.7;
   font-size: 10px;
   font-weight: 800;
 }
@@ -1326,7 +1394,7 @@
   place-items: center;
   border: 1px solid var(--site-cizgi);
   border-radius: 50%;
-  color: var(--site-vurgu);
+  color: var(--site-alan-yazi);
   font-size: 21px;
   font-style: normal;
   transition: transform 250ms ease;
@@ -1417,8 +1485,8 @@
   gap: 22px;
   padding: clamp(28px, 4vw, 52px);
   border: 1px solid var(--site-cizgi);
-  background: color-mix(in srgb, var(--site-ikinci-arka-plan) 72%, transparent);
-  color: var(--site-panel-yazi);
+  background: var(--site-kutu-zemin);
+  color: var(--site-kutu-yazi);
 }
 
 .talepFormu label {
@@ -1427,7 +1495,7 @@
 }
 
 .talepFormu label > span {
-  color: var(--site-soluk-yazi);
+  color: var(--site-kutu-soluk);
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -1445,8 +1513,13 @@
   border-radius: 0;
   outline: none;
   background: transparent;
-  color: var(--site-yazi);
+  color: var(--site-kutu-yazi);
   font-size: 16px;
+}
+
+.talepFormu :is(input, textarea)::placeholder {
+  color: var(--site-kutu-soluk);
+  opacity: 0.82;
 }
 
 .talepFormu textarea {
@@ -1481,7 +1554,7 @@
 }
 
 .talepFormu > small {
-  color: var(--site-soluk-yazi);
+  color: var(--site-kutu-soluk);
   font-size: 10px;
   line-height: 1.6;
 }
@@ -1565,9 +1638,13 @@
 }
 
 .footer {
+  --site-alan-yazi: var(--site-ters-yazi);
+  --site-alan-soluk: color-mix(in srgb, var(--site-ters-yazi) 62%, transparent);
+  --site-alan-cizgi: color-mix(in srgb, var(--site-ters-yazi) 22%, transparent);
+
   padding: clamp(90px, 9vw, 160px) 5vw 35px;
   background: var(--site-yazi);
-  color: var(--site-arka-plan);
+  color: var(--site-alan-yazi);
 }
 
 .footerFirma span {
@@ -1616,7 +1693,7 @@
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--site-arka-plan);
+  color: var(--site-alan-yazi);
   font-size: 12px;
   cursor: pointer;
   text-decoration: none;
@@ -1632,7 +1709,7 @@
 .footerIletisim a,
 .footerIletisim span {
   max-width: 450px;
-  color: var(--site-arka-plan);
+  color: var(--site-alan-yazi);
   font-size: 12px;
   text-align: right;
   text-decoration: none;
@@ -1643,11 +1720,7 @@
   justify-content: space-between;
   gap: 20px;
   padding-top: 30px;
-  color: color-mix(
-    in srgb,
-    var(--site-arka-plan) 58%,
-    transparent
-  );
+  color: var(--site-alan-soluk);
   font-size: 9px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1903,6 +1976,10 @@
 }
 
 .site[data-tasarim-duzen="sinematik"] .heroBolumu:not(.gorselliHero) {
+  --site-alan-yazi: #ffffff;
+  --site-alan-soluk: rgba(255, 255, 255, 0.72);
+  --site-alan-cizgi: rgba(255, 255, 255, 0.28);
+
   min-height: calc(100svh - 92px);
   grid-template-columns: 1fr;
   padding: 0;
@@ -2012,8 +2089,8 @@
 }
 
 .site[data-tasarim-duzen="editorial"] .heroGorseli {
-  margin-bottom: -7vw;
-  transform: translateY(-3vw);
+  margin-bottom: 0;
+  transform: none;
 }
 
 .site[data-tasarim-duzen="editorial"] .heroBilgiListesi {
@@ -2101,7 +2178,7 @@
 }
 
 .site[data-tasarim-duzen="portfoy"] .heroGorseli {
-  transform: rotate(1.5deg) scale(1.04);
+  transform: rotate(0.6deg) scale(0.985);
 }
 
 .site[data-tasarim-duzen="portfoy"] .heroGorseli::before {
@@ -2249,15 +2326,19 @@
 }
 
 .site[data-tasarim-aile="acil-saha-servisi"] .iletisimYerlesimi {
+  --site-alan-yazi: var(--site-ters-yazi);
+  --site-alan-soluk: color-mix(in srgb, var(--site-ters-yazi) 72%, transparent);
+  --site-alan-cizgi: color-mix(in srgb, var(--site-ters-yazi) 22%, transparent);
+
   padding: clamp(30px, 5vw, 70px);
   background: var(--site-yazi);
-  color: var(--site-arka-plan);
+  color: var(--site-alan-yazi);
 }
 
 .site[data-tasarim-aile="acil-saha-servisi"] .iletisimYerlesimi p,
 .site[data-tasarim-aile="acil-saha-servisi"] .iletisimListesi a,
 .site[data-tasarim-aile="acil-saha-servisi"] .iletisimListesi strong {
-  color: var(--site-arka-plan);
+  color: var(--site-alan-yazi);
 }
 
 /* Kuaför, berber ve güzellik: portre, stil ve randevu. */
@@ -2974,7 +3055,7 @@
   }
 
   .site[data-tasarim-duzen="portfoy"] .heroGorseli {
-    transform: rotate(0.8deg) scale(1.01);
+    transform: rotate(0.4deg) scale(0.985);
   }
 
   .site[data-tasarim-duzen] .heroMetni h1,

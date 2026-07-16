@@ -21,6 +21,10 @@
   color: inherit;
 }
 
+.sektorSemasi [data-site-parcasi="galeri"] {
+  align-items: start;
+}
+
 .sektorSemasi [data-site-parcasi="kart"],
 .sektorSemasi [data-site-parcasi="hero-gorsel"],
 .sektorSemasi [data-site-parcasi="hikaye-gorsel"],
@@ -47,6 +51,17 @@
 ) [data-site-alani="hero"] :is([data-site-parcasi="hero-metin"] > span:first-child, [data-site-parcasi="hero-bilgi"] li > span) {
   border-color: currentColor;
   color: var(--site-ters-yazi);
+}
+
+.sektorSemasi:is(
+  [data-sektor="oto-detaylandirma"],
+  [data-sektor="berber"],
+  [data-sektor="spor-salonu"],
+  [data-sektor="transfer"]
+) [data-site-alani="hero"] {
+  --site-alan-yazi: var(--site-ters-yazi);
+  --site-alan-soluk: color-mix(in srgb, var(--site-ters-yazi) 72%, transparent);
+  --site-alan-cizgi: color-mix(in srgb, var(--site-ters-yazi) 24%, transparent);
 }
 
 .sektorSemasi:is(
@@ -137,12 +152,12 @@
 }
 
 .sektorSemasi[data-sektor="arac-kaplama"] [data-site-parcasi="hero-gorsel"] {
-  transform: rotate(-2.5deg);
+  transform: rotate(-1deg) scale(0.97);
   box-shadow: -34px 34px 0 color-mix(in srgb, var(--site-vurgu) 42%, transparent);
 }
 
 .sektorSemasi[data-sektor="arac-kaplama"] section[data-bolum-turu="hizmetler"] [data-site-parcasi="kart"]:nth-child(3n + 2) {
-  transform: translateY(42px);
+  margin-top: 42px;
 }
 
 .sektorSemasi[data-sektor="arac-kaplama"] section[data-bolum-turu="galeri"] [data-site-parcasi="galeri"] {
@@ -354,8 +369,9 @@
 
 .sektorSemasi[data-sektor="kuafor"] [data-site-parcasi="hero-metin"] {
   z-index: 4;
-  margin-right: -16vw;
+  margin-right: 0;
   padding: 38px;
+  border-left: 1px solid var(--site-vurgu);
   background: color-mix(in srgb, var(--site-arka-plan) 92%, transparent);
 }
 
@@ -458,7 +474,7 @@
 }
 
 .sektorSemasi[data-sektor="fizyoterapist"] section[data-bolum-turu="surec"] [data-site-parcasi="kart"]:nth-child(even) {
-  transform: translateY(34px);
+  margin-top: 34px;
 }
 
 /* 18 · Diş kliniği — klinik modüller */
@@ -635,7 +651,8 @@
 }
 
 .sektorSemasi[data-sektor="anaokulu"] section[data-bolum-turu="hizmetler"] [data-site-parcasi="kart"]:nth-child(even) {
-  transform: translateY(38px) rotate(1deg);
+  margin-top: 38px;
+  transform: rotate(1deg);
 }
 
 /* 26 · Özel eğitim kursu — akademik program tablosu */
@@ -695,7 +712,7 @@
 }
 
 .sektorSemasi[data-sektor="cicekci"] section[data-bolum-turu="urunler"] [data-site-parcasi="kart"]:nth-child(3n + 2) {
-  transform: translateY(58px);
+  margin-top: 58px;
 }
 
 /* 29 · Pastane — butik ürün editoryali */
@@ -860,7 +877,33 @@
   box-shadow: var(--sektor-golge);
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 1240px) {
+  .sektorSemasi [data-site-alani="hero"] {
+    min-height: auto;
+    grid-template-columns: 1fr;
+    padding-right: 5vw;
+    padding-left: 5vw;
+    background-position: center;
+  }
+
+  .sektorSemasi [data-site-parcasi="hero-metin"] {
+    width: auto;
+    max-width: 900px;
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  .sektorSemasi [data-site-parcasi="hero-gorsel"] {
+    width: 100%;
+    max-width: none;
+    clip-path: none;
+    transform: none;
+  }
+
+  .sektorSemasi [data-site-parcasi="hero-gorsel"] img {
+    min-height: 560px;
+  }
+
   .sektorSemasi[data-sektor="oto-yikama"] section[data-bolum-turu="hizmetler"] [data-site-parcasi="liste"],
   .sektorSemasi[data-sektor="spor-salonu"] section[data-bolum-turu="hizmetler"] [data-site-parcasi="liste"],
   .sektorSemasi[data-sektor="matbaa"] section[data-bolum-turu="urunler"] [data-site-parcasi="liste"] {
@@ -869,7 +912,8 @@
 
   .sektorSemasi[data-sektor="fotografci"] [data-site-alani="hero"],
   .sektorSemasi[data-sektor="mobilya"] [data-site-alani="hero"] {
-    grid-template-columns: minmax(300px, 0.68fr) minmax(500px, 1.32fr);
+    grid-template-columns: 1fr;
+    padding-right: 5vw;
   }
 }
 

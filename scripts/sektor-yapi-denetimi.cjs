@@ -557,10 +557,30 @@ for (const semantikRenk of [
   "--site-ters-yazi",
   "--site-vurgu-zemin",
   "--site-vurgu-yazi",
+  "--site-alan-yazi",
+  "--site-alan-soluk",
+  "--site-kutu-zemin",
+  "--site-kutu-yazi",
+  "--site-kutu-soluk",
 ]) {
   if (!siteCss.includes(semantikRenk)) {
     sorunlar.push(`semantik kontrast rengi eksik: ${semantikRenk}`);
   }
+}
+
+for (const guvenliYerlesimKurali of [
+  "contain: paint",
+  "z-index: 4",
+  "var(--site-kutu-yazi)",
+  "var(--site-kutu-soluk)",
+]) {
+  if (!siteCss.includes(guvenliYerlesimKurali)) {
+    sorunlar.push(`görsel/metin güvenlik kuralı eksik: ${guvenliYerlesimKurali}`);
+  }
+}
+
+if (!sektorSemaCss.includes("@media (max-width: 1240px)")) {
+  sorunlar.push("dar masaüstü için güvenli sektör kırılımı eksik");
 }
 
 for (const sektor of sektorler.sektorler) {

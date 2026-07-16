@@ -11,9 +11,20 @@ import {
   X,
 } from "lucide-react";
 import { AnimatePresence, motion, type Variants } from "motion/react";
-import { type CSSProperties, useEffect, useMemo, useState } from "react";
+import {
+  type CSSProperties,
+  type FormEvent,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import styles from "./siteGorunumu.module.css";
-import type { SiteBolumu, SiteSayfasi } from "@/data/sektorSablonlari";
+import type {
+  AnimasyonTuru,
+  SiteBolumu,
+  SiteSayfasi,
+} from "@/data/sektorSablonlari";
+import { temaKarakterleriniGetir } from "@/data/sektorSunumProfilleri";
 import type { ProjeVerisi } from "@/types/proje";
 
 interface TemaRenkleri {
@@ -289,6 +300,45 @@ const bolumGecisi: Variants = {
   },
 };
 
+const bolumAnimasyonlari: Record<AnimasyonTuru, Variants> = {
+  asagidan: bolumGecisi,
+  soldan: {
+    gizli: { opacity: 0, x: -70 },
+    gorunur: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.82, ease: [0.22, 1, 0.36, 1] },
+    },
+  },
+  sagdan: {
+    gizli: { opacity: 0, x: 70 },
+    gorunur: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.82, ease: [0.22, 1, 0.36, 1] },
+    },
+  },
+  soluklasarak: {
+    gizli: { opacity: 0 },
+    gorunur: {
+      opacity: 1,
+      transition: { duration: 0.9, ease: "easeOut" },
+    },
+  },
+  maskeli: {
+    gizli: { opacity: 0, clipPath: "inset(0 0 100% 0)" },
+    gorunur: {
+      opacity: 1,
+      clipPath: "inset(0 0 0% 0)",
+      transition: { duration: 0.95, ease: [0.22, 1, 0.36, 1] },
+    },
+  },
+  yok: {
+    gizli: { opacity: 1 },
+    gorunur: { opacity: 1 },
+  },
+};
+
 const listeKapsayici: Variants = {
   gizli: {},
 
@@ -314,39 +364,6 @@ const listeElemaniGecisi: Variants = {
       ease: [0.22, 1, 0.36, 1],
     },
   },
-};
-
-const sayfaOncelikleri: Record<string, number> = {
-  "": 0,
-  ana: 0,
-  "ana-sayfa": 0,
-  anasayfa: 0,
-
-  hakkimizda: 10,
-  "hakkimizda-sayfasi": 10,
-
-  hizmetler: 20,
-  hizmetlerimiz: 20,
-  servisler: 20,
-  menu: 20,
-  urunler: 20,
-  ilanlar: 20,
-  odalar: 20,
-
-  uzmanlarimiz: 30,
-  ekibimiz: 30,
-  ekip: 30,
-
-  galeri: 40,
-  portfolyo: 40,
-  projeler: 40,
-
-  rezervasyon: 50,
-  randevu: 50,
-
-  iletisim: 90,
-  bizeulasin: 90,
-  "bize-ulasin": 90,
 };
 
 function bolumNumarasi(index: number) {
@@ -410,6 +427,22 @@ function ozelBaglantiMi(baglanti: string) {
   );
 }
 
+function whatsappNumarasiniDuzenle(telefon: unknown) {
+  let numara = String(telefon ?? "").replace(/\D/g, "");
+
+  if (numara.startsWith("0")) {
+    numara = `90${numara.slice(1)}`;
+  }
+
+  return numara;
+}
+
+function varyasyonSinifi(varyasyon: string) {
+  const anahtar = varyasyon.trim().replace(/-/g, "_");
+
+  return anahtar ? styles[`varyasyon_${anahtar}`] ?? "" : "";
+}
+
 function sayfalariSirala(sayfalar: SiteSayfasi[]) {
   return [...sayfalar].sort((a, b) => {
     if (a.anaSayfa && !b.anaSayfa) {
@@ -418,23 +451,6 @@ function sayfalariSirala(sayfalar: SiteSayfasi[]) {
 
     if (!a.anaSayfa && b.anaSayfa) {
       return 1;
-    }
-
-    const aSlug = turkceSlugOlustur(a.slug || a.ad);
-    const bSlug = turkceSlugOlustur(b.slug || b.ad);
-
-    const aOncelik =
-      sayfaOncelikleri[aSlug] ??
-      sayfaOncelikleri[turkceSlugOlustur(a.ad)] ??
-      60;
-
-    const bOncelik =
-      sayfaOncelikleri[bSlug] ??
-      sayfaOncelikleri[turkceSlugOlustur(b.ad)] ??
-      60;
-
-    if (aOncelik !== bOncelik) {
-      return aOncelik - bOncelik;
     }
 
     return a.sira - b.sira;
@@ -595,14 +611,18 @@ function HeroBolumu({
         backgroundImage: `linear-gradient(rgba(5, 8, 6, 0.55), rgba(5, 8, 6, 0.55)), url("${bolum.arkaPlanGorseli}")`,
       }
     : undefined;
+  const animasyon = bolumAnimasyonlari[bolum.animasyon] ?? bolumGecisi;
 
   return (
-    <section
+    <motion.section
       id={`bolum-${bolum.id}`}
       className={`${styles.heroBolumu} ${
         bolum.arkaPlanGorseli ? styles.gorselliHero : ""
-      } ${styles[`hero_${tema}`] ?? ""}`}
+      } ${styles[`hero_${tema}`] ?? ""} ${varyasyonSinifi(bolum.varyasyon)}`}
       style={arkaPlanStili}
+      initial="gizli"
+      animate="gorunur"
+      variants={animasyon}
     >
       <div className={styles.heroDekorasyon}>
         <motion.span
@@ -691,7 +711,7 @@ function HeroBolumu({
         <span />
         Aşağı kaydır
       </motion.div>
-    </section>
+    </motion.section>
   );
 }
 
@@ -783,6 +803,33 @@ function ListeBolumu({
 
   if (elemanlar.length === 0) {
     return null;
+  }
+
+  if (bolum.tur === "sss") {
+    return (
+      <motion.div
+        className={styles.sssListesi}
+        variants={listeKapsayici}
+        initial="gizli"
+        whileInView="gorunur"
+        viewport={{ once: true, amount: 0.12 }}
+      >
+        {elemanlar.map((eleman, index) => (
+          <motion.details
+            className={styles.sssOgesi}
+            key={eleman.id}
+            variants={listeElemaniGecisi}
+          >
+            <summary>
+              <span>{bolumNumarasi(index)}</span>
+              <strong>{eleman.baslik}</strong>
+              <i aria-hidden="true">+</i>
+            </summary>
+            <p>{eleman.aciklama}</p>
+          </motion.details>
+        ))}
+      </motion.div>
+    );
   }
 
   return (
@@ -954,7 +1001,7 @@ function IletisimBolumu({
           id: "whatsapp",
           etiket: "WhatsApp",
           deger: proje.whatsapp,
-          baglanti: `https://wa.me/${proje.whatsapp.replace(/\D/g, "")}`,
+          baglanti: `https://wa.me/${whatsappNumarasiniDuzenle(proje.whatsapp)}`,
           ikon: MessageCircle,
         }
       : null,
@@ -1041,6 +1088,111 @@ function IletisimBolumu({
           </motion.div>
         )}
       </motion.div>
+    </div>
+  );
+}
+
+function FormBolumu({
+  bolum,
+  proje,
+}: {
+  bolum: SiteBolumu;
+  proje: ProjeVerisi;
+}) {
+  function formuGonder(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const veriler = new FormData(form);
+    const ad = String(veriler.get("ad") ?? "").trim();
+    const telefon = String(veriler.get("telefon") ?? "").trim();
+    const mesaj = String(veriler.get("mesaj") ?? "").trim();
+    const metin = [
+      `Merhaba, ${proje.firmaAdi} web sitesinden bilgi almak istiyorum.`,
+      ad ? `Ad soyad: ${ad}` : "",
+      telefon ? `Telefon: ${telefon}` : "",
+      mesaj ? `Talep: ${mesaj}` : "",
+    ]
+      .filter(Boolean)
+      .join("\n");
+    const whatsapp = whatsappNumarasiniDuzenle(proje.whatsapp);
+
+    if (whatsapp) {
+      window.open(
+        `https://wa.me/${whatsapp}?text=${encodeURIComponent(metin)}`,
+        "_blank",
+        "noopener,noreferrer",
+      );
+      return;
+    }
+
+    if (proje.eposta.trim()) {
+      window.location.href = `mailto:${proje.eposta.trim()}?subject=${encodeURIComponent("Web sitesi bilgi talebi")}&body=${encodeURIComponent(metin)}`;
+      return;
+    }
+
+    if (proje.telefon.trim()) {
+      window.location.href = `tel:${proje.telefon.replace(/\s/g, "")}`;
+    }
+  }
+
+  const gonderimEtiketi = proje.whatsapp.trim()
+    ? "WhatsApp ile gönder"
+    : proje.eposta.trim()
+      ? "E-posta ile gönder"
+      : "Telefonla iletişime geç";
+
+  return (
+    <div className={styles.formYerlesimi}>
+      <motion.div
+        className={styles.formTanitim}
+        variants={bolumGecisi}
+        initial="gizli"
+        whileInView="gorunur"
+        viewport={{ once: true, amount: 0.25 }}
+      >
+        {bolum.ustBaslik.trim() && (
+          <span className={styles.kucukBaslik}>{bolum.ustBaslik}</span>
+        )}
+        {bolum.baslik.trim() && <h2>{bolum.baslik}</h2>}
+        {bolum.aciklama.trim() && <p>{bolum.aciklama}</p>}
+      </motion.div>
+
+      <motion.form
+        className={styles.talepFormu}
+        onSubmit={formuGonder}
+        variants={listeKapsayici}
+        initial="gizli"
+        whileInView="gorunur"
+        viewport={{ once: true, amount: 0.2 }}
+      >
+        <motion.label variants={listeElemaniGecisi}>
+          <span>Ad soyad</span>
+          <input name="ad" type="text" autoComplete="name" required />
+        </motion.label>
+        <motion.label variants={listeElemaniGecisi}>
+          <span>Telefon</span>
+          <input
+            name="telefon"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            required
+          />
+        </motion.label>
+        <motion.label variants={listeElemaniGecisi}>
+          <span>İhtiyacınızı kısaca anlatın</span>
+          <textarea name="mesaj" rows={5} required />
+        </motion.label>
+        <motion.button type="submit" variants={listeElemaniGecisi}>
+          <span>{gonderimEtiketi}</span>
+          <ArrowRight size={18} />
+        </motion.button>
+        <small>
+          Gönder butonu sizi seçili iletişim kanalına yönlendirir; bilgileriniz
+          bu sitede saklanmaz.
+        </small>
+      </motion.form>
     </div>
   );
 }
@@ -1174,20 +1326,21 @@ function BolumRender({
     "sss",
     "istatistik",
   ].includes(bolum.tur);
+  const animasyon = bolumAnimasyonlari[bolum.animasyon] ?? bolumGecisi;
 
   return (
     <motion.section
       id={`bolum-${bolum.id}`}
       className={`${styles.standartBolum} ${
         index % 2 === 1 ? styles.alternatifBolum : ""
-      } ${styles[`bolum_${bolum.tur}`] ?? ""}`}
+      } ${styles[`bolum_${bolum.tur}`] ?? ""} ${varyasyonSinifi(bolum.varyasyon)}`}
       initial="gizli"
       whileInView="gorunur"
       viewport={{
         once: true,
         amount: 0.08,
       }}
-      variants={bolumGecisi}
+      variants={animasyon}
     >
       <div className={styles.bolumNumarasi}>
         <span>{bolumNumarasi(index)}</span>
@@ -1210,6 +1363,8 @@ function BolumRender({
         <IletisimBolumu bolum={bolum} proje={proje} />
       ) : bolum.tur === "harita" ? (
         <HaritaBolumu bolum={bolum} proje={proje} />
+      ) : bolum.tur === "form" ? (
+        <FormBolumu bolum={bolum} proje={proje} />
       ) : listeTuruMu ? (
         <>
           <AnimasyonluBaslik
@@ -1248,7 +1403,19 @@ export default function SiteGorunumu({
   baslangicSlug = "",
   gercekRotaKullan = false,
 }: SiteGorunumuProps) {
-  const [aktifSayfaId, setAktifSayfaId] = useState("");
+  const [aktifSayfaId, setAktifSayfaId] = useState(() => {
+    const ilkSayfalar = sayfalariSirala(proje.sayfalar);
+    const ilkAnaSayfa = anaSayfayiBul(ilkSayfalar);
+    const temizBaslangicSlug = turkceSlugOlustur(baslangicSlug);
+    const baslangicSayfasi = temizBaslangicSlug
+      ? ilkSayfalar.find(
+          (sayfa) =>
+            turkceSlugOlustur(sayfa.slug || sayfa.ad) === temizBaslangicSlug,
+        )
+      : ilkAnaSayfa;
+
+    return baslangicSayfasi?.id ?? ilkAnaSayfa?.id ?? "";
+  });
 
   const [mobilMenuAcik, setMobilMenuAcik] = useState(false);
 
@@ -1259,34 +1426,6 @@ export default function SiteGorunumu({
   const anaSayfa = useMemo(() => {
     return anaSayfayiBul(siraliSayfalar);
   }, [siraliSayfalar]);
-
-  useEffect(() => {
-    if (!anaSayfa) {
-      setAktifSayfaId("");
-      return;
-    }
-
-    const temizBaslangicSlug = turkceSlugOlustur(baslangicSlug);
-
-    const baslangicSayfasi = temizBaslangicSlug
-      ? siraliSayfalar.find(
-          (sayfa) =>
-            turkceSlugOlustur(sayfa.slug || sayfa.ad) === temizBaslangicSlug,
-        )
-      : anaSayfa;
-
-    setAktifSayfaId((mevcutSayfaId) => {
-      const sayfaHalaVar = siraliSayfalar.some(
-        (sayfa) => sayfa.id === mevcutSayfaId,
-      );
-
-      if (sayfaHalaVar && !baslangicSlug) {
-        return mevcutSayfaId;
-      }
-
-      return baslangicSayfasi?.id ?? anaSayfa.id;
-    });
-  }, [anaSayfa, baslangicSlug, siraliSayfalar]);
 
   useEffect(() => {
     if (!gercekRotaKullan) {
@@ -1478,6 +1617,10 @@ export default function SiteGorunumu({
   }
 
   const renkler = temaRenkleri[proje.tema] ?? temaRenkleri.standard;
+  const temaKarakterSiniflari = temaKarakterleriniGetir(proje.tema)
+    .map((karakter) => styles[`tema_${karakter}`] ?? "")
+    .filter(Boolean)
+    .join(" ");
 
   const menuSayfalari = siraliSayfalar.filter((sayfa) => sayfa.menuGoster);
 
@@ -1497,7 +1640,7 @@ export default function SiteGorunumu({
 
   return (
     <main
-      className={`${styles.site} ${styles[`tema_${proje.tema}`] ?? ""}`}
+      className={`${styles.site} ${styles[`tema_${proje.tema}`] ?? ""} ${temaKarakterSiniflari}`}
       style={cssDegiskenleri}
     >
       <header className={styles.siteHeader}>
@@ -1683,7 +1826,7 @@ export default function SiteGorunumu({
       {proje.whatsapp && (
         <motion.a
           className={styles.sabitWhatsapp}
-          href={`https://wa.me/${proje.whatsapp.replace(/\D/g, "")}`}
+          href={`https://wa.me/${whatsappNumarasiniDuzenle(proje.whatsapp)}`}
           target="_blank"
           rel="noreferrer"
           initial={{

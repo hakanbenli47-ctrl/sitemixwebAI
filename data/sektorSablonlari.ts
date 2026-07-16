@@ -1,3 +1,9 @@
+import { sektorIcerikProfiliniGetir } from "@/data/sektorIcerikProfilleri";
+import {
+  sektorSunumProfiliniGetir,
+  type SayfaRolu,
+} from "@/data/sektorSunumProfilleri";
+
 export type BolumTuru =
   | "hero"
   | "metin"
@@ -178,6 +184,7 @@ const hizmetHaritasi: Record<string, string[]> = {
   "teknik-servis": ["Arıza tespiti", "Bakım", "Onarım", "Kurulum"],
   "oto-yikama": ["İç dış yıkama", "Detaylı temizlik", "Seramik kaplama", "Koltuk temizliği"],
   "oto-servis": ["Periyodik bakım", "Arıza tespiti", "Mekanik onarım", "Elektrik ve elektronik"],
+  "arac-kaplama": ["Tam araç renk değişim kaplama", "Şeffaf boya koruma filmi (PPF)", "Cam filmi uygulaması", "Bölgesel araç kaplama", "Krom karartma", "Ticari araç reklam kaplama"],
   "arac-kiralama": ["Günlük araç kiralama", "Uzun dönem kiralama", "Havalimanı teslimi", "Kurumsal filo çözümleri"],
   restoran: ["Öne çıkan lezzetler", "Ana yemekler", "Tatlılar", "İçecekler"],
   kafe: ["Kahve çeşitleri", "Kahvaltı", "Tatlılar", "Soğuk içecekler"],
@@ -194,8 +201,8 @@ const hizmetHaritasi: Record<string, string[]> = {
   insaat: ["Anahtar teslim proje", "Tadilat", "İç dekorasyon", "Dış cephe"],
   mimarlik: ["Mimari proje", "İç mimari", "Proje danışmanlığı", "Uygulama takibi"],
   emlak: ["Satılık gayrimenkuller", "Kiralık gayrimenkuller", "Değerleme", "Yatırım danışmanlığı"],
-  otel: ["Oda seçenekleri", "Konaklama", "Kahvaltı", "Otel olanakları"],
-  pansiyon: ["Oda seçenekleri", "Konaklama", "Kahvaltı", "Yerel deneyimler"],
+  otel: ["Standart oda", "Geniş oda", "Aile odası", "Otel olanakları"],
+  pansiyon: ["Standart oda", "Geniş oda", "Aile odası", "Yerel deneyimler"],
   turizm: ["Tur paketleri", "Konaklama planlama", "Rehberlik", "Özel gezi programı"],
   transfer: ["Havalimanı transferi", "Şehir içi transfer", "VIP transfer", "Grup transferi"],
   kurs: ["Birebir eğitim", "Grup eğitimi", "Sınav hazırlığı", "Online eğitim"],
@@ -229,75 +236,115 @@ function anaSayfaBolumleri(
   hizmetAdlari: string[],
 ): SiteBolumu[] {
   const konum = hizmetBolgesiMetni(bilgi);
-  const konumVurgusu = konum ? `${konum} bölgesinde ` : "";
+  const icerik = sektorIcerikProfiliniGetir(bilgi.sektor);
+  const sunum = sektorSunumProfiliniGetir(bilgi.sektor);
+  const aksiyonHedefi = sunum.aksiyonSayfasi
+    ? `/${sunum.aksiyonSayfasi.slug}`
+    : "/iletisim";
 
-  return [
-    bolum("hero", 0, {
-      varyasyon: "buyuk-baslik",
+  const bolumler: Record<string, SiteBolumu> = {
+    hero: bolum("hero", 0, {
+      varyasyon: sunum.heroVaryasyonu,
       ustBaslik: konum ? `${bilgi.sektorAdi} · ${konum}` : bilgi.sektorAdi,
-      baslik: bilgi.firmaAdi,
-      aciklama: `${bilgi.firmaAdi}, ${konumVurgusu}${kucukHarf(bilgi.sektorAdi)} alanında güvenilir, ulaşılabilir ve ihtiyaca uygun çözümler sunar.`,
+      baslik: icerik.heroBaslik,
+      aciklama: icerik.odakMetni,
       butonlar: [
-        buton(
-          bilgi.whatsapp ? "WhatsApp’tan ulaşın" : "İletişime geçin",
-          bilgi.whatsapp
-            ? `https://wa.me/${whatsappNumarasi(bilgi.whatsapp)}`
-            : "/iletisim",
-        ),
-        buton("Hizmetleri inceleyin", "/hizmetler"),
+        buton(icerik.ctaMetni, aksiyonHedefi),
+        buton(sunum.hizmetSayfasiAdi, `/${sunum.hizmetSayfasiSlug}`),
       ],
     }),
-    bolum("metin", 1, {
-      varyasyon: "sag-gorsel",
-      ustBaslik: "Hakkımızda",
-      baslik: `${bilgi.firmaAdi} ile güvenli ve düzenli hizmet`,
-      aciklama: `${bilgi.firmaAdi}, müşterilerinin ihtiyacını doğru anlamaya, süreci açık biçimde yönetmeye ve her işte özenli sonuç sunmaya odaklanır.${konum ? ` ${konum} ve çevresinde hızlı iletişim ve yerel hizmet avantajı sağlar.` : ""}`,
-    }),
-    bolum("hizmetler", 2, {
-      varyasyon: "cizgili-liste",
-      ustBaslik: "Hizmetler",
-      baslik: "İhtiyacınıza uygun çözümler",
-      aciklama: `${bilgi.firmaAdi} tarafından sunulan temel hizmetleri inceleyin; detay ve teklif için doğrudan iletişime geçin.`,
-      listeElemanlari: hizmetAdlari.map((ad) =>
-        listeElemani(
-          ad,
-          `${ad} ihtiyacınız için planlı, şeffaf ve işletmenizin beklentilerine uygun hizmet sunulur.`,
-        ),
-      ),
-    }),
-    bolum("neden-biz", 3, {
-      varyasyon: "cizgili-liste",
-      ustBaslik: "Neden biz",
-      baslik: "Doğru iletişim, özenli çalışma, güvenilir sonuç",
+    guven: bolum("istatistik", 0, {
+      varyasyon: "kartli",
+      ustBaslik: "Karar desteği",
+      baslik: sunum.guvenBasligi,
+      aciklama: "İyi bir hizmet deneyimi, beklentinin ve kapsamın işe başlamadan önce anlaşılmasıyla başlar.",
       listeElemanlari: [
-        listeElemani("İhtiyaca özel yaklaşım", "Her talep kendi koşullarıyla değerlendirilir ve uygun çözüm net biçimde planlanır."),
-        listeElemani("Şeffaf süreç", "İşin kapsamı, uygulanacak adımlar ve iletişim süreci müşteriye açık biçimde aktarılır."),
-        listeElemani("Kolay ulaşım", "Telefon ve WhatsApp üzerinden hızlı bilgi, planlama ve teklif desteği sağlanır."),
+        listeElemani("Doğru ön değerlendirme", icerik.kararOlcutleri),
+        listeElemani("Açık çalışma kapsamı", icerik.kisaYaklasim),
+        listeElemani("Kontrollü tamamlama", icerik.sonKontrol),
       ],
     }),
-    bolum("galeri", 4, {
-      varyasyon: "tam-genislik",
-      ustBaslik: "Galeri",
-      baslik: "Hizmetlerimizden görüntüler",
-      aciklama: `${bilgi.firmaAdi} hizmetlerini, çalışma yaklaşımını ve öne çıkan detayları görseller üzerinden inceleyin.`,
-      listeElemanlari: hizmetAdlari.slice(0, 4).map((ad) =>
-        listeElemani(ad, `${ad} çalışmalarından örnek görünüm.`),
+    hizmetler: bolum("hizmetler", 0, {
+      varyasyon: sunum.listeVaryasyonu,
+      ustBaslik: sunum.hizmetUstBasligi,
+      baslik: sunum.hizmetSayfasiAdi,
+      aciklama: icerik.kararOlcutleri,
+      listeElemanlari: hizmetAdlari.map((ad) =>
+        listeElemani(ad, `${ad} için kapsam, mevcut durum ve beklenti birlikte değerlendirilir.`),
       ),
+      butonlar: [buton(`Tüm ${kucukHarf(sunum.hizmetSayfasiAdi)}`, `/${sunum.hizmetSayfasiSlug}`)],
     }),
-    bolum("iletisim", 5, {
-      ustBaslik: "İletişim",
-      baslik: `${bilgi.firmaAdi} ile iletişime geçin`,
-      aciklama: bilgi.adres || (konum ? `${konum} ve çevresinde hizmet veriyoruz.` : "Detaylı bilgi ve teklif için bize ulaşın."),
+    surec: bolum("neden-biz", 0, {
+      varyasyon: "adimlar",
+      ustBaslik: "Çalışma süreci",
+      baslik: sunum.surecBasligi,
+      aciklama: "Her adımın amacı, kapsamı ve sonraki aşaması açık biçimde ilerletilir.",
+      listeElemanlari: [
+        listeElemani("İhtiyacı anlayalım", icerik.iletisimIstegi),
+        listeElemani("Kapsamı netleştirelim", icerik.kararOlcutleri),
+        listeElemani("Planlı biçimde ilerleyelim", icerik.detayliYaklasim),
+        listeElemani("Birlikte kontrol edelim", icerik.sonKontrol),
+      ],
+    }),
+    hikaye: bolum("metin", 0, {
+      varyasyon: sunum.metinVaryasyonu,
+      ustBaslik: "Yaklaşımımız",
+      baslik: icerik.yaklasimBaslik,
+      aciklama: icerik.detayliYaklasim,
+      butonlar: [buton("Bizi daha yakından tanıyın", "/hakkimizda")],
+    }),
+    galeri: bolum("galeri", 0, {
+      varyasyon: sunum.galeriVaryasyonu,
+      ustBaslik: sunum.galeriSayfasiAdi,
+      baslik: "İşi yalnızca sonuçla değil, ayrıntılarıyla inceleyin",
+      aciklama: "Görseller, hizmetin kapsamını ve uygulama yaklaşımını daha doğru değerlendirmenize yardımcı olur.",
+      listeElemanlari: hizmetAdlari.slice(0, 4).map((ad) =>
+        listeElemani(ad, `${ad} kapsamında öne çıkan uygulama ayrıntısı.`),
+      ),
+      butonlar: [buton(sunum.galeriSayfasiAdi, `/${sunum.galeriSayfasiSlug}`)],
+    }),
+    sss: bolum("sss", 0, {
+      varyasyon: "akordeon",
+      ustBaslik: "Sık sorulan sorular",
+      baslik: sunum.sssBasligi,
+      aciklama: "İlk görüşme öncesinde en çok merak edilen başlıkları açık ve kısa yanıtlarla inceleyin.",
+      listeElemanlari: [
+        listeElemani("Başlamak için hangi bilgileri paylaşmalıyım?", icerik.iletisimIstegi),
+        listeElemani("Hizmet kapsamı nasıl belirleniyor?", icerik.kararOlcutleri),
+        listeElemani("Süreç nasıl ilerliyor?", icerik.kisaYaklasim),
+        listeElemani("Tamamlanırken nelere dikkat ediliyor?", icerik.sonKontrol),
+      ],
+    }),
+    iletisim: bolum("iletisim", 0, {
+      varyasyon: "iletisim-paneli",
+      ustBaslik: "Bilgi ve planlama",
+      baslik: icerik.ctaMetni,
+      aciklama: `${icerik.iletisimIstegi} Telefon veya WhatsApp üzerinden kısa bilgi paylaşmanız yeterlidir.`,
       butonlar: [
         ...(bilgi.telefon
-          ? [buton("Telefonla arayın", `tel:${bilgi.telefon.replace(/\s/g, "")}`)]
+          ? [buton(`Telefon: ${bilgi.telefon}`, `tel:${bilgi.telefon.replace(/\s/g, "")}`)]
           : []),
         ...(bilgi.whatsapp
           ? [buton("WhatsApp’tan yazın", `https://wa.me/${whatsappNumarasi(bilgi.whatsapp)}`)]
           : []),
       ],
     }),
-  ];
+  };
+
+  const anaSayfaSirasi = [...sunum.anaSayfaSirasi];
+
+  if (sunum.galeriKullan && !anaSayfaSirasi.includes("galeri")) {
+    const sssSirasi = anaSayfaSirasi.indexOf("sss");
+    anaSayfaSirasi.splice(sssSirasi === -1 ? anaSayfaSirasi.length : sssSirasi, 0, "galeri");
+  }
+
+  return anaSayfaSirasi
+    .filter((anahtar) => anahtar !== "galeri" || sunum.galeriKullan)
+    .map((anahtar, index) => ({
+      ...bolumler[anahtar],
+      sira: index,
+      animasyon: sunum.animasyonAkisi[index % sunum.animasyonAkisi.length],
+    }));
 }
 
 function standartSayfalar(
@@ -305,215 +352,182 @@ function standartSayfalar(
   hizmetAdlari: string[],
 ): SiteSayfasi[] {
   const konum = hizmetBolgesiMetni(bilgi);
+  const icerik = sektorIcerikProfiliniGetir(bilgi.sektor);
+  const sunum = sektorSunumProfiliniGetir(bilgi.sektor);
+  const icHeroVaryasyonu = sunum.heroVaryasyonu === "kapak" ? "odakli" : sunum.heroVaryasyonu;
 
-  return [
-    sayfa("Ana Sayfa", "", 0, anaSayfaBolumleri(bilgi, hizmetAdlari), true),
-    sayfa("Hakkımızda", "hakkimizda", 1, [
+  const surecBolumu = () =>
+    bolum("neden-biz", 2, {
+      varyasyon: "adimlar",
+      ustBaslik: "Nasıl ilerliyoruz?",
+      baslik: sunum.surecBasligi,
+      aciklama: "İşin kapsamı ve sonraki adımlar baştan itibaren anlaşılır tutulur.",
+      listeElemanlari: [
+        listeElemani("Ön değerlendirme", icerik.iletisimIstegi),
+        listeElemani("Kapsam ve plan", icerik.kararOlcutleri),
+        listeElemani("Uygulama veya hizmet", icerik.kisaYaklasim),
+        listeElemani("Kontrol ve takip", icerik.sonKontrol),
+      ],
+      animasyon: "soldan",
+    });
+
+  const sssBolumu = (sira: number) =>
+    bolum("sss", sira, {
+      varyasyon: "akordeon",
+      ustBaslik: "Sık sorulan sorular",
+      baslik: sunum.sssBasligi,
+      listeElemanlari: [
+        listeElemani("Hangi bilgiler gerekli?", icerik.iletisimIstegi),
+        listeElemani("Kapsam nasıl belirlenir?", icerik.kararOlcutleri),
+        listeElemani("Süreç nasıl yürütülür?", icerik.detayliYaklasim),
+        listeElemani("Son kontrol nasıl yapılır?", icerik.sonKontrol),
+      ],
+      animasyon: "asagidan",
+    });
+
+  const sayfalar: Partial<Record<SayfaRolu, SiteSayfasi>> = {
+    ana: sayfa("Ana Sayfa", "", 0, anaSayfaBolumleri(bilgi, hizmetAdlari), true),
+    hakkimizda: sayfa("Hakkımızda", "hakkimizda", 0, [
       bolum("hero", 0, {
+        varyasyon: icHeroVaryasyonu,
         ustBaslik: "Hakkımızda",
-        baslik: bilgi.firmaAdi,
-        aciklama: `${bilgi.firmaAdi}, ${kucukHarf(bilgi.sektorAdi)} alanında güven, düzenli iletişim ve kaliteli sonuç odaklı çalışır.${konum ? ` ${konum} bölgesindeki müşterilerine ulaşılabilir hizmet sunar.` : ""}`,
+        baslik: icerik.yaklasimBaslik,
+        aciklama: icerik.kisaYaklasim,
+        animasyon: "soluklasarak",
       }),
       bolum("metin", 1, {
-        varyasyon: "sag-gorsel",
-        baslik: "İşimize gösterdiğimiz özeni müşterimize yansıtıyoruz",
-        aciklama: "Her talebi dikkatle değerlendiriyor, ihtiyacı doğru belirliyor ve uygulanabilir çözümü açık bir çalışma planıyla sunuyoruz.",
+        varyasyon: sunum.metinVaryasyonu,
+        ustBaslik: `${bilgi.firmaAdi} yaklaşımı`,
+        baslik: "İyi hizmet, doğru beklenti ve düzenli iletişimle başlar",
+        aciklama: icerik.detayliYaklasim,
+        animasyon: "asagidan",
       }),
-      bolum("neden-biz", 2, {
-        baslik: "Çalışma anlayışımız",
+      bolum("istatistik", 2, {
+        varyasyon: "kartli",
+        ustBaslik: "Çalışma ilkeleri",
+        baslik: sunum.guvenBasligi,
         listeElemanlari: [
-          listeElemani("Kalite", "Sunulan hizmetin her aşamasında özenli ve tutarlı standartları koruruz."),
-          listeElemani("Güven", "Süreç, kapsam ve iletişim konularında açık davranırız."),
-          listeElemani("Müşteri memnuniyeti", "Beklentiyi doğru anlamaya ve ihtiyaç halinde hızlı destek vermeye önem veririz."),
+          listeElemani("Açık kapsam", icerik.kararOlcutleri),
+          listeElemani("Ulaşılabilir iletişim", icerik.iletisimIstegi),
+          listeElemani("Kontrollü tamamlama", icerik.sonKontrol),
         ],
+        animasyon: "sagdan",
       }),
     ]),
-    sayfa("Hizmetler", "hizmetler", 2, [
+    hizmet: sayfa(sunum.hizmetSayfasiAdi, sunum.hizmetSayfasiSlug, 0, [
       bolum("hero", 0, {
-        ustBaslik: "Hizmetler",
-        baslik: `${bilgi.firmaAdi} hizmetleri`,
-        aciklama: `${bilgi.sektorAdi} alanındaki ihtiyaçlarınıza uygun hizmet seçeneklerini inceleyin.`,
+        varyasyon: icHeroVaryasyonu,
+        ustBaslik: sunum.hizmetUstBasligi,
+        baslik: sunum.hizmetSayfasiAdi,
+        aciklama: icerik.kararOlcutleri,
+        animasyon: "soluklasarak",
       }),
-      bolum("hizmetler", 1, {
-        varyasyon: "cizgili-liste",
-        baslik: "Hizmetlerimiz",
+      bolum(sunum.hizmetBolumTuru, 1, {
+        varyasyon: sunum.listeVaryasyonu,
+        ustBaslik: "Ayrıntılı kapsam",
+        baslik: "İhtiyacınıza uygun seçeneği karşılaştırın",
+        aciklama: "Her seçeneğin kapsamı mevcut durum ve beklentiye göre netleştirilir.",
         listeElemanlari: hizmetAdlari.map((ad) =>
-          listeElemani(ad, `${ad} için ihtiyaca uygun planlama, açık iletişim ve özenli uygulama sunulur.`),
+          listeElemani(ad, `${ad} için kapsam, hazırlık ve sonraki adımlar açık biçimde planlanır.`),
         ),
+        butonlar: [buton(icerik.ctaMetni, sunum.aksiyonSayfasi ? `/${sunum.aksiyonSayfasi.slug}` : "/iletisim")],
+        animasyon: "asagidan",
       }),
+      surecBolumu(),
+      sssBolumu(3),
     ]),
-    sayfa("Galeri", "galeri", 3, [
-      bolum("hero", 0, {
-        ustBaslik: "Galeri",
-        baslik: "Çalışmalarımızdan görüntüler",
-        aciklama: `${bilgi.firmaAdi} hizmetlerini ve çalışma alanlarını yakından inceleyin.`,
-      }),
-      bolum("galeri", 1, {
-        varyasyon: "tam-genislik",
-        listeElemanlari: [...hizmetAdlari, ...hizmetAdlari.slice(0, 2)].map((ad) =>
-          listeElemani(ad, `${ad} için örnek çalışma görünümü.`),
-        ),
-      }),
-    ]),
-    sayfa("İletişim", "iletisim", 4, [
+    galeri: sunum.galeriKullan
+      ? sayfa(sunum.galeriSayfasiAdi, sunum.galeriSayfasiSlug, 0, [
+          bolum("hero", 0, {
+            varyasyon: icHeroVaryasyonu,
+            ustBaslik: sunum.galeriSayfasiAdi,
+            baslik: "Çalışmaları ve ayrıntıları yakından inceleyin",
+            aciklama: "Görselleri, hizmetin uygulama biçimini ve öne çıkan ayrıntılarını anlamak için inceleyebilirsiniz.",
+            animasyon: "soluklasarak",
+          }),
+          bolum("galeri", 1, {
+            varyasyon: sunum.galeriVaryasyonu,
+            ustBaslik: "Seçili örnekler",
+            baslik: sunum.galeriSayfasiAdi,
+            listeElemanlari: [...hizmetAdlari, ...hizmetAdlari.slice(0, 2)].map((ad) =>
+              listeElemani(ad, `${ad} kapsamında öne çıkan çalışma ayrıntısı.`),
+            ),
+            animasyon: "maskeli",
+          }),
+        ])
+      : undefined,
+    aksiyon: sunum.aksiyonSayfasi
+      ? sayfa(sunum.aksiyonSayfasi.ad, sunum.aksiyonSayfasi.slug, 0, [
+          bolum("hero", 0, {
+            varyasyon: "odakli",
+            ustBaslik: sunum.aksiyonSayfasi.ustBaslik,
+            baslik: sunum.aksiyonSayfasi.baslik,
+            aciklama: icerik.iletisimIstegi,
+            animasyon: "soluklasarak",
+          }),
+          bolum("form", 1, {
+            varyasyon: "talep-formu",
+            ustBaslik: "Kısa talep formu",
+            baslik: icerik.ctaMetni,
+            aciklama: icerik.iletisimIstegi,
+            animasyon: "asagidan",
+          }),
+        ])
+      : undefined,
+    iletisim: sayfa("İletişim", "iletisim", 0, [
       bolum("iletisim", 0, {
+        varyasyon: "iletisim-paneli",
         ustBaslik: "İletişim",
         baslik: `${bilgi.firmaAdi} ile iletişime geçin`,
-        aciklama: bilgi.adres || (konum ? `${konum} ve çevresinde hizmet veriyoruz.` : "Bilgi ve teklif için bize ulaşın."),
+        aciklama: `${icerik.iletisimIstegi}${konum ? ` ${konum} için güncel uygunluğu doğrudan sorabilirsiniz.` : ""}`,
         butonlar: [
-          ...(bilgi.telefon ? [buton("Telefonla arayın", `tel:${bilgi.telefon.replace(/\s/g, "")}`)] : []),
+          ...(bilgi.telefon ? [buton(`Telefon: ${bilgi.telefon}`, `tel:${bilgi.telefon.replace(/\s/g, "")}`)] : []),
           ...(bilgi.whatsapp ? [buton("WhatsApp’tan yazın", `https://wa.me/${whatsappNumarasi(bilgi.whatsapp)}`)] : []),
           ...(bilgi.eposta ? [buton("E-posta gönderin", `mailto:${bilgi.eposta}`)] : []),
         ],
+        animasyon: "soluklasarak",
       }),
       bolum("harita", 1, {
-        baslik: "Konumumuz",
+        varyasyon: "harita-paneli",
+        ustBaslik: "Konum ve hizmet bölgesi",
+        baslik: bilgi.adres ? "Bizi haritada bulun" : "Hizmet verdiğimiz bölge",
         aciklama: bilgi.adres || konum,
-      }),
-      bolum("form", 2, {
-        baslik: "Bize mesaj gönderin",
-        aciklama: "Hizmet, fiyat ve uygunluk bilgisi için iletişim bilgilerinizi bırakarak bize ulaşabilirsiniz.",
+        animasyon: "asagidan",
       }),
     ]),
-  ];
+  };
+
+  const sayfaSirasi = [...sunum.sayfaSirasi];
+
+  if (sunum.galeriKullan && !sayfaSirasi.includes("galeri")) {
+    const hakkimizdaSirasi = sayfaSirasi.indexOf("hakkimizda");
+    sayfaSirasi.splice(
+      hakkimizdaSirasi === -1 ? sayfaSirasi.length : hakkimizdaSirasi,
+      0,
+      "galeri",
+    );
+  }
+
+  return sayfaSirasi
+    .map((rol) => sayfalar[rol])
+    .filter((sayfaVerisi): sayfaVerisi is SiteSayfasi => Boolean(sayfaVerisi))
+    .map((sayfaVerisi, index) => ({ ...sayfaVerisi, sira: index }));
 }
 
 function restoranSayfalari(bilgi: SablonBilgileri): SiteSayfasi[] {
-  const hizmetler = sektorHizmetleriniGetir(bilgi.sektor);
-  const sayfalar = standartSayfalar(bilgi, hizmetler);
-
-  sayfalar.splice(
-    2,
-    1,
-    sayfa("Menü", "menu", 2, [
-      bolum("hero", 0, {
-        ustBaslik: "Menü",
-        baslik: `${bilgi.firmaAdi} menüsü`,
-        aciklama: "Özenle hazırlanan lezzetleri ve öne çıkan menü seçeneklerini keşfedin.",
-      }),
-      bolum("urunler", 1, {
-        varyasyon: "cizgili-liste",
-        baslik: "Menümüz",
-        listeElemanlari: hizmetler.map((ad) =>
-          listeElemani(ad, `${ad} seçenekleri ve güncel bilgi için işletmemizle iletişime geçebilirsiniz.`),
-        ),
-      }),
-    ]),
-  );
-
-  sayfalar.splice(
-    4,
-    0,
-    sayfa("Rezervasyon", "rezervasyon", 4, [
-      bolum("form", 0, {
-        ustBaslik: "Rezervasyon",
-        baslik: "Masanızı ayırtın",
-        aciklama: "Tarih, saat ve kişi sayısını paylaşarak rezervasyon talebinizi iletin.",
-      }),
-    ]),
-  );
-
-  return sayfalar.map((sayfaVerisi, index) => ({ ...sayfaVerisi, sira: index }));
+  return standartSayfalar(bilgi, sektorHizmetleriniGetir(bilgi.sektor));
 }
 
 function saglikSayfalari(bilgi: SablonBilgileri): SiteSayfasi[] {
-  const hizmetler = sektorHizmetleriniGetir(bilgi.sektor);
-  const sayfalar = standartSayfalar(bilgi, hizmetler);
-
-  sayfalar.splice(
-    3,
-    0,
-    sayfa("Uzmanlarımız", "uzmanlarimiz", 3, [
-      bolum("hero", 0, {
-        ustBaslik: "Ekibimiz",
-        baslik: "Uzmanlarımızla tanışın",
-        aciklama: "Alanında deneyimli ekibimiz ve yaklaşımımız hakkında bilgi alın.",
-      }),
-      bolum("ekip", 1, {
-        listeElemanlari: [
-          listeElemani("Uzman bilgisi", "Uzmanlık alanı, eğitim ve deneyim bilgileri."),
-          listeElemani("Uzman bilgisi", "Uzmanlık alanı, eğitim ve deneyim bilgileri."),
-        ],
-      }),
-    ]),
-  );
-
-  sayfalar.splice(
-    5,
-    0,
-    sayfa("Randevu", "randevu", 5, [
-      bolum("form", 0, {
-        ustBaslik: "Randevu",
-        baslik: "Randevu talebi oluşturun",
-        aciklama: "Uygun gün ve saat için iletişim bilgilerinizi paylaşın.",
-      }),
-    ]),
-  );
-
-  return sayfalar.map((sayfaVerisi, index) => ({ ...sayfaVerisi, sira: index }));
+  return standartSayfalar(bilgi, sektorHizmetleriniGetir(bilgi.sektor));
 }
 
 function emlakSayfalari(bilgi: SablonBilgileri): SiteSayfasi[] {
-  const sayfalar = standartSayfalar(bilgi, sektorHizmetleriniGetir("emlak"));
-
-  sayfalar.splice(
-    2,
-    1,
-    sayfa("İlanlar", "ilanlar", 2, [
-      bolum("hero", 0, {
-        ustBaslik: "İlanlar",
-        baslik: "Gayrimenkul seçeneklerimiz",
-        aciklama: "Satılık ve kiralık gayrimenkulleri, konum ve özellik bilgileriyle inceleyin.",
-      }),
-      bolum("urunler", 1, {
-        listeElemanlari: [
-          listeElemani("Öne çıkan ilan", "Konum, temel özellikler ve fiyat bilgisi."),
-          listeElemani("Yeni ilan", "Konum, temel özellikler ve fiyat bilgisi."),
-          listeElemani("Yatırım fırsatı", "Konum, temel özellikler ve fiyat bilgisi."),
-        ],
-      }),
-    ]),
-  );
-
-  return sayfalar;
+  return standartSayfalar(bilgi, sektorHizmetleriniGetir("emlak"));
 }
 
 function otelSayfalari(bilgi: SablonBilgileri): SiteSayfasi[] {
-  const hizmetler = sektorHizmetleriniGetir(bilgi.sektor);
-  const sayfalar = standartSayfalar(bilgi, hizmetler);
-
-  sayfalar.splice(
-    2,
-    1,
-    sayfa("Odalar", "odalar", 2, [
-      bolum("hero", 0, {
-        ustBaslik: "Odalar",
-        baslik: "Konaklama seçeneklerimiz",
-        aciklama: "Konforlu oda seçeneklerini, olanakları ve konaklama detaylarını inceleyin.",
-      }),
-      bolum("urunler", 1, {
-        listeElemanlari: [
-          listeElemani("Standart oda", "Oda özellikleri ve konaklama bilgisi."),
-          listeElemani("Geniş oda", "Oda özellikleri ve konaklama bilgisi."),
-          listeElemani("Aile odası", "Oda özellikleri ve konaklama bilgisi."),
-        ],
-      }),
-    ]),
-  );
-
-  sayfalar.splice(
-    4,
-    0,
-    sayfa("Rezervasyon", "rezervasyon", 4, [
-      bolum("form", 0, {
-        ustBaslik: "Rezervasyon",
-        baslik: "Konaklama talebi oluşturun",
-        aciklama: "Giriş-çıkış tarihlerini ve kişi sayısını paylaşarak rezervasyon talebi oluşturun.",
-      }),
-    ]),
-  );
-
-  return sayfalar.map((sayfaVerisi, index) => ({ ...sayfaVerisi, sira: index }));
+  return standartSayfalar(bilgi, sektorHizmetleriniGetir(bilgi.sektor));
 }
 
 export function sektorSayfalariOlustur(bilgi: SablonBilgileri): SiteSayfasi[] {

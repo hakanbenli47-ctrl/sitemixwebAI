@@ -30,58 +30,18 @@ import {
   useState,
 } from "react";
 import styles from "./icerik.module.css";
-import { projeyeOzelTopluIcerikOlustur } from "@/data/icerikSablonlari";
+import {
+  projeyeOzelIcerigiUygula,
+  projeyeOzelTopluIcerikOlustur,
+} from "@/data/icerikSablonlari";
 import type {
   ButonVerisi,
   ListeElemani,
   SiteBolumu,
   SiteSayfasi,
 } from "@/data/sektorSablonlari";
+import { sektorSunumProfiliniGetir } from "@/data/sektorSunumProfilleri";
 import type { ProjeVerisi } from "@/types/proje";
-
-const sayfaOncelikleri: Record<string, number> = {
-  "": 0,
-  ana: 0,
-  anasayfa: 0,
-  "ana-sayfa": 0,
-  hakkimizda: 10,
-  hizmetler: 20,
-  hizmetlerimiz: 20,
-  menu: 20,
-  urunler: 20,
-  ilanlar: 20,
-  odalar: 20,
-  uzmanlarimiz: 30,
-  uzmanlar: 30,
-  ekip: 30,
-  ekibimiz: 30,
-  galeri: 40,
-  projeler: 40,
-  portfolyo: 40,
-  randevu: 50,
-  rezervasyon: 50,
-  iletisim: 90,
-  "bize-ulasin": 90,
-};
-
-const bolumOncelikleri: Record<SiteBolumu["tur"], number> = {
-  hero: 0,
-  metin: 10,
-  hizmetler: 20,
-  urunler: 20,
-  "neden-biz": 30,
-  istatistik: 40,
-  galeri: 50,
-  yorumlar: 60,
-  ekip: 70,
-  fiyatlar: 80,
-  sss: 90,
-  iletisim: 100,
-  harita: 110,
-  form: 120,
-  video: 130,
-  ozel: 140,
-};
 
 const listeDestekleyenBolumler: SiteBolumu["tur"][] = [
   "hizmetler",
@@ -202,23 +162,6 @@ function sayfalariSirala(sayfalar: SiteSayfasi[]) {
         return 1;
       }
 
-      const aAnahtar = slugOlustur(a.slug || a.ad);
-      const bAnahtar = slugOlustur(b.slug || b.ad);
-
-      const aOncelik =
-        sayfaOncelikleri[aAnahtar] ??
-        sayfaOncelikleri[slugOlustur(a.ad)] ??
-        60;
-
-      const bOncelik =
-        sayfaOncelikleri[bAnahtar] ??
-        sayfaOncelikleri[slugOlustur(b.ad)] ??
-        60;
-
-      if (aOncelik !== bOncelik) {
-        return aOncelik - bOncelik;
-      }
-
       return a.sira - b.sira;
     })
     .map((sayfa, index) => ({
@@ -229,16 +172,7 @@ function sayfalariSirala(sayfalar: SiteSayfasi[]) {
 
 function bolumleriSirala(bolumler: SiteBolumu[]) {
   return [...bolumler]
-    .sort((a, b) => {
-      const aOncelik = bolumOncelikleri[a.tur];
-      const bOncelik = bolumOncelikleri[b.tur];
-
-      if (aOncelik !== bOncelik) {
-        return aOncelik - bOncelik;
-      }
-
-      return a.sira - b.sira;
-    })
+    .sort((a, b) => a.sira - b.sira)
     .map((bolum, index) => ({
       ...bolum,
       sira: index,
@@ -249,6 +183,7 @@ function anaSayfaButonlariniOlustur(
   proje: ProjeVerisi,
   mevcutButonlar: ButonVerisi[],
 ) {
+  const sunum = sektorSunumProfiliniGetir(proje.sektor);
   const gecerliButonlar = mevcutButonlar.filter(
     (buton) =>
       String(buton.metin ?? "").trim() &&
@@ -281,12 +216,18 @@ function anaSayfaButonlariniOlustur(
     gecerliButonlar.find(
       (buton) =>
         buton.baglanti.includes("hizmet") ||
-        slugOlustur(buton.metin).includes("hizmet"),
+        buton.baglanti.includes(sunum.hizmetSayfasiSlug) ||
+        slugOlustur(buton.metin).includes("hizmet") ||
+        slugOlustur(buton.metin).includes(
+          slugOlustur(sunum.hizmetSayfasiAdi),
+        ),
     ) ?? {
       id: idOlustur(),
-      metin: "Hizmetleri inceleyin",
+      metin: `${sunum.hizmetSayfasiAdi} sayfasını inceleyin`,
       baglanti:
-        proje.siteTipi === "tek-sayfa" ? "#hizmetler" : "/hizmetler",
+        proje.siteTipi === "tek-sayfa"
+          ? "#hizmetler"
+          : `/${sunum.hizmetSayfasiSlug}`,
     };
 
   const digerButonlar = gecerliButonlar.filter(
@@ -1638,9 +1579,22 @@ export default function KolayIcerikDuzenleyici() {
           <button
             type="button"
             onClick={() => {
-              setTopluIcerik(projeyeOzelTopluIcerikOlustur(proje));
+              const guncelProje = projeyeOzelIcerigiUygula(proje);
+              const ilkSayfa = guncelProje.sayfalar[0];
+
+              projeyiKaydet(guncelProje);
+              setTopluIcerik(
+                projeyeOzelTopluIcerikOlustur(guncelProje),
+              );
+
+              if (ilkSayfa) {
+                setSecilenSayfaId(ilkSayfa.id);
+                setSecilenBolumId(ilkSayfa.bolumler[0]?.id ?? "");
+                setAcikGorselSayfalari([ilkSayfa.id]);
+              }
+
               setTopluBilgi(
-                `${proje.sektorAdi} için işletme bilgileri yeniden yerleştirildi.`,
+                `${proje.sektorAdi} için sayfa sırası, bölüm yapısı, içerikler ve sunum tercihleri yenilendi.`,
               );
             }}
           >

@@ -400,7 +400,11 @@ function stokGorselleriDoldur(proje: ProjeVerisi): ProjeVerisi {
         !arkaPlanGorseli.trim() &&
         !gorsel.trim()
       ) {
-        arkaPlanGorseli = siradakiGorsel();
+        if (bolum.varyasyon === "kapak") {
+          arkaPlanGorseli = siradakiGorsel();
+        } else {
+          gorsel = siradakiGorsel();
+        }
       }
 
       if (bolum.tur === "metin" && !gorsel.trim()) {

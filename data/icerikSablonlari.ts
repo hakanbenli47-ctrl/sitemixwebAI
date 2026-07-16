@@ -3,12 +3,14 @@ import {
   hizmetDetayiniGetir,
   sektorIcerikProfiliniGetir,
 } from "@/data/sektorIcerikProfilleri";
+import { sektorSunumProfiliniGetir } from "@/data/sektorSunumProfilleri";
 import type {
   ButonVerisi,
   ListeElemani,
   SiteBolumu,
   SiteSayfasi,
 } from "@/data/sektorSablonlari";
+import { sektorSayfalariOlustur } from "@/data/sektorSablonlari";
 import type { ProjeVerisi } from "@/types/proje";
 
 type HazirButon = Pick<ButonVerisi, "metin" | "baglanti">;
@@ -268,14 +270,37 @@ function iletisimHedefi(proje: ProjeVerisi) {
   return proje.siteTipi === "tek-sayfa" ? "#iletisim" : "/iletisim";
 }
 
+function aksiyonHedefi(proje: ProjeVerisi) {
+  const sunum = sektorSunumProfiliniGetir(proje.sektor);
+
+  if (proje.siteTipi === "tek-sayfa" || !sunum.aksiyonSayfasi) {
+    return iletisimHedefi(proje);
+  }
+
+  return `/${sunum.aksiyonSayfasi.slug}`;
+}
+
 function hizmetHedefi(proje: ProjeVerisi) {
-  return proje.siteTipi === "tek-sayfa" ? "#hizmetler" : "/hizmetler";
+  const sunum = sektorSunumProfiliniGetir(proje.sektor);
+
+  return proje.siteTipi === "tek-sayfa"
+    ? "#hizmetler"
+    : `/${sunum.hizmetSayfasiSlug}`;
+}
+
+function galeriHedefi(proje: ProjeVerisi) {
+  const sunum = sektorSunumProfiliniGetir(proje.sektor);
+
+  return proje.siteTipi === "tek-sayfa"
+    ? "#galeri"
+    : `/${sunum.galeriSayfasiSlug}`;
 }
 
 function anaSayfaButonlari(proje: ProjeVerisi): HazirButon[] {
   const butonlar: HazirButon[] = [];
   const whatsapp = whatsappNumarasi(proje.whatsapp);
   const telefon = telefonNumarasi(proje.telefon);
+  const sunum = sektorSunumProfiliniGetir(proje.sektor);
 
   if (whatsapp) {
     butonlar.push({
@@ -292,7 +317,7 @@ function anaSayfaButonlari(proje: ProjeVerisi): HazirButon[] {
   }
 
   butonlar.push({
-    metin: "Hizmetleri inceleyin",
+    metin: `${sunum.hizmetSayfasiAdi} sayfasını inceleyin`,
     baglanti: hizmetHedefi(proje),
   });
 
@@ -415,7 +440,7 @@ function temizlikIcerigi(
       })),
       butonlar: anaSayfaMi
         ? [{ metin: "Tüm hizmetleri inceleyin", baglanti: hizmetHedefi(proje) }]
-        : [{ metin: "Fiyat ve uygunluk sorun", baglanti: iletisimHedefi(proje) }],
+        : [{ metin: "Fiyat ve uygunluk sorun", baglanti: aksiyonHedefi(proje) }],
     };
   }
 
@@ -493,8 +518,8 @@ function temizlikIcerigi(
         baglanti: eleman.baglanti,
       })),
       butonlar: anaSayfaMi
-        ? [{ metin: "Galeriyi inceleyin", baglanti: proje.siteTipi === "tek-sayfa" ? "#galeri" : "/galeri" }]
-        : [{ metin: "Kendi alanınız için bilgi alın", baglanti: iletisimHedefi(proje) }],
+        ? [{ metin: "Çalışmaları inceleyin", baglanti: galeriHedefi(proje) }]
+        : [{ metin: "Kendi alanınız için bilgi alın", baglanti: aksiyonHedefi(proje) }],
     };
   }
 
@@ -617,11 +642,11 @@ function genelIcerik(
   }
 
   if (bolum.tur === "hizmetler" || bolum.tur === "urunler") {
+    const sunum = sektorSunumProfiliniGetir(proje.sektor);
+
     return {
-      ustBaslik: bolum.tur === "urunler" ? bolum.ustBaslik : "Hizmetler",
-      baslik: anaSayfaMi
-        ? "İhtiyacınıza uygun seçenekleri keşfedin"
-        : bolum.baslik || `${proje.firmaAdi} hizmetleri`,
+      ustBaslik: bolum.ustBaslik || sunum.hizmetUstBasligi,
+      baslik: bolum.baslik || sunum.hizmetSayfasiAdi,
       aciklama: anaSayfaMi
         ? `${profil.kararOlcutleri} Temel hizmetleri inceleyin; ayrıntılı kapsam için kısa bilgi paylaşmanız yeterlidir.`
         : `${profil.kararOlcutleri} Her seçeneğin kapsamı mevcut durum ve beklentiye göre netleştirilir; başlamadan önce süreç hakkında açık bilgi verilir.`,
@@ -631,12 +656,44 @@ function genelIcerik(
         baglanti: eleman.baglanti,
       })),
       butonlar: anaSayfaMi && proje.siteTipi === "cok-sayfa"
-        ? [{ metin: "Tüm hizmetleri inceleyin", baglanti: hizmetHedefi(proje) }]
-        : [{ metin: profil.ctaMetni, baglanti: iletisimHedefi(proje) }],
+        ? [{ metin: `${sunum.hizmetSayfasiAdi} sayfasını inceleyin`, baglanti: hizmetHedefi(proje) }]
+        : [{ metin: profil.ctaMetni, baglanti: aksiyonHedefi(proje) }],
     };
   }
 
   if (bolum.tur === "neden-biz") {
+    const surecBolumuMu = bolum.varyasyon === "adimlar";
+
+    if (surecBolumuMu) {
+      return {
+        ustBaslik: bolum.ustBaslik || "Çalışma süreci",
+        baslik: bolum.baslik || profil.yaklasimBaslik,
+        aciklama: bolum.aciklama || "Her aşama, bir sonraki adımı anlaşılır kılacak biçimde planlanır.",
+        listeElemanlari: [
+          {
+            baslik: "İhtiyacı anlayalım",
+            aciklama: profil.iletisimIstegi,
+            baglanti: "",
+          },
+          {
+            baslik: "Kapsamı netleştirelim",
+            aciklama: profil.kararOlcutleri,
+            baglanti: "",
+          },
+          {
+            baslik: "Planlı biçimde ilerleyelim",
+            aciklama: profil.kisaYaklasim,
+            baglanti: "",
+          },
+          {
+            baslik: "Kontrol ederek tamamlayalım",
+            aciklama: profil.sonKontrol,
+            baglanti: "",
+          },
+        ],
+      };
+    }
+
     return {
       ustBaslik: anaSayfaMi ? "Neden bizi tercih etmelisiniz?" : "Çalışma ilkelerimiz",
       baslik: anaSayfaMi
@@ -669,11 +726,13 @@ function genelIcerik(
   }
 
   if (bolum.tur === "galeri") {
+    const sunum = sektorSunumProfiliniGetir(proje.sektor);
+
     return {
-      ustBaslik: anaSayfaMi ? "Öne çıkan çalışmalar" : "Uygulama galerisi",
+      ustBaslik: bolum.ustBaslik || sunum.galeriSayfasiAdi,
       baslik: anaSayfaMi
-        ? "Hizmetlerimizi gerçek ayrıntılarıyla inceleyin"
-        : "Farklı ihtiyaçlar için çalışma örnekleri",
+        ? bolum.baslik || "Hizmetlerimizi gerçek ayrıntılarıyla inceleyin"
+        : bolum.baslik || "Farklı ihtiyaçlar için çalışma örnekleri",
       aciklama: anaSayfaMi
         ? `${proje.firmaAdi} hizmetlerinin çalışma yaklaşımını ve öne çıkan ayrıntılarını görseller üzerinden keşfedin.`
         : "Görselleri yalnızca sonuç olarak değil, hizmetin kapsamını ve uygulama detaylarını anlamanıza yardımcı olacak örnekler olarak inceleyebilirsiniz.",
@@ -683,8 +742,40 @@ function genelIcerik(
         baglanti: eleman.baglanti,
       })),
       butonlar: anaSayfaMi && proje.siteTipi === "cok-sayfa"
-        ? [{ metin: "Tüm çalışmaları inceleyin", baglanti: "/galeri" }]
-        : [{ metin: profil.ctaMetni, baglanti: iletisimHedefi(proje) }],
+        ? [{ metin: `${sunum.galeriSayfasiAdi} sayfasını inceleyin`, baglanti: galeriHedefi(proje) }]
+        : [{ metin: profil.ctaMetni, baglanti: aksiyonHedefi(proje) }],
+    };
+  }
+
+  if (bolum.tur === "sss") {
+    const sunum = sektorSunumProfiliniGetir(proje.sektor);
+
+    return {
+      ustBaslik: bolum.ustBaslik || "Sık sorulan sorular",
+      baslik: bolum.baslik || sunum.sssBasligi,
+      aciklama: bolum.aciklama || "Karar vermeden önce hizmet kapsamı ve süreçle ilgili temel soruların yanıtlarını inceleyin.",
+      listeElemanlari: [
+        {
+          baslik: "Başlamak için hangi bilgileri paylaşmalıyım?",
+          aciklama: profil.iletisimIstegi,
+          baglanti: "",
+        },
+        {
+          baslik: "Hizmet kapsamı nasıl belirleniyor?",
+          aciklama: profil.kararOlcutleri,
+          baglanti: "",
+        },
+        {
+          baslik: "Süreç nasıl ilerliyor?",
+          aciklama: profil.kisaYaklasim,
+          baglanti: "",
+        },
+        {
+          baslik: "Tamamlanırken nelere dikkat ediliyor?",
+          aciklama: profil.sonKontrol,
+          baglanti: "",
+        },
+      ],
     };
   }
 
@@ -710,7 +801,11 @@ function genelIcerik(
   if (bolum.tur === "form") {
     const randevuSayfasiMi =
       sayfaAnahtari.includes("randevu") ||
-      sayfaAnahtari.includes("rezervasyon");
+      sayfaAnahtari.includes("rezervasyon") ||
+      sayfaAnahtari.includes("teklif") ||
+      sayfaAnahtari.includes("gorusme") ||
+      sayfaAnahtari.includes("görüşme") ||
+      sayfaAnahtari.includes("talep");
 
     return {
       ustBaslik: randevuSayfasiMi ? "Talep oluşturun" : "Kısa bilgi bırakın",
@@ -779,12 +874,104 @@ function satirEkle(satirlar: string[], etiket: string, deger: string) {
 }
 
 export function projeyeOzelIcerigiUygula(proje: ProjeVerisi): ProjeVerisi {
+  const anaSayfa = proje.sayfalar.find(
+    (sayfa) => sayfa.anaSayfa || !sayfa.slug.trim(),
+  );
+  const profesyonelYapiVar = Boolean(
+    anaSayfa?.bolumler.some((bolum) => bolum.tur === "sss") &&
+      anaSayfa.bolumler.some((bolum) => bolum.tur === "istatistik") &&
+      anaSayfa.bolumler.some(
+        (bolum) =>
+          bolum.tur === "neden-biz" && bolum.varyasyon === "adimlar",
+      ),
+  );
+
+  let kaynakProje = proje;
+
+  if (!profesyonelYapiVar) {
+    let yeniSayfalar = sektorSayfalariOlustur({
+      firmaAdi: proje.firmaAdi,
+      sektor: proje.sektor,
+      sektorAdi: proje.sektorAdi,
+      telefon: proje.telefon,
+      whatsapp: proje.whatsapp,
+      eposta: proje.eposta,
+      adres: proje.adres,
+      sehir: proje.sehir,
+      ilce: proje.ilce,
+      hizmetBolgesi: proje.hizmetBolgesi,
+    });
+
+    if (proje.siteTipi === "tek-sayfa") {
+      yeniSayfalar = yeniSayfalar.length > 0 ? [yeniSayfalar[0]] : [];
+    }
+
+    const eskiSayfaHaritasi = new Map(
+      proje.sayfalar.map((sayfa) => [
+        sayfa.anaSayfa ? "__ana__" : metniKucult(sayfa.slug || sayfa.ad),
+        sayfa,
+      ]),
+    );
+
+    yeniSayfalar = yeniSayfalar.map((sayfa) => {
+      const sayfaAnahtari = sayfa.anaSayfa
+        ? "__ana__"
+        : metniKucult(sayfa.slug || sayfa.ad);
+      const eskiSayfa = eskiSayfaHaritasi.get(sayfaAnahtari);
+
+      if (!eskiSayfa) {
+        return sayfa;
+      }
+
+      const kullanilanBolumler = new Set<string>();
+
+      return {
+        ...sayfa,
+        bolumler: sayfa.bolumler.map((bolum) => {
+          const eskiBolum = eskiSayfa.bolumler.find(
+            (aday) => aday.tur === bolum.tur && !kullanilanBolumler.has(aday.id),
+          );
+
+          if (!eskiBolum) {
+            return bolum;
+          }
+
+          kullanilanBolumler.add(eskiBolum.id);
+
+          return {
+            ...bolum,
+            gorsel: eskiBolum.gorsel || bolum.gorsel,
+            arkaPlanGorseli:
+              eskiBolum.arkaPlanGorseli || bolum.arkaPlanGorseli,
+            listeElemanlari: bolum.listeElemanlari.map((eleman, index) => ({
+              ...eleman,
+              gorsel:
+                eskiBolum.listeElemanlari[index]?.gorsel || eleman.gorsel,
+            })),
+          };
+        }),
+      };
+    });
+
+    kaynakProje = {
+      ...proje,
+      sayfalar: yeniSayfalar,
+    };
+  }
+
+  const sunum = sektorSunumProfiliniGetir(kaynakProje.sektor);
+
   return {
-    ...proje,
-    sayfalar: proje.sayfalar.map((sayfa) => ({
+    ...kaynakProje,
+    tema: kaynakProje.tema || sunum.varsayilanTema,
+    sayfalar: kaynakProje.sayfalar.map((sayfa) => ({
       ...sayfa,
       bolumler: sayfa.bolumler.map((bolum) => {
-        const icerik = hazirBolumIcerigiOlustur(proje, sayfa, bolum);
+        const icerik = hazirBolumIcerigiOlustur(
+          kaynakProje,
+          sayfa,
+          bolum,
+        );
 
         return {
           ...bolum,

@@ -262,6 +262,7 @@ const sektorGrubu: Record<string, keyof typeof gruplar> = {
   "teknik-servis": "teknik",
   "oto-yikama": "otomotiv",
   "oto-servis": "otomotiv",
+  "arac-kaplama": "otomotiv",
   "arac-kiralama": "otomotiv",
   restoran: "restoran",
   kafe: "kafe",

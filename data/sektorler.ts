@@ -51,6 +51,11 @@ export const sektorler: Sektor[] = [
     kategori: "Otomotiv",
   },
   {
+    id: "arac-kaplama",
+    ad: "Araç Kaplama ve Cam Filmi",
+    kategori: "Otomotiv",
+  },
+  {
     id: "arac-kiralama",
     ad: "Araç Kiralama",
     kategori: "Otomotiv",

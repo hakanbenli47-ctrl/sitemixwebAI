@@ -266,8 +266,14 @@ async function branchReferansiniBekle({
 async function kaynakDosyalariOku() {
   const kokDizin = process.cwd();
 
-  const [siteGorunumu, siteStilleri, sektorSablonlari, projeTipi] =
-    await Promise.all([
+  const [
+    siteGorunumu,
+    siteStilleri,
+    sektorSablonlari,
+    sektorSunumProfilleri,
+    sektorIcerikProfilleri,
+    projeTipi,
+  ] = await Promise.all([
       readFile(
         path.join(kokDizin, "components", "site", "SiteGorunumu.tsx"),
         "utf8",
@@ -277,6 +283,14 @@ async function kaynakDosyalariOku() {
         "utf8",
       ),
       readFile(path.join(kokDizin, "data", "sektorSablonlari.ts"), "utf8"),
+      readFile(
+        path.join(kokDizin, "data", "sektorSunumProfilleri.ts"),
+        "utf8",
+      ),
+      readFile(
+        path.join(kokDizin, "data", "sektorIcerikProfilleri.ts"),
+        "utf8",
+      ),
       readFile(path.join(kokDizin, "types", "proje.ts"), "utf8"),
     ]);
 
@@ -284,6 +298,8 @@ async function kaynakDosyalariOku() {
     siteGorunumu,
     siteStilleri,
     sektorSablonlari,
+    sektorSunumProfilleri,
+    sektorIcerikProfilleri,
     projeTipi,
   };
 }
@@ -766,6 +782,8 @@ npm run dev
     "components/site/SiteGorunumu.tsx": kaynaklar.siteGorunumu,
     "components/site/siteGorunumu.module.css": kaynaklar.siteStilleri,
     "data/sektorSablonlari.ts": kaynaklar.sektorSablonlari,
+    "data/sektorSunumProfilleri.ts": kaynaklar.sektorSunumProfilleri,
+    "data/sektorIcerikProfilleri.ts": kaynaklar.sektorIcerikProfilleri,
     "data/proje.ts": projeTs,
     "types/proje.ts": kaynaklar.projeTipi,
     ...yerelGorselSonucu.gorselDosyalari,

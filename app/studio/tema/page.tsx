@@ -12,6 +12,7 @@ import {
   Smartphone,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { sektorTemaOnerileriniGetir } from "@/data/sektorSunumProfilleri";
 import styles from "./tema.module.css";
 
 type TemaKimligi =
@@ -416,27 +417,31 @@ export default function TemaSecimSayfasi() {
   const [hata, setHata] = useState("");
 
   useEffect(() => {
-    const kayitliProje = localStorage.getItem("sitemix-aktif-proje");
+    const yuklemeZamanlayicisi = window.setTimeout(() => {
+      const kayitliProje = localStorage.getItem("sitemix-aktif-proje");
 
-    if (!kayitliProje) {
-      setYukleniyor(false);
-      return;
-    }
-
-    try {
-      const projeVerisi = JSON.parse(kayitliProje) as ProjeVerisi;
-
-      setProje(projeVerisi);
-
-      if (projeVerisi.tema) {
-        setSecilenTema(projeVerisi.tema);
+      if (!kayitliProje) {
+        setYukleniyor(false);
+        return;
       }
-    } catch (error) {
-      console.error("Proje yüklenemedi:", error);
-      localStorage.removeItem("sitemix-aktif-proje");
-    } finally {
-      setYukleniyor(false);
-    }
+
+      try {
+        const projeVerisi = JSON.parse(kayitliProje) as ProjeVerisi;
+
+        setProje(projeVerisi);
+
+        if (projeVerisi.tema) {
+          setSecilenTema(projeVerisi.tema);
+        }
+      } catch (error) {
+        console.error("Proje yüklenemedi:", error);
+        localStorage.removeItem("sitemix-aktif-proje");
+      } finally {
+        setYukleniyor(false);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(yuklemeZamanlayicisi);
   }, []);
 
   const siraliTemalar = useMemo(() => {
@@ -444,11 +449,19 @@ export default function TemaSecimSayfasi() {
       return temalar;
     }
 
+    const oneriler = sektorTemaOnerileriniGetir(proje.sektor);
+
     return [...temalar].sort((a, b) => {
-      const aUygun = a.uygunSektorler.includes(proje.sektor);
-      const bUygun = b.uygunSektorler.includes(proje.sektor);
+      const aSirasi = oneriler.indexOf(a.id);
+      const bSirasi = oneriler.indexOf(b.id);
+      const aUygun = aSirasi !== -1;
+      const bUygun = bSirasi !== -1;
 
       if (aUygun === bUygun) {
+        if (aUygun && aSirasi !== bSirasi) {
+          return aSirasi - bSirasi;
+        }
+
         return 0;
       }
 
@@ -603,9 +616,9 @@ export default function TemaSecimSayfasi() {
           <div className={styles.temaIzgarasi}>
             {siraliTemalar.map((tema) => {
               const aktif = secilenTema === tema.id;
-              const sektoreUygun = tema.uygunSektorler.includes(
+              const sektoreUygun = sektorTemaOnerileriniGetir(
                 proje.sektor,
-              );
+              ).includes(tema.id);
 
               return (
                 <button

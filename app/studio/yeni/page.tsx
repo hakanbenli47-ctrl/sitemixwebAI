@@ -17,6 +17,7 @@ import { useMemo, useState } from "react";
 import { projeyeOzelIcerigiUygula } from "@/data/icerikSablonlari";
 import { sektorler } from "@/data/sektorler";
 import { sektorSayfalariOlustur } from "@/data/sektorSablonlari";
+import { sektorVarsayilanTemasiniGetir } from "@/data/sektorSunumProfilleri";
 import type { ProjeVerisi } from "@/types/proje";
 
 type SiteTipi = "tek-sayfa" | "cok-sayfa";
@@ -199,7 +200,7 @@ export default function YeniProjeSayfasi() {
         ilce: form.ilce.trim(),
         hizmetBolgesi: form.hizmetBolgesi.trim(),
         slug: form.slug.trim(),
-        tema: "",
+        tema: sektorVarsayilanTemasiniGetir(form.sektor),
         sayfalar,
         seoBaslik: `${form.firmaAdi.trim()} | ${sektorAdi}`,
         seoAciklama: `${form.firmaAdi.trim()}, ${gorunenKonum || form.sehir.trim()} bölgesinde ${String(sektorAdi ?? "").toLocaleLowerCase("tr-TR")} hizmetleri sunar.`,

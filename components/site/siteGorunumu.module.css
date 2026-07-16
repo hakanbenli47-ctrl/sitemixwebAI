@@ -272,6 +272,48 @@
   text-decoration: none;
 }
 
+.markaSeridi {
+  position: relative;
+  z-index: 12;
+  overflow: hidden;
+  border-bottom: 1px solid var(--site-cizgi);
+  background: var(--site-vurgu);
+  color: var(--site-buton-yazi);
+}
+
+.markaSeridiAkisi {
+  width: max-content;
+  min-height: 43px;
+  display: flex;
+  align-items: center;
+  animation: markaAkisi 32s linear infinite;
+}
+
+.markaSeridiAkisi span {
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+  padding: 0 30px;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.markaSeridiAkisi i {
+  width: 6px;
+  height: 6px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+@keyframes markaAkisi {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 .sayfaIcerigi {
   overflow: hidden;
 }
@@ -288,6 +330,10 @@
   border-bottom: 1px solid var(--site-cizgi);
   background-position: center;
   background-size: cover;
+}
+
+.site[data-ana-sayfa="true"] .heroBolumu {
+  min-height: calc(100svh - 135px);
 }
 
 .heroBolumu::before {
@@ -317,6 +363,41 @@
   transform-origin: left;
 }
 
+.heroKunye {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  color: var(--site-soluk-yazi);
+  font-size: 8px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  transform: translateY(-50%) rotate(90deg);
+  transform-origin: center;
+}
+
+.heroKunye span {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.heroKunye i {
+  width: 42px;
+  height: 1px;
+  display: block;
+  background: var(--site-vurgu);
+}
+
+.heroKunye strong {
+  color: var(--site-vurgu);
+  font-weight: 900;
+}
+
 .heroMetni {
   position: relative;
   z-index: 2;
@@ -337,6 +418,59 @@
   color: var(--site-soluk-yazi);
   font-size: clamp(17px, 1.6vw, 22px);
   line-height: 1.7;
+}
+
+.heroBilgiListesi {
+  max-width: 760px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: clamp(42px, 5vw, 74px) 0 0;
+  padding: 0;
+  border-top: 1px solid var(--site-cizgi);
+  list-style: none;
+}
+
+.heroBilgiListesi li {
+  min-width: 0;
+  min-height: 88px;
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 15px 14px 15px 0;
+  border-bottom: 1px solid var(--site-cizgi);
+}
+
+.heroBilgiListesi li:not(:last-child) {
+  border-right: 1px solid var(--site-cizgi);
+}
+
+.heroBilgiListesi li > span {
+  color: var(--site-vurgu);
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.heroBilgiListesi li > div {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.heroBilgiListesi small {
+  color: var(--site-soluk-yazi);
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.heroBilgiListesi strong {
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .gorselliHero {
@@ -530,11 +664,208 @@
 .standartBolum {
   position: relative;
   padding: clamp(100px, 9vw, 170px) 5vw;
+  overflow: hidden;
   border-bottom: 1px solid var(--site-cizgi);
+}
+
+.standartBolum::before {
+  position: absolute;
+  width: clamp(220px, 28vw, 520px);
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--site-vurgu) 20%, transparent);
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+  top: -18%;
+  right: -12%;
+  opacity: 0.55;
+}
+
+.bolumIcerikSahnesi {
+  position: relative;
+  z-index: 2;
+}
+
+.bolumFiligran {
+  position: absolute;
+  z-index: 0;
+  top: clamp(28px, 4vw, 62px);
+  right: 3vw;
+  color: color-mix(in srgb, var(--site-vurgu) 10%, transparent);
+  font-size: clamp(120px, 19vw, 330px);
+  font-weight: 900;
+  line-height: 0.7;
+  letter-spacing: -0.09em;
+  pointer-events: none;
 }
 
 .alternatifBolum {
   background: var(--site-ikinci-arka-plan);
+}
+
+.standartBolum[data-bolum-turu="hizmetler"] .bolumBasligi,
+.standartBolum[data-bolum-turu="urunler"] .bolumBasligi {
+  max-width: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+  align-items: end;
+  gap: 3vw 7vw;
+}
+
+.standartBolum[data-bolum-turu="hizmetler"] .bolumBasligi .kucukBaslik,
+.standartBolum[data-bolum-turu="urunler"] .bolumBasligi .kucukBaslik {
+  grid-column: 1 / -1;
+}
+
+.standartBolum[data-bolum-turu="hizmetler"] .bolumBasligi h2,
+.standartBolum[data-bolum-turu="urunler"] .bolumBasligi h2 {
+  margin-bottom: 0;
+}
+
+.standartBolum[data-bolum-turu="hizmetler"] .bolumBasligi p,
+.standartBolum[data-bolum-turu="urunler"] .bolumBasligi p {
+  padding: 0 0 8px 28px;
+  border-left: 1px solid var(--site-vurgu);
+}
+
+.standartBolum[data-bolum-turu="hizmetler"] .listeSatiri,
+.standartBolum[data-bolum-turu="urunler"] .listeSatiri {
+  transition:
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 420ms ease,
+    border-color 420ms ease;
+}
+
+.standartBolum[data-bolum-turu="hizmetler"] .listeSatiri:hover,
+.standartBolum[data-bolum-turu="urunler"] .listeSatiri:hover {
+  z-index: 3;
+  border-color: var(--site-vurgu);
+  box-shadow: 0 28px 80px color-mix(in srgb, var(--site-yazi) 13%, transparent);
+  transform: translateY(-10px);
+}
+
+.standartBolum[data-bolum-turu="istatistik"] {
+  background:
+    radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--site-vurgu) 28%, transparent), transparent 30%),
+    var(--site-yazi);
+  color: var(--site-arka-plan);
+}
+
+.standartBolum[data-bolum-turu="istatistik"] .bolumFiligran {
+  color: color-mix(in srgb, var(--site-vurgu) 19%, transparent);
+}
+
+.standartBolum[data-bolum-turu="istatistik"] .bolumBasligi p,
+.standartBolum[data-bolum-turu="istatistik"] .listeIcerik p {
+  color: color-mix(in srgb, var(--site-arka-plan) 68%, transparent);
+}
+
+.standartBolum[data-bolum-turu="istatistik"] .varyasyon_kartli .listeSatiri,
+.standartBolum[data-bolum-turu="istatistik"] .varyasyon_iki_kolon .listeSatiri {
+  border-color: color-mix(in srgb, var(--site-arka-plan) 18%, transparent);
+  background: color-mix(in srgb, var(--site-arka-plan) 7%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.standartBolum[data-bolum-turu="istatistik"] .listeIcerik h3,
+.standartBolum[data-bolum-turu="istatistik"] .listeIcerik a {
+  color: var(--site-arka-plan);
+}
+
+.standartBolum[data-bolum-turu="neden-biz"] .varyasyon_adimlar .liste {
+  padding-bottom: 48px;
+}
+
+.standartBolum[data-bolum-turu="neden-biz"] .varyasyon_adimlar .listeSatiri:nth-child(even) {
+  transform: translateY(38px);
+}
+
+.standartBolum[data-bolum-turu="neden-biz"] .varyasyon_adimlar .listeNumara {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--site-vurgu);
+  border-radius: 50%;
+}
+
+.standartBolum[data-bolum-turu="galeri"] {
+  padding-right: 2vw;
+  padding-left: 2vw;
+  background: var(--site-yazi);
+  color: var(--site-arka-plan);
+}
+
+.standartBolum[data-bolum-turu="galeri"] .bolumBasligi {
+  margin-left: 3vw;
+}
+
+.standartBolum[data-bolum-turu="galeri"] .bolumBasligi p {
+  color: color-mix(in srgb, var(--site-arka-plan) 68%, transparent);
+}
+
+.standartBolum[data-bolum-turu="galeri"] .galeri figure {
+  position: relative;
+  overflow: hidden;
+}
+
+.standartBolum[data-bolum-turu="galeri"] .galeri figcaption {
+  padding: 14px 16px 22px;
+}
+
+.standartBolum[data-bolum-turu="galeri"] .galeri figcaption span {
+  color: color-mix(in srgb, var(--site-arka-plan) 62%, transparent);
+}
+
+.standartBolum[data-bolum-turu="galeri"] .butonlar {
+  margin-left: 3vw;
+}
+
+.standartBolum[data-bolum-turu="sss"] .bolumIcerikSahnesi {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr);
+  align-items: start;
+  gap: 7vw;
+}
+
+.standartBolum[data-bolum-turu="sss"] .bolumBasligi {
+  position: sticky;
+  top: 130px;
+  margin: 0;
+}
+
+.standartBolum[data-bolum-turu="sss"] .bolumBasligi h2 {
+  font-size: clamp(44px, 5.5vw, 86px);
+}
+
+.standartBolum[data-bolum-turu="sss"] .sssListesi,
+.standartBolum[data-bolum-turu="sss"] .bolumIcerikSahnesi > .butonlar {
+  grid-column: 2;
+}
+
+.standartBolum[data-bolum-turu="iletisim"] {
+  padding: 3vw;
+  background: var(--site-vurgu);
+  color: var(--site-buton-yazi);
+}
+
+.standartBolum[data-bolum-turu="iletisim"] .bolumIcerikSahnesi {
+  padding: clamp(42px, 7vw, 110px);
+  border: 1px solid color-mix(in srgb, var(--site-buton-yazi) 32%, transparent);
+}
+
+.standartBolum[data-bolum-turu="iletisim"] .kucukBaslik,
+.standartBolum[data-bolum-turu="iletisim"] .iletisimYerlesimi p,
+.standartBolum[data-bolum-turu="iletisim"] .iletisimListesi small {
+  border-color: currentColor;
+  color: color-mix(in srgb, var(--site-buton-yazi) 72%, transparent);
+}
+
+.standartBolum[data-bolum-turu="iletisim"] .iletisimListesi > a,
+.standartBolum[data-bolum-turu="iletisim"] .iletisimListesi > div,
+.standartBolum[data-bolum-turu="iletisim"] .iletisimListesi strong {
+  border-color: color-mix(in srgb, var(--site-buton-yazi) 28%, transparent);
+  color: var(--site-buton-yazi);
 }
 
 .bolumNumarasi {
@@ -1502,12 +1833,76 @@
   background: var(--site-cizgi);
 }
 
-.site[data-tasarim-duzen="sinematik"] .heroBolumu {
+.site[data-tasarim-duzen="teknik"] .heroGorseli {
+  clip-path: polygon(9% 0, 100% 0, 100% 100%, 0 100%, 0 9%);
+}
+
+.site[data-tasarim-duzen="teknik"] .heroBilgiListesi {
+  border: 1px solid var(--site-cizgi);
+}
+
+.site[data-tasarim-duzen="teknik"] .heroBilgiListesi li {
+  padding-left: 14px;
+}
+
+.site[data-tasarim-duzen="sinematik"] .heroBolumu:not(.gorselliHero) {
   min-height: calc(100svh - 92px);
+  grid-template-columns: 1fr;
+  padding: 0;
+  color: #ffffff;
+}
+
+.site[data-ana-sayfa="true"][data-tasarim-duzen="sinematik"] .heroBolumu:not(.gorselliHero),
+.site[data-ana-sayfa="true"][data-tasarim-duzen="sinematik"] .heroGorseli img {
+  min-height: calc(100svh - 135px);
+}
+
+.site[data-tasarim-duzen="sinematik"] .heroBolumu:not(.gorselliHero) .heroMetni,
+.site[data-tasarim-duzen="sinematik"] .heroBolumu:not(.gorselliHero) .heroGorseli {
+  grid-area: 1 / 1;
+}
+
+.site[data-tasarim-duzen="sinematik"] .heroBolumu:not(.gorselliHero) .heroMetni {
+  align-self: end;
+  z-index: 4;
+  max-width: 1180px;
+  padding: clamp(90px, 10vw, 160px) 7vw clamp(65px, 8vw, 120px);
+}
+
+.site[data-tasarim-duzen="sinematik"] .heroGorseli {
+  height: 100%;
+}
+
+.site[data-tasarim-duzen="sinematik"] .heroGorseli::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  content: "";
+  background:
+    linear-gradient(90deg, rgba(5, 8, 6, 0.82), rgba(5, 8, 6, 0.14) 76%),
+    linear-gradient(0deg, rgba(5, 8, 6, 0.72), transparent 58%);
+  pointer-events: none;
 }
 
 .site[data-tasarim-duzen="sinematik"] .heroGorseli img {
-  min-height: min(78vh, 820px);
+  height: 100%;
+  min-height: calc(100svh - 92px);
+}
+
+.site[data-tasarim-duzen="sinematik"] .heroMetni p,
+.site[data-tasarim-duzen="sinematik"] .heroBilgiListesi small,
+.site[data-tasarim-duzen="sinematik"] .heroKunye {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.site[data-tasarim-duzen="sinematik"] .heroBilgiListesi,
+.site[data-tasarim-duzen="sinematik"] .heroBilgiListesi li {
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.site[data-tasarim-duzen="sinematik"] .butonlar a:nth-child(even) {
+  border-color: #ffffff;
+  color: #ffffff;
 }
 
 .site[data-tasarim-duzen="sinematik"] .galeri {
@@ -1521,6 +1916,17 @@
 
 .site[data-tasarim-duzen="servis"] .heroMetni h1 {
   font-size: clamp(56px, 7.4vw, 118px);
+}
+
+.site[data-tasarim-duzen="servis"] .heroBilgiListesi {
+  grid-template-columns: 1fr;
+  border: 1px solid var(--site-cizgi);
+}
+
+.site[data-tasarim-duzen="servis"] .heroBilgiListesi li {
+  min-height: 70px;
+  padding-left: 14px;
+  border-right: 0;
 }
 
 .site[data-tasarim-duzen="servis"] .iletisimYerlesimi,
@@ -1539,6 +1945,20 @@
 
 .site[data-tasarim-duzen="editorial"] .heroBolumu {
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+  align-items: end;
+}
+
+.site[data-tasarim-duzen="editorial"] .heroGorseli {
+  margin-bottom: -7vw;
+  transform: translateY(-3vw);
+}
+
+.site[data-tasarim-duzen="editorial"] .heroBilgiListesi {
+  max-width: none;
+}
+
+.site[data-tasarim-duzen="editorial"] .standartBolum:first-child {
+  padding-top: clamp(150px, 14vw, 240px);
 }
 
 .site[data-tasarim-duzen="klinik"] .heroBolumu {
@@ -1546,6 +1966,8 @@
   margin: 24px 2vw 0;
   border: 1px solid var(--site-cizgi);
   border-radius: 42px;
+  background-image:
+    radial-gradient(circle at 84% 20%, color-mix(in srgb, var(--site-vurgu) 18%, transparent), transparent 24%);
 }
 
 .site[data-tasarim-duzen="klinik"] .heroMetni h1 {
@@ -1555,6 +1977,20 @@
 .site[data-tasarim-duzen="klinik"] .varyasyon_kartli .listeSatiri,
 .site[data-tasarim-duzen="klinik"] .talepFormu {
   border-radius: 24px;
+}
+
+.site[data-tasarim-duzen="klinik"] .heroGorseli,
+.site[data-tasarim-duzen="klinik"] .heroGorseli img {
+  border-radius: 48% 48% 22px 22px;
+}
+
+.site[data-tasarim-duzen="klinik"] .heroBilgiListesi li {
+  min-height: 96px;
+  margin: 0 5px;
+  padding: 14px;
+  border: 1px solid var(--site-cizgi);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--site-arka-plan) 80%, transparent);
 }
 
 .site[data-tasarim-duzen="katalog"] .varyasyon_kartli .liste,
@@ -1568,9 +2004,27 @@
   padding: clamp(18px, 2.4vw, 34px);
 }
 
+.site[data-tasarim-duzen="katalog"] .heroBilgiListesi li {
+  min-height: 110px;
+  align-content: end;
+  padding: 20px;
+  background: var(--site-ikinci-arka-plan);
+}
+
 .site[data-tasarim-duzen="rezervasyon"] .heroBolumu {
   min-height: min(78svh, 850px);
   grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
+}
+
+.site[data-tasarim-duzen="rezervasyon"] .heroBilgiListesi {
+  padding: 10px;
+  border: 1px solid var(--site-cizgi);
+  background: color-mix(in srgb, var(--site-ikinci-arka-plan) 74%, transparent);
+  box-shadow: 0 24px 70px color-mix(in srgb, var(--site-yazi) 12%, transparent);
+}
+
+.site[data-tasarim-duzen="rezervasyon"] .heroBilgiListesi li {
+  padding-left: 12px;
 }
 
 .site[data-tasarim-duzen="rezervasyon"] .headerAksiyon,
@@ -1580,6 +2034,15 @@
 
 .site[data-tasarim-duzen="portfoy"] .heroBolumu {
   grid-template-columns: minmax(0, 0.72fr) minmax(460px, 1.28fr);
+  align-items: end;
+}
+
+.site[data-tasarim-duzen="portfoy"] .heroGorseli {
+  transform: rotate(1.5deg) scale(1.04);
+}
+
+.site[data-tasarim-duzen="portfoy"] .heroGorseli::before {
+  inset: 26px;
 }
 
 .site[data-tasarim-duzen="portfoy"] .galeri {
@@ -1594,6 +2057,18 @@
 .site[data-tasarim-duzen="egitim"] .alternatifBolum {
   margin: 20px 2vw;
   border-radius: 46px;
+}
+
+.site[data-tasarim-duzen="egitim"] .heroBolumu::after {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  right: 8%;
+  bottom: -70px;
+  border-radius: 44% 56% 60% 40%;
+  content: "";
+  background: color-mix(in srgb, var(--site-vurgu) 28%, transparent);
+  pointer-events: none;
 }
 
 .site[data-tasarim-duzen="egitim"] .listeSatiri {
@@ -2056,6 +2531,16 @@
     font-size: 7px;
   }
 
+  .markaSeridiAkisi {
+    min-height: 38px;
+    animation-duration: 24s;
+  }
+
+  .markaSeridiAkisi span {
+    padding: 0 20px;
+    font-size: 8px;
+  }
+
   .heroBolumu {
     min-height: auto;
     gap: 34px;
@@ -2085,6 +2570,10 @@
     display: none;
   }
 
+  .heroKunye {
+    display: none;
+  }
+
   .heroMetni h1,
   .tema_editorial .heroMetni h1,
   .tema_portfolio .heroMetni h1 {
@@ -2096,6 +2585,35 @@
 
   .heroMetni p {
     font-size: 15px;
+  }
+
+  .heroBilgiListesi,
+  .site[data-tasarim-duzen="servis"] .heroBilgiListesi {
+    width: calc(100vw - 36px);
+    max-width: none;
+    display: flex;
+    gap: 10px;
+    margin-top: 38px;
+    padding: 0 0 8px;
+    overflow-x: auto;
+    border: 0;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .heroBilgiListesi::-webkit-scrollbar {
+    display: none;
+  }
+
+  .heroBilgiListesi li,
+  .site[data-tasarim-duzen="klinik"] .heroBilgiListesi li,
+  .site[data-tasarim-duzen="katalog"] .heroBilgiListesi li,
+  .site[data-tasarim-duzen="servis"] .heroBilgiListesi li {
+    min-width: min(78vw, 270px);
+    min-height: 82px;
+    padding: 14px;
+    border: 1px solid var(--site-cizgi);
+    scroll-snap-align: start;
   }
 
   .heroGorseli img,
@@ -2125,6 +2643,70 @@
 
   .standartBolum {
     padding: 82px 18px 60px;
+  }
+
+  .standartBolum::before {
+    width: 220px;
+    top: -70px;
+    right: -110px;
+  }
+
+  .bolumFiligran {
+    top: 28px;
+    right: -6px;
+    font-size: 116px;
+  }
+
+  .standartBolum[data-bolum-turu="hizmetler"] .bolumBasligi,
+  .standartBolum[data-bolum-turu="urunler"] .bolumBasligi {
+    display: block;
+  }
+
+  .standartBolum[data-bolum-turu="hizmetler"] .bolumBasligi p,
+  .standartBolum[data-bolum-turu="urunler"] .bolumBasligi p {
+    margin-top: 24px;
+    padding: 0 0 0 18px;
+  }
+
+  .standartBolum[data-bolum-turu="hizmetler"] .listeSatiri:hover,
+  .standartBolum[data-bolum-turu="urunler"] .listeSatiri:hover {
+    transform: none;
+  }
+
+  .standartBolum[data-bolum-turu="neden-biz"] .varyasyon_adimlar .liste {
+    padding-bottom: 0;
+  }
+
+  .standartBolum[data-bolum-turu="neden-biz"] .varyasyon_adimlar .listeSatiri:nth-child(even) {
+    transform: none;
+  }
+
+  .standartBolum[data-bolum-turu="galeri"] {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .standartBolum[data-bolum-turu="galeri"] .bolumBasligi,
+  .standartBolum[data-bolum-turu="galeri"] .butonlar {
+    margin-right: 8px;
+    margin-left: 8px;
+  }
+
+  .standartBolum[data-bolum-turu="sss"] .bolumIcerikSahnesi {
+    display: block;
+  }
+
+  .standartBolum[data-bolum-turu="sss"] .bolumBasligi {
+    position: static;
+    margin-bottom: 42px;
+  }
+
+  .standartBolum[data-bolum-turu="iletisim"] {
+    padding: 10px;
+  }
+
+  .standartBolum[data-bolum-turu="iletisim"] .bolumIcerikSahnesi {
+    padding: 54px 18px;
   }
 
   .tema_food .alternatifBolum {
@@ -2310,6 +2892,28 @@
     border-radius: 0 0 28px 28px;
   }
 
+  .site[data-ana-sayfa][data-tasarim-duzen="sinematik"] .heroBolumu:not(.gorselliHero) {
+    min-height: 82svh;
+  }
+
+  .site[data-tasarim-duzen="sinematik"] .heroBolumu:not(.gorselliHero) .heroMetni {
+    padding: 100px 18px 54px;
+  }
+
+  .site[data-ana-sayfa][data-tasarim-duzen="sinematik"] .heroGorseli img {
+    height: 82svh;
+    min-height: 82svh;
+  }
+
+  .site[data-tasarim-duzen="editorial"] .heroGorseli {
+    margin-bottom: 0;
+    transform: none;
+  }
+
+  .site[data-tasarim-duzen="portfoy"] .heroGorseli {
+    transform: rotate(0.8deg) scale(1.01);
+  }
+
   .site[data-tasarim-duzen] .heroMetni h1,
   .site[data-tasarim-aile] .heroMetni h1 {
     max-width: 100%;
@@ -2378,6 +2982,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .markaSeridiAkisi {
+    animation: none;
+  }
+
   .site *,
   .site *::before,
   .site *::after {

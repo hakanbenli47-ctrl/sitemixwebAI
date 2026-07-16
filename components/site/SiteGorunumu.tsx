@@ -34,7 +34,10 @@ import type {
 import { sektorHizmetleriniGetir } from "@/data/sektorSablonlari";
 import { sektorFormProfiliniGetir } from "@/data/sektorFormProfilleri";
 import { temaKarakterleriniGetir } from "@/data/sektorSunumProfilleri";
-import { sektorTasariminiGetir } from "@/data/sektorTasarimlari";
+import {
+  sektorTasariminiGetir,
+  type SektorTasarimSecenegi,
+} from "@/data/sektorTasarimlari";
 import {
   epostaGecerliMi,
   telefonBaglantisi,
@@ -621,13 +624,53 @@ function Butonlar({
   );
 }
 
+interface HeroBilgisi {
+  etiket: string;
+  deger: string;
+}
+
+function MarkaSeridi({
+  sektorAdi,
+  hizmetler,
+}: {
+  sektorAdi: string;
+  hizmetler: string[];
+}) {
+  const ogeler = [sektorAdi, ...hizmetler].filter(Boolean);
+
+  if (ogeler.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className={styles.markaSeridi} aria-label="Öne çıkan hizmetler">
+      <div className={styles.markaSeridiAkisi}>
+        {[...ogeler, ...ogeler].map((oge, index) => (
+          <span key={`${oge}-${index}`} aria-hidden={index >= ogeler.length}>
+            <i />
+            {oge}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function HeroBolumu({
   bolum,
   tema,
+  firmaAdi,
+  sektorAdi,
+  tasarim,
+  bilgiler,
   dahiliBaglantiAc,
 }: {
   bolum: SiteBolumu;
   tema: string;
+  firmaAdi: string;
+  sektorAdi: string;
+  tasarim?: SektorTasarimSecenegi;
+  bilgiler: HeroBilgisi[];
   dahiliBaglantiAc: DahiliBaglantiFonksiyonu;
 }) {
   const arkaPlanStili = bolum.arkaPlanGorseli
@@ -660,6 +703,12 @@ function HeroBolumu({
         />
       </div>
 
+      <div className={styles.heroKunye} aria-hidden="true">
+        <span>{firmaAdi}</span>
+        <i />
+        <strong>{tasarim?.etiket || sektorAdi}</strong>
+      </div>
+
       <motion.div
         className={styles.heroMetni}
         initial="gizli"
@@ -684,6 +733,23 @@ function HeroBolumu({
         )}
 
         <Butonlar bolum={bolum} dahiliBaglantiAc={dahiliBaglantiAc} />
+
+        {bilgiler.length > 0 && (
+          <motion.ul
+            className={styles.heroBilgiListesi}
+            variants={listeElemaniGecisi}
+          >
+            {bilgiler.map((bilgi, index) => (
+              <li key={`${bilgi.etiket}-${bilgi.deger}`}>
+                <span>{bolumNumarasi(index)}</span>
+                <div>
+                  <small>{bilgi.etiket}</small>
+                  <strong>{bilgi.deger}</strong>
+                </div>
+              </li>
+            ))}
+          </motion.ul>
+        )}
       </motion.div>
 
       {bolum.gorsel && !bolum.arkaPlanGorseli && (
@@ -1381,11 +1447,15 @@ function BolumRender({
   bolum,
   proje,
   index,
+  anaSayfaMi,
+  tasarim,
   dahiliBaglantiAc,
 }: {
   bolum: SiteBolumu;
   proje: ProjeVerisi;
   index: number;
+  anaSayfaMi: boolean;
+  tasarim?: SektorTasarimSecenegi;
   dahiliBaglantiAc: DahiliBaglantiFonksiyonu;
 }) {
   if (!bolum.aktif) {
@@ -1393,10 +1463,42 @@ function BolumRender({
   }
 
   if (bolum.tur === "hero") {
+    const hizmetler = sektorHizmetleriniGetir(proje.sektor);
+    const hizmetBolgesi =
+      proje.hizmetBolgesi?.trim() ||
+      [proje.ilce, proje.sehir].filter(Boolean).join(", ");
+    const iletisimYolu = whatsappBaglantisi(proje.whatsapp)
+      ? telefonBaglantisi(proje.telefon)
+        ? "WhatsApp ve telefon"
+        : "WhatsApp"
+      : telefonBaglantisi(proje.telefon)
+        ? "Telefon"
+        : "İletişim formu";
+    const heroBilgileri: HeroBilgisi[] = anaSayfaMi
+      ? [
+          {
+            etiket: "Öne çıkan",
+            deger: hizmetler[0] || proje.sektorAdi,
+          },
+          {
+            etiket: hizmetBolgesi ? "Hizmet bölgesi" : "Uzmanlık",
+            deger: hizmetBolgesi || hizmetler[1] || proje.sektorAdi,
+          },
+          {
+            etiket: "Doğrudan iletişim",
+            deger: iletisimYolu,
+          },
+        ]
+      : [];
+
     return (
       <HeroBolumu
         bolum={bolum}
         tema={proje.tema}
+        firmaAdi={proje.firmaAdi}
+        sektorAdi={proje.sektorAdi}
+        tasarim={tasarim}
+        bilgiler={heroBilgileri}
         dahiliBaglantiAc={dahiliBaglantiAc}
       />
     );
@@ -1420,6 +1522,8 @@ function BolumRender({
       className={`${styles.standartBolum} ${
         index % 2 === 1 ? styles.alternatifBolum : ""
       } ${styles[`bolum_${bolum.tur}`] ?? ""} ${varyasyonSinifi(bolum.varyasyon)}`}
+      data-bolum-turu={bolum.tur}
+      data-bolum-sira={index}
       initial="gizli"
       whileInView="gorunur"
       viewport={{
@@ -1433,39 +1537,45 @@ function BolumRender({
         <i />
       </div>
 
-      {bolum.tur === "galeri" ? (
-        <>
-          <AnimasyonluBaslik
-            ustBaslik={bolum.ustBaslik}
-            baslik={bolum.baslik}
-            aciklama={bolum.aciklama}
-          />
+      <span className={styles.bolumFiligran} aria-hidden="true">
+        {bolumNumarasi(index)}
+      </span>
 
-          <GaleriBolumu bolum={bolum} />
+      <div className={styles.bolumIcerikSahnesi}>
+        {bolum.tur === "galeri" ? (
+          <>
+            <AnimasyonluBaslik
+              ustBaslik={bolum.ustBaslik}
+              baslik={bolum.baslik}
+              aciklama={bolum.aciklama}
+            />
 
-          <Butonlar bolum={bolum} dahiliBaglantiAc={dahiliBaglantiAc} />
-        </>
-      ) : bolum.tur === "iletisim" ? (
-        <IletisimBolumu bolum={bolum} proje={proje} />
-      ) : bolum.tur === "harita" ? (
-        <HaritaBolumu bolum={bolum} proje={proje} />
-      ) : bolum.tur === "form" ? (
-        <FormBolumu bolum={bolum} proje={proje} />
-      ) : listeTuruMu ? (
-        <>
-          <AnimasyonluBaslik
-            ustBaslik={bolum.ustBaslik}
-            baslik={bolum.baslik}
-            aciklama={bolum.aciklama}
-          />
+            <GaleriBolumu bolum={bolum} />
 
-          <ListeBolumu bolum={bolum} dahiliBaglantiAc={dahiliBaglantiAc} />
+            <Butonlar bolum={bolum} dahiliBaglantiAc={dahiliBaglantiAc} />
+          </>
+        ) : bolum.tur === "iletisim" ? (
+          <IletisimBolumu bolum={bolum} proje={proje} />
+        ) : bolum.tur === "harita" ? (
+          <HaritaBolumu bolum={bolum} proje={proje} />
+        ) : bolum.tur === "form" ? (
+          <FormBolumu bolum={bolum} proje={proje} />
+        ) : listeTuruMu ? (
+          <>
+            <AnimasyonluBaslik
+              ustBaslik={bolum.ustBaslik}
+              baslik={bolum.baslik}
+              aciklama={bolum.aciklama}
+            />
 
-          <Butonlar bolum={bolum} dahiliBaglantiAc={dahiliBaglantiAc} />
-        </>
-      ) : (
-        <MetinBolumu bolum={bolum} dahiliBaglantiAc={dahiliBaglantiAc} />
-      )}
+            <ListeBolumu bolum={bolum} dahiliBaglantiAc={dahiliBaglantiAc} />
+
+            <Butonlar bolum={bolum} dahiliBaglantiAc={dahiliBaglantiAc} />
+          </>
+        ) : (
+          <MetinBolumu bolum={bolum} dahiliBaglantiAc={dahiliBaglantiAc} />
+        )}
+      </div>
     </motion.section>
   );
 }
@@ -1773,6 +1883,7 @@ export default function SiteGorunumu({
   const aktifBolumler = [...aktifSayfa.bolumler]
     .filter((bolum) => bolum.aktif)
     .sort((a, b) => a.sira - b.sira);
+  const markaHizmetleri = sektorHizmetleriniGetir(proje.sektor).slice(0, 4);
 
   const cssDegiskenleri = {
     "--site-arka-plan": renkler.arkaPlan,
@@ -1793,6 +1904,7 @@ export default function SiteGorunumu({
       data-kart-stili={tasarim?.kartStili}
       data-yogunluk={tasarim?.yogunluk}
       data-gorsel-orani={tasarim?.gorselOrani}
+      data-ana-sayfa={aktifSayfa.anaSayfa ? "true" : "false"}
     >
       <header className={styles.siteHeader}>
         <a
@@ -1861,6 +1973,13 @@ export default function SiteGorunumu({
           <Menu size={24} />
         </button>
       </header>
+
+      {aktifSayfa.anaSayfa && (
+        <MarkaSeridi
+          sektorAdi={proje.sektorAdi}
+          hizmetler={markaHizmetleri}
+        />
+      )}
 
       <AnimatePresence>
         {mobilMenuAcik && (
@@ -1965,6 +2084,8 @@ export default function SiteGorunumu({
                 bolum={bolum}
                 proje={proje}
                 index={index}
+                anaSayfaMi={aktifSayfa.anaSayfa}
+                tasarim={tasarim}
                 dahiliBaglantiAc={dahiliBaglantiAc}
               />
             ))

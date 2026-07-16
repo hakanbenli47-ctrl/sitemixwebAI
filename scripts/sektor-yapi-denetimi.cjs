@@ -455,6 +455,10 @@ const siteCss = fs.readFileSync(
   path.join(kok, "components/site/siteGorunumu.module.css"),
   "utf8",
 );
+const temaSecimCss = fs.readFileSync(
+  path.join(kok, "app/studio/tema/tema.module.css"),
+  "utf8",
+);
 const otomatikOlusturmaKaynagi = fs.readFileSync(
   path.join(kok, "data/sektorGorselDoldurma.ts"),
   "utf8",
@@ -523,6 +527,13 @@ for (const gerekliSinif of [
   ".varyasyon_adimlar",
   ".sssOgesi",
   ".formYerlesimi",
+  ".markaSeridi",
+  ".heroBilgiListesi",
+  ".bolumFiligran",
+  '[data-bolum-turu="hizmetler"]',
+  '[data-bolum-turu="istatistik"]',
+  '[data-bolum-turu="galeri"]',
+  '[data-bolum-turu="sss"]',
   "@media (max-width: 650px)",
   "@media (prefers-reduced-motion: reduce)",
   '[data-tasarim-aile="otomotiv-atolye"]',
@@ -542,10 +553,16 @@ for (const veriNiteligi of [
   "data-kart-stili",
   "data-yogunluk",
   "data-gorsel-orani",
+  "data-bolum-turu",
+  "data-ana-sayfa",
 ]) {
   if (!siteBileseni.includes(veriNiteligi)) {
     sorunlar.push(`site görünümünde tasarım niteliği eksik: ${veriNiteligi}`);
   }
+}
+
+if (!temaSecimCss.includes("grid-template-columns: repeat(3, minmax(0, 1fr))")) {
+  sorunlar.push("tema seçimindeki üçlü sektör düzeni eksik; boş hücre oluşabilir");
 }
 
 console.log(`Sektör: ${sektorler.sektorler.length}`);

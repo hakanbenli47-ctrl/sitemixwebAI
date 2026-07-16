@@ -2,6 +2,7 @@ import {
   hizmetDetayiniGetir,
   sektorIcerikProfiliniGetir,
 } from "@/data/sektorIcerikProfilleri";
+import { sektorDonusumProfiliniGetir } from "@/data/sektorDonusumProfilleri";
 import {
   sektorSunumProfiliniGetir,
   type SayfaRolu,
@@ -11,7 +12,7 @@ import {
   whatsappBaglantisi,
 } from "@/lib/iletisim";
 
-export const GUNCEL_SABLON_SURUMU = 2;
+export const GUNCEL_SABLON_SURUMU = 3;
 
 export type BolumTuru =
   | "hero"
@@ -254,6 +255,7 @@ function anaSayfaBolumleri(
 ): SiteBolumu[] {
   const konum = hizmetBolgesiMetni(bilgi);
   const icerik = sektorIcerikProfiliniGetir(bilgi.sektor);
+  const donusum = sektorDonusumProfiliniGetir(bilgi.sektor);
   const sunum = sektorSunumProfiliniGetir(bilgi.sektor);
   const aksiyonHedefi = sunum.aksiyonSayfasi
     ? `/${sunum.aksiyonSayfasi.slug}`
@@ -263,7 +265,7 @@ function anaSayfaBolumleri(
     hero: bolum("hero", 0, {
       varyasyon: sunum.heroVaryasyonu,
       ustBaslik: konum ? `${bilgi.sektorAdi} · ${konum}` : bilgi.sektorAdi,
-      baslik: icerik.heroBaslik,
+      baslik: donusum.heroBaslik,
       aciklama: icerik.odakMetni,
       butonlar: [
         buton(icerik.ctaMetni, aksiyonHedefi),
@@ -273,18 +275,16 @@ function anaSayfaBolumleri(
     guven: bolum("istatistik", 0, {
       varyasyon: "kartli",
       ustBaslik: "Karar desteği",
-      baslik: sunum.guvenBasligi,
-      aciklama: `${icerik.kararOlcutleri} Böylece kapsam, hazırlık ve sonraki adımlar karar vermeden önce anlaşılır hâle gelir.`,
-      listeElemanlari: [
-        listeElemani("Doğru ön değerlendirme", icerik.kararOlcutleri),
-        listeElemani("Açık çalışma kapsamı", icerik.kisaYaklasim),
-        listeElemani("Kontrollü tamamlama", icerik.sonKontrol),
-      ],
+      baslik: donusum.guvenBaslik,
+      aciklama: "",
+      listeElemanlari: donusum.guvenUnsurlari.map((oge) =>
+        listeElemani(oge.baslik, oge.aciklama),
+      ),
     }),
     hizmetler: bolum("hizmetler", 0, {
       varyasyon: sunum.listeVaryasyonu,
       ustBaslik: sunum.hizmetUstBasligi,
-      baslik: sunum.hizmetSayfasiAdi,
+      baslik: donusum.hizmetlerBaslik,
       aciklama: icerik.kararOlcutleri,
       listeElemanlari: hizmetAdlari.map((ad) =>
         listeElemani(ad, hizmetDetayiniGetir(icerik, ad, false)),
@@ -294,48 +294,45 @@ function anaSayfaBolumleri(
     surec: bolum("neden-biz", 0, {
       varyasyon: "adimlar",
       ustBaslik: "Çalışma süreci",
-      baslik: sunum.surecBasligi,
-      aciklama: `${icerik.kisaYaklasim} Sürecin her adımında ne yapılacağı ve sizden hangi bilginin beklendiği açık tutulur.`,
-      listeElemanlari: [
-        listeElemani("İhtiyacı anlayalım", icerik.iletisimIstegi),
-        listeElemani("Kapsamı netleştirelim", icerik.kararOlcutleri),
-        listeElemani("Planlı biçimde ilerleyelim", icerik.detayliYaklasim),
-        listeElemani("Birlikte kontrol edelim", icerik.sonKontrol),
-      ],
+      baslik: donusum.surecBaslik,
+      aciklama: "",
+      listeElemanlari: donusum.surecAdimlari.map((oge) =>
+        listeElemani(oge.baslik, oge.aciklama),
+      ),
     }),
     hikaye: bolum("metin", 0, {
       varyasyon: sunum.metinVaryasyonu,
       ustBaslik: "Yaklaşımımız",
-      baslik: icerik.yaklasimBaslik,
+      baslik: donusum.hakkimizdaBaslik,
       aciklama: icerik.detayliYaklasim,
       butonlar: [buton("Bizi daha yakından tanıyın", "/hakkimizda")],
     }),
     galeri: bolum("galeri", 0, {
       varyasyon: sunum.galeriVaryasyonu,
       ustBaslik: sunum.galeriSayfasiAdi,
-      baslik: `${bilgi.sektorAdi} çalışmalarını ayrıntılarıyla inceleyin`,
-      aciklama: `${icerik.sonKontrol} Görseller, kullanılan yaklaşımı ve işin niteliğini daha doğru değerlendirmenize yardımcı olur.`,
-      listeElemanlari: hizmetAdlari.slice(0, 4).map((ad) =>
-        listeElemani(ad, `${ad} kapsamında öne çıkan uygulama ayrıntısı.`),
+      baslik: donusum.galeriBaslik,
+      aciklama: icerik.sonKontrol,
+      listeElemanlari: donusum.galeriBasliklari.slice(0, 4).map((ad, index) =>
+        listeElemani(
+          ad,
+          hizmetDetayiniGetir(icerik, hizmetAdlari[index % hizmetAdlari.length], false),
+        ),
       ),
       butonlar: [buton(sunum.galeriSayfasiAdi, `/${sunum.galeriSayfasiSlug}`)],
     }),
     sss: bolum("sss", 0, {
       varyasyon: "akordeon",
       ustBaslik: "Sık sorulan sorular",
-      baslik: sunum.sssBasligi,
-      aciklama: `${icerik.iletisimIstegi} İlk görüşmeden önce kapsam, hazırlık ve takip hakkında merak edilenleri inceleyin.`,
-      listeElemanlari: [
-        listeElemani("Başlamak için hangi bilgileri paylaşmalıyım?", icerik.iletisimIstegi),
-        listeElemani("Hizmet kapsamı nasıl belirleniyor?", icerik.kararOlcutleri),
-        listeElemani("Süreç nasıl ilerliyor?", icerik.kisaYaklasim),
-        listeElemani("Tamamlanırken nelere dikkat ediliyor?", icerik.sonKontrol),
-      ],
+      baslik: donusum.sssBaslik,
+      aciklama: "",
+      listeElemanlari: donusum.sorular.map((oge) =>
+        listeElemani(oge.baslik, oge.aciklama),
+      ),
     }),
     iletisim: bolum("iletisim", 0, {
       varyasyon: "iletisim-paneli",
       ustBaslik: "Bilgi ve planlama",
-      baslik: icerik.ctaMetni,
+      baslik: donusum.iletisimBaslik,
       aciklama: `${icerik.iletisimIstegi} Telefon veya WhatsApp üzerinden kısa bilgi paylaşmanız yeterlidir.`,
       butonlar: [
         ...(telefonBaglantisi(bilgi.telefon)
@@ -370,6 +367,7 @@ function standartSayfalar(
 ): SiteSayfasi[] {
   const konum = hizmetBolgesiMetni(bilgi);
   const icerik = sektorIcerikProfiliniGetir(bilgi.sektor);
+  const donusum = sektorDonusumProfiliniGetir(bilgi.sektor);
   const sunum = sektorSunumProfiliniGetir(bilgi.sektor);
   const icHeroVaryasyonu = sunum.heroVaryasyonu === "kapak" ? "odakli" : sunum.heroVaryasyonu;
 
@@ -377,14 +375,11 @@ function standartSayfalar(
     bolum("neden-biz", 2, {
       varyasyon: "adimlar",
       ustBaslik: "Nasıl ilerliyoruz?",
-      baslik: sunum.surecBasligi,
-      aciklama: `${icerik.kisaYaklasim} Kapsam ve sonraki adımlar baştan itibaren anlaşılır tutulur.`,
-      listeElemanlari: [
-        listeElemani("Ön değerlendirme", icerik.iletisimIstegi),
-        listeElemani("Kapsam ve plan", icerik.kararOlcutleri),
-        listeElemani("Uygulama veya hizmet", icerik.kisaYaklasim),
-        listeElemani("Kontrol ve takip", icerik.sonKontrol),
-      ],
+      baslik: donusum.surecBaslik,
+      aciklama: "",
+      listeElemanlari: donusum.surecAdimlari.map((oge) =>
+        listeElemani(oge.baslik, oge.aciklama),
+      ),
       animasyon: "soldan",
     });
 
@@ -392,13 +387,10 @@ function standartSayfalar(
     bolum("sss", sira, {
       varyasyon: "akordeon",
       ustBaslik: "Sık sorulan sorular",
-      baslik: sunum.sssBasligi,
-      listeElemanlari: [
-        listeElemani("Hangi bilgiler gerekli?", icerik.iletisimIstegi),
-        listeElemani("Kapsam nasıl belirlenir?", icerik.kararOlcutleri),
-        listeElemani("Süreç nasıl yürütülür?", icerik.detayliYaklasim),
-        listeElemani("Son kontrol nasıl yapılır?", icerik.sonKontrol),
-      ],
+      baslik: donusum.sssBaslik,
+      listeElemanlari: donusum.sorular.map((oge) =>
+        listeElemani(oge.baslik, oge.aciklama),
+      ),
       animasyon: "asagidan",
     });
 
@@ -408,25 +400,34 @@ function standartSayfalar(
       bolum("hero", 0, {
         varyasyon: icHeroVaryasyonu,
         ustBaslik: "Hakkımızda",
-        baslik: icerik.yaklasimBaslik,
+        baslik: donusum.hakkimizdaBaslik,
         aciklama: icerik.kisaYaklasim,
         animasyon: "soluklasarak",
       }),
       bolum("metin", 1, {
         varyasyon: sunum.metinVaryasyonu,
         ustBaslik: `${bilgi.firmaAdi} yaklaşımı`,
-        baslik: "İyi hizmet, doğru beklenti ve düzenli iletişimle başlar",
+        baslik: donusum.hakkimizdaBaslik,
         aciklama: icerik.detayliYaklasim,
         animasyon: "asagidan",
       }),
       bolum("istatistik", 2, {
         varyasyon: "kartli",
         ustBaslik: "Çalışma ilkeleri",
-        baslik: sunum.guvenBasligi,
+        baslik: donusum.guvenBaslik,
         listeElemanlari: [
-          listeElemani("Açık kapsam", icerik.kararOlcutleri),
-          listeElemani("Ulaşılabilir iletişim", icerik.iletisimIstegi),
-          listeElemani("Kontrollü tamamlama", icerik.sonKontrol),
+          listeElemani(
+            donusum.guvenUnsurlari[0].baslik,
+            `${icerik.kisaYaklasim} Bu yaklaşım, hizmetin ilk temasından itibaren korunur.`,
+          ),
+          listeElemani(
+            donusum.guvenUnsurlari[1].baslik,
+            `${icerik.detayliYaklasim} Kararlar, işin kendi koşulları içinde açıklanır.`,
+          ),
+          listeElemani(
+            donusum.guvenUnsurlari[2].baslik,
+            `${icerik.sonKontrol} Böylece tamamlanan kapsam görünür hâle gelir.`,
+          ),
         ],
         animasyon: "sagdan",
       }),
@@ -435,14 +436,14 @@ function standartSayfalar(
       bolum("hero", 0, {
         varyasyon: icHeroVaryasyonu,
         ustBaslik: sunum.hizmetUstBasligi,
-        baslik: sunum.hizmetSayfasiAdi,
+        baslik: donusum.hizmetlerBaslik,
         aciklama: icerik.kararOlcutleri,
         animasyon: "soluklasarak",
       }),
       bolum(sunum.hizmetBolumTuru, 1, {
         varyasyon: sunum.listeVaryasyonu,
         ustBaslik: "Ayrıntılı kapsam",
-        baslik: `${sunum.hizmetSayfasiAdi} arasından doğru kapsamı seçin`,
+        baslik: donusum.hizmetlerBaslik,
         aciklama: `${icerik.kararOlcutleri} Her seçeneğin hazırlığı, uygulama biçimi ve takip ihtiyacı başlamadan önce açıklanır.`,
         listeElemanlari: hizmetAdlari.map((ad) =>
           listeElemani(ad, hizmetDetayiniGetir(icerik, ad, true)),
@@ -458,16 +459,19 @@ function standartSayfalar(
           bolum("hero", 0, {
             varyasyon: icHeroVaryasyonu,
             ustBaslik: sunum.galeriSayfasiAdi,
-            baslik: `${bilgi.sektorAdi} işlerinden seçili örnekler`,
+            baslik: donusum.galeriBaslik,
             aciklama: `${icerik.sonKontrol} Çalışma örneklerini sonuç, uygulama biçimi ve öne çıkan ayrıntılarıyla inceleyebilirsiniz.`,
             animasyon: "soluklasarak",
           }),
           bolum("galeri", 1, {
             varyasyon: sunum.galeriVaryasyonu,
             ustBaslik: "Seçili örnekler",
-            baslik: sunum.galeriSayfasiAdi,
-            listeElemanlari: [...hizmetAdlari, ...hizmetAdlari.slice(0, 2)].map((ad) =>
-              listeElemani(ad, `${hizmetDetayiniGetir(icerik, ad, false)} Uygulamadaki işçilik ve kontrol ayrıntılarını inceleyin.`),
+            baslik: donusum.galeriBaslik,
+            listeElemanlari: donusum.galeriBasliklari.map((ad, index) =>
+              listeElemani(
+                ad,
+                hizmetDetayiniGetir(icerik, hizmetAdlari[index % hizmetAdlari.length], false),
+              ),
             ),
             animasyon: "maskeli",
           }),
@@ -478,14 +482,14 @@ function standartSayfalar(
           bolum("hero", 0, {
             varyasyon: "odakli",
             ustBaslik: sunum.aksiyonSayfasi.ustBaslik,
-            baslik: sunum.aksiyonSayfasi.baslik,
+            baslik: donusum.iletisimBaslik,
             aciklama: icerik.iletisimIstegi,
             animasyon: "soluklasarak",
           }),
           bolum("form", 1, {
             varyasyon: "talep-formu",
             ustBaslik: "Kısa talep formu",
-            baslik: icerik.ctaMetni,
+            baslik: donusum.iletisimBaslik,
             aciklama: icerik.iletisimIstegi,
             animasyon: "asagidan",
           }),
@@ -495,7 +499,7 @@ function standartSayfalar(
       bolum("iletisim", 0, {
         varyasyon: "iletisim-paneli",
         ustBaslik: "İletişim",
-        baslik: `${bilgi.firmaAdi} ile iletişime geçin`,
+        baslik: donusum.iletisimBaslik,
         aciklama: `${icerik.iletisimIstegi}${konum ? ` ${konum} için güncel uygunluğu doğrudan sorabilirsiniz.` : ""}`,
         butonlar: [
           ...(telefonBaglantisi(bilgi.telefon) ? [buton(`Telefon: ${bilgi.telefon}`, telefonBaglantisi(bilgi.telefon))] : []),

@@ -426,7 +426,45 @@ const sektorGrubu: Record<string, keyof typeof gruplar> = {
   ozel: "genel",
 };
 
+const tamamlayiciGruplar: Record<string, (keyof typeof gruplar)[]> = {
+  "arac-kiralama": ["transfer"],
+  "cam-balkon": ["tente", "tadilat"],
+  tente: ["camBalkon", "tadilat"],
+  tadilat: ["mimarlik", "mobilya"],
+  dekorasyon: ["mimarlik", "tadilat"],
+  temizlik: ["haliKoltuk"],
+  "koltuk-yikama": ["temizlik"],
+  "hali-yikama": ["temizlik"],
+  ilaclama: ["temizlik"],
+  "guzellik-salonu": ["kuafor"],
+  kuafor: ["guzellik"],
+  berber: ["kuafor"],
+  diyetisyen: ["saglik"],
+  psikolog: ["saglik"],
+  fizyoterapist: ["saglik", "spor"],
+  "dis-klinigi": ["saglik"],
+  emlak: ["mimarlik", "mobilya"],
+  mimarlik: ["tadilat", "mobilya"],
+  fotografci: ["organizasyon"],
+  "dugun-salonu": ["fotograf"],
+  "spor-salonu": ["saglik"],
+  anaokulu: ["egitim"],
+  "ozel-egitim-kursu": ["kres"],
+  cicekci: ["organizasyon"],
+  pastane: ["restoran"],
+  mobilya: ["mimarlik", "tadilat"],
+  elektrikci: ["teknik"],
+  tesisatci: ["teknik"],
+  "kombi-servisi": ["teknik"],
+  nakliyat: ["transfer"],
+  transfer: ["otomotiv"],
+};
+
 export function sektorStokGorselleriniGetir(sektor: string) {
   const grup = sektorGrubu[sektor] ?? "genel";
-  return [...gruplar[grup]];
+  const gruplarListesi = [grup, ...(tamamlayiciGruplar[sektor] ?? [])];
+
+  return Array.from(
+    new Set(gruplarListesi.flatMap((grupAdi) => [...gruplar[grupAdi]])),
+  );
 }

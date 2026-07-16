@@ -1094,7 +1094,9 @@ export function hizmetDetayiniGetir(
     ];
 
   if (hazirDetay) {
-    return hazirDetay;
+    return detayli
+      ? `${hazirDetay} Hazırlık, uygulama sınırları ve takip gereksinimi bu hizmet için ayrıca netleştirilir.`
+      : hazirDetay;
   }
 
   return detayli

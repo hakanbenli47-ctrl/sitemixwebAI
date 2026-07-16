@@ -36,6 +36,7 @@ import {
   projeyeOzelIcerigiUygula,
   projeyeOzelTopluIcerikOlustur,
 } from "@/data/icerikSablonlari";
+import { stokGorselleriDoldur } from "@/data/sektorGorselDoldurma";
 import type {
   ButonVerisi,
   ListeElemani,
@@ -830,7 +831,7 @@ export default function KolayIcerikDuzenleyici() {
         const guncelSablonluProje =
           hamProje.sablonSurumu === GUNCEL_SABLON_SURUMU
             ? hamProje
-            : projeyeOzelIcerigiUygula(hamProje);
+            : stokGorselleriDoldur(projeyeOzelIcerigiUygula(hamProje));
         const duzenlenmisProje = projeyiDuzenle(guncelSablonluProje);
 
         setProje(duzenlenmisProje);
@@ -1689,7 +1690,9 @@ export default function KolayIcerikDuzenleyici() {
           <button
             type="button"
             onClick={() => {
-              const guncelProje = projeyeOzelIcerigiUygula(proje);
+              const guncelProje = stokGorselleriDoldur(
+                projeyeOzelIcerigiUygula(proje),
+              );
               const ilkSayfa = guncelProje.sayfalar[0];
 
               projeyiKaydet(guncelProje, true);

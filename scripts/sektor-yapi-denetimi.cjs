@@ -38,12 +38,16 @@ const sektorler = tsModulunuYukle(path.join(kok, "data/sektorler.ts"));
 const profiller = tsModulunuYukle(
   path.join(kok, "data/sektorIcerikProfilleri.ts"),
 );
+const donusumler = tsModulunuYukle(
+  path.join(kok, "data/sektorDonusumProfilleri.ts"),
+);
 const sunumlar = tsModulunuYukle(
   path.join(kok, "data/sektorSunumProfilleri.ts"),
 );
 const sablonlar = tsModulunuYukle(
   path.join(kok, "data/sektorSablonlari.ts"),
   {
+    "@/data/sektorDonusumProfilleri": donusumler,
     "@/data/sektorIcerikProfilleri": profiller,
     "@/data/sektorSunumProfilleri": sunumlar,
     "@/lib/iletisim": iletisim,
@@ -55,10 +59,17 @@ const formlar = tsModulunuYukle(
 const gorseller = tsModulunuYukle(
   path.join(kok, "data/sektorStokGorselleri.ts"),
 );
+const gorselDoldurma = tsModulunuYukle(
+  path.join(kok, "data/sektorGorselDoldurma.ts"),
+  {
+    "@/data/sektorStokGorselleri": gorseller,
+  },
+);
 const icerikler = tsModulunuYukle(
   path.join(kok, "data/icerikSablonlari.ts"),
   {
     "@/data/sektorler": sektorler,
+    "@/data/sektorDonusumProfilleri": donusumler,
     "@/data/sektorIcerikProfilleri": profiller,
     "@/data/sektorSunumProfilleri": sunumlar,
     "@/data/sektorSablonlari": sablonlar,
@@ -102,6 +113,7 @@ const temaKimlikleri = new Set([
 const sorunlar = [];
 let sayfaSayisi = 0;
 let bolumSayisi = 0;
+const donusumAciklamalari = new Map();
 
 if (
   JSON.stringify(sektorler.sektorler.map((sektor) => sektor.id)) !==
@@ -113,11 +125,57 @@ if (
 for (const sektor of sektorler.sektorler) {
   const sunum = sunumlar.sektorSunumProfiliniGetir(sektor.id);
   const profil = profiller.sektorIcerikProfiliniGetir(sektor.id);
+  const donusum = donusumler.sektorDonusumProfiliniGetir(sektor.id);
   const formProfili = formlar.sektorFormProfiliniGetir(sektor.id);
   const stokGorseller = gorseller.sektorStokGorselleriniGetir(sektor.id);
 
   if (profil === profiller.sektorIcerikProfiliniGetir("__bilinmeyen__")) {
     sorunlar.push(`${sektor.id}: özel içerik profili bulunamadı`);
+  }
+
+  if (
+    donusum === donusumler.sektorDonusumProfiliniGetir("__bilinmeyen__")
+  ) {
+    sorunlar.push(`${sektor.id}: özel dönüşüm profili bulunamadı`);
+  }
+
+  if (
+    donusum.guvenUnsurlari.length < 3 ||
+    donusum.surecAdimlari.length < 4 ||
+    donusum.sorular.length < 4 ||
+    donusum.galeriBasliklari.length < 6
+  ) {
+    sorunlar.push(`${sektor.id}: dönüşüm içeriği yüzeysel kaldı`);
+  }
+
+  for (const baslik of [
+    donusum.heroBaslik,
+    donusum.hakkimizdaBaslik,
+    donusum.hizmetlerBaslik,
+    donusum.guvenBaslik,
+    donusum.surecBaslik,
+    donusum.sssBaslik,
+    donusum.galeriBaslik,
+    donusum.iletisimBaslik,
+  ]) {
+    if (baslik.trim().split(/\s+/).length > 6) {
+      sorunlar.push(`${sektor.id}: uzun bölüm başlığı: ${baslik}`);
+    }
+  }
+
+  for (const oge of [
+    ...donusum.guvenUnsurlari,
+    ...donusum.surecAdimlari,
+    ...donusum.sorular,
+  ]) {
+    const anahtar = oge.aciklama.toLocaleLowerCase("tr-TR").replace(/\s+/g, " ").trim();
+    const onceki = donusumAciklamalari.get(anahtar);
+
+    if (onceki && onceki !== sektor.id) {
+      sorunlar.push(`${sektor.id}: başka sektörle aynı açıklama: ${oge.aciklama}`);
+    } else {
+      donusumAciklamalari.set(anahtar, sektor.id);
+    }
   }
 
   if (sunum === sunumlar.sektorSunumProfiliniGetir("__bilinmeyen__")) {
@@ -277,6 +335,46 @@ for (const sektor of sektorler.sektorler) {
     }
 
     const tumIcerik = JSON.stringify(sonuc);
+    const aciklamaKullanimlari = new Map();
+
+    for (const aciklama of sonuc.sayfalar.flatMap((sayfa) =>
+      sayfa.bolumler.flatMap((bolum) => [
+        bolum.aciklama,
+        ...bolum.listeElemanlari.map((eleman) => eleman.aciklama),
+      ]),
+    )) {
+      const anahtar = String(aciklama ?? "")
+        .toLocaleLowerCase("tr-TR")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      if (anahtar.length < 50) continue;
+      aciklamaKullanimlari.set(
+        anahtar,
+        (aciklamaKullanimlari.get(anahtar) ?? 0) + 1,
+      );
+    }
+
+    const yinelenenAciklama = [...aciklamaKullanimlari.entries()].find(
+      ([, adet]) => adet > 1,
+    );
+
+    if (yinelenenAciklama) {
+      sorunlar.push(
+        `${sektor.id}/${siteTipi}: aynı açıklama birden fazla yerde kullanıldı: ${yinelenenAciklama[0].slice(0, 80)}`,
+      );
+    }
+
+    for (const eskiKalip of [
+      "İhtiyacı anlayalım",
+      "Kapsamı netleştirelim",
+      "Planlı biçimde ilerleyelim",
+      "Tamamlanırken nelere dikkat ediliyor?",
+    ]) {
+      if (tumIcerik.includes(eskiKalip)) {
+        sorunlar.push(`${sektor.id}/${siteTipi}: yinelenen eski kalıp kaldı: ${eskiKalip}`);
+      }
+    }
 
     if (tumIcerik.includes("Uzman bilgisi")) {
       sorunlar.push(`${sektor.id}/${siteTipi}: yer tutucu içerik kaldı`);
@@ -285,6 +383,30 @@ for (const sektor of sektorler.sektorler) {
     if (!tumIcerik.includes("https://wa.me/905325550000")) {
       sorunlar.push(`${sektor.id}/${siteTipi}: WhatsApp bağlantısı eksik`);
     }
+
+    const gorselliSonuc = gorselDoldurma.stokGorselleriDoldur(sonuc);
+
+    for (const bolum of gorselliSonuc.sayfalar.flatMap(
+      (sayfa) => sayfa.bolumler,
+    )) {
+      if (
+        bolum.tur === "hero" &&
+        !bolum.gorsel.trim() &&
+        !bolum.arkaPlanGorseli.trim()
+      ) {
+        sorunlar.push(`${sektor.id}/${siteTipi}: açılış görseli boş kaldı`);
+      }
+
+      if (bolum.tur === "metin" && !bolum.gorsel.trim()) {
+        sorunlar.push(`${sektor.id}/${siteTipi}: metin görseli boş kaldı`);
+      }
+
+      if (["hizmetler", "urunler", "galeri"].includes(bolum.tur)) {
+        if (bolum.listeElemanlari.some((eleman) => !eleman.gorsel.trim())) {
+          sorunlar.push(`${sektor.id}/${siteTipi}: kart görseli boş kaldı`);
+        }
+      }
+    }
   }
 }
 
@@ -292,6 +414,18 @@ const siteCss = fs.readFileSync(
   path.join(kok, "components/site/siteGorunumu.module.css"),
   "utf8",
 );
+const otomatikOlusturmaKaynagi = fs.readFileSync(
+  path.join(kok, "data/sektorGorselDoldurma.ts"),
+  "utf8",
+);
+
+if (
+  !otomatikOlusturmaKaynagi.includes(
+    '["hizmetler", "urunler", "galeri"].includes(bolum.tur)',
+  )
+) {
+  sorunlar.push("otomatik görsel doldurma hizmet kartlarını kapsamıyor");
+}
 
 function renkAydinligi(hex) {
   const sayi = Number.parseInt(hex.slice(1), 16);

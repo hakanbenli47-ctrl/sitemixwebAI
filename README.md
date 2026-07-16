@@ -6,12 +6,12 @@ siteleri hazırlayan Next.js tabanlı stüdyo.
 ## Çalışma akışı
 
 1. Firma, sektör, konum ve geçerli iletişim kanalları girilir.
-2. Seçilen sektör için sayfa rolleri, bölüm sırası, hizmet anlatımı ve tema
-   önerileri hazırlanır.
+2. Seçilen sektör için kısa başlıklar; özgün güven, süreç, SSS, galeri ve
+   hizmet anlatımları; sayfa rolleri, bölüm sırası ve tema önerileri hazırlanır.
 3. İsteğe bağlı OpenAI yapılandırması varsa metinler, mevcut sektör profilini
    ve kullanıcının verdiği gerçek bilgileri koruyarak yeniden yazılır.
-4. Sektöre özel, doğrulanmış Unsplash görselleri uygun açılış, hakkımızda,
-   ürün ve galeri alanlarına yerleştirilir.
+4. Sektöre özel, doğrulanmış Unsplash görselleri uygun açılış, metin, hizmet,
+   ürün ve galeri alanlarına yerleştirilir; sahte ekip görseli oluşturulmaz.
 5. İçerik merkezinde toplu metin değişiklikleri önce ön izlenir; eşleşme
    hataları giderildikten sonra uygulanır ve son toplu işlem geri alınabilir.
 6. Talep formu araç, ölçü, tarih, konum, randevu veya hizmet kapsamı gibi
@@ -28,8 +28,9 @@ npm run build
 ```
 
 Sektör denetimi 36 sektörün tek ve çok sayfalı yapılarını; sayfa rolleri,
-sluglar, bağlantılar, form profilleri, görsel havuzları ve şablon sürümünü
-kontrol eder.
+sluglar, bağlantılar, form profilleri, görsel havuzları, başlık uzunlukları,
+sektörler arası içerik özgünlüğü, sayfa içi tekrarlar ve şablon sürümünü kontrol
+eder.
 
 ## Ortam değişkenleri
 

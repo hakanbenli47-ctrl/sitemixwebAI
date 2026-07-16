@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
-import type {
-  SiteBolumu,
-  SiteSayfasi,
-} from "@/data/sektorSablonlari";
 import { sektorHizmetleriniGetir } from "@/data/sektorSablonlari";
 import { sektorFormProfiliniGetir } from "@/data/sektorFormProfilleri";
+import { sektorDonusumProfiliniGetir } from "@/data/sektorDonusumProfilleri";
+import { stokGorselleriDoldur } from "@/data/sektorGorselDoldurma";
 import { sektorIcerikProfiliniGetir } from "@/data/sektorIcerikProfilleri";
-import { sektorStokGorselleriniGetir } from "@/data/sektorStokGorselleri";
 import type { ProjeVerisi } from "@/types/proje";
 
 export const runtime = "nodejs";
@@ -188,6 +185,7 @@ async function yapayZekaIcerigiOlustur(
   const sektorYonergesi = {
     hizmetler: sektorHizmetleriniGetir(proje.sektor),
     anlatim: sektorIcerikProfiliniGetir(proje.sektor),
+    donusum: sektorDonusumProfiliniGetir(proje.sektor),
     talepFormu: sektorFormProfiliniGetir(proje.sektor),
   };
 
@@ -203,7 +201,8 @@ Kurallar:
 - Kullanıcının vermediği kuruluş yılı, çalışan sayısı, sertifika, ödül, fiyat, garanti, başarı oranı veya resmi yetki uydurma.
 - Sağlık alanlarında tanı koyma, kesin sonuç vaat etme ve hassas sağlık verisi isteme. Acil durum yönlendirmesini yalnızca ilgili talep formu notunda kullan.
 - Ekip bölümünde gerçek kişi adı, unvanı veya uzmanlık belgesi uydurma.
-- Başlıkları kısa; açıklamaları çoğunlukla 1-3 cümle tut.
+- Ana ve kart başlıklarını 2-5 kelime tut; zorunlu olmadıkça 6 kelimeyi geçme. Derinliği açıklamalara dağıt.
+- Aynı soru, vaat, güven gerekçesi veya süreç cümlesini farklı bölümlerde yeniden kullanma. Her bölüm ziyaretçinin yeni bir karar sorusunu yanıtlasın.
 - Her sayfanın rolüne sadık kal. Galeri başlıkları gerçek çalışma kanıtı gibi konuşmamalı; gösterilen uygulama türünü açıklamalı.
 - Sayfa, bölüm ve liste öğesi ID'lerini aynen koru. Yeni sayfa veya bölüm ekleme ve mevcut olanı silme.
 - Galeri öğelerine de sektöre uygun başlık ve kısa açıklama yaz.
@@ -365,88 +364,6 @@ function uretilenIcerigiUygula(
             .filter(Boolean),
     sayfalar,
     otomatikIcerikOlusturulduMu: true,
-    guncellenmeTarihi: new Date().toISOString(),
-  };
-}
-
-function gorselGerekenBolumMu(bolum: SiteBolumu) {
-  return ["hero", "metin", "urunler", "galeri"].includes(bolum.tur);
-}
-
-function listeGorseliGerekenBolumMu(bolum: SiteBolumu) {
-  return ["urunler", "galeri"].includes(bolum.tur);
-}
-
-function stokGorselleriDoldur(proje: ProjeVerisi): ProjeVerisi {
-  const stoklar = sektorStokGorselleriniGetir(proje.sektor);
-  let sira = 0;
-  let hakkimizdaGorseliAtandi = false;
-
-  function siradakiGorsel() {
-    const gorsel = stoklar[sira % stoklar.length];
-    sira += 1;
-    return gorsel;
-  }
-
-  const sayfalar: SiteSayfasi[] = proje.sayfalar.map((sayfa) => ({
-    ...sayfa,
-    bolumler: sayfa.bolumler.map((bolum) => {
-      if (!gorselGerekenBolumMu(bolum)) {
-        return bolum;
-      }
-
-      let gorsel = bolum.gorsel;
-      let arkaPlanGorseli = bolum.arkaPlanGorseli;
-
-      if (
-        bolum.tur === "hero" &&
-        !arkaPlanGorseli.trim() &&
-        !gorsel.trim()
-      ) {
-        if (bolum.varyasyon === "kapak") {
-          arkaPlanGorseli = siradakiGorsel();
-        } else {
-          gorsel = siradakiGorsel();
-        }
-      }
-
-      if (
-        bolum.tur === "metin" &&
-        sayfa.rol === "hakkimizda" &&
-        !hakkimizdaGorseliAtandi &&
-        !gorsel.trim()
-      ) {
-        gorsel = siradakiGorsel();
-        hakkimizdaGorseliAtandi = true;
-      }
-
-      const listeElemanlari = bolum.listeElemanlari.map((eleman) => {
-        if (
-          !listeGorseliGerekenBolumMu(bolum) ||
-          eleman.gorsel.trim()
-        ) {
-          return eleman;
-        }
-
-        return {
-          ...eleman,
-          gorsel: siradakiGorsel(),
-        };
-      });
-
-      return {
-        ...bolum,
-        gorsel,
-        arkaPlanGorseli,
-        listeElemanlari,
-      };
-    }),
-  }));
-
-  return {
-    ...proje,
-    sayfalar,
-    otomatikGorsellerOlusturulduMu: true,
     guncellenmeTarihi: new Date().toISOString(),
   };
 }

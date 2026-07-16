@@ -3,6 +3,7 @@ import {
   hizmetDetayiniGetir,
   sektorIcerikProfiliniGetir,
 } from "@/data/sektorIcerikProfilleri";
+import { sektorDonusumProfiliniGetir } from "@/data/sektorDonusumProfilleri";
 import {
   sektorSunumProfiliniGetir,
   type SayfaRolu,
@@ -15,6 +16,7 @@ import type {
 } from "@/data/sektorSablonlari";
 import {
   GUNCEL_SABLON_SURUMU,
+  sektorHizmetleriniGetir,
   sektorSayfalariOlustur,
 } from "@/data/sektorSablonlari";
 import {
@@ -368,6 +370,13 @@ function temizlikIcerigi(
   sayfa: SiteSayfasi,
   bolum: SiteBolumu,
 ): Partial<HazirBolumIcerigi> | null {
+  if (
+    proje.sablonSurumu === GUNCEL_SABLON_SURUMU ||
+    proje.sektor === "temizlik"
+  ) {
+    return genelIcerik(proje, sayfa, bolum);
+  }
+
   const bolge = hizmetBolgesiMetni(proje);
   const yerVurgusu = bolge ? `${bolge} ve çevresinde` : "Hizmet bölgenizde";
   const sayfaRolu = sayfaRolunuGetir(sayfa);
@@ -597,12 +606,14 @@ function genelIcerik(
     )
     .join(" ");
   const profil = sektorIcerikProfiliniGetir(proje.sektor, mevcutIcerik);
+  const donusum = sektorDonusumProfiliniGetir(proje.sektor);
+  const hizmetler = sektorHizmetleriniGetir(proje.sektor);
   const yerMetni = bolge ? `${bolge} ve çevresinde` : "hizmet bölgenizde";
 
   if (bolum.tur === "hero" && anaSayfaMi) {
     return {
       ustBaslik: bolge ? `${proje.sektorAdi} · ${bolge}` : proje.sektorAdi,
-      baslik: profil.heroBaslik || ton.anaBaslik,
+      baslik: donusum.heroBaslik || profil.heroBaslik || ton.anaBaslik,
       aciklama: `${proje.firmaAdi}, ${yerMetni} hizmet verir. ${profil.odakMetni}`,
       butonlar: anaSayfaButonlari(proje),
     };
@@ -612,8 +623,8 @@ function genelIcerik(
     if (sayfaRolu === "hakkimizda") {
       return {
         ustBaslik: "Hakkımızda",
-        baslik: profil.yaklasimBaslik,
-        aciklama: profil.detayliYaklasim,
+        baslik: donusum.hakkimizdaBaslik,
+        aciklama: profil.kisaYaklasim,
       };
     }
 
@@ -623,7 +634,7 @@ function genelIcerik(
         baslik:
           bolum.baslik && !bolum.baslik.includes(proje.firmaAdi)
             ? bolum.baslik
-            : `${proje.sektorAdi} seçeneklerini ayrıntılı inceleyin`,
+            : donusum.hizmetlerBaslik,
         aciklama: `${profil.kararOlcutleri} Aşağıdaki seçenekleri inceleyerek ihtiyacınıza en yakın hizmet hakkında bilgi alabilirsiniz.`,
       };
     }
@@ -631,14 +642,14 @@ function genelIcerik(
     if (sayfaRolu === "galeri") {
       return {
         ustBaslik: "Çalışmalarımız",
-        baslik: "Uygulama ve hizmet ayrıntılarını yakından inceleyin",
+        baslik: donusum.galeriBaslik,
         aciklama: `${proje.firmaAdi} tarafından sunulan hizmetlerin çalışma biçimini, öne çıkan detaylarını ve farklı ihtiyaçlara nasıl uyarlandığını görseller üzerinden inceleyin.`,
       };
     }
 
     return {
       ustBaslik: bolum.ustBaslik || sayfa.ad,
-      baslik: bolum.baslik || profil.heroBaslik,
+      baslik: bolum.baslik || donusum.heroBaslik,
       aciklama: bolum.aciklama || profil.odakMetni,
     };
   }
@@ -646,7 +657,7 @@ function genelIcerik(
   if (bolum.tur === "metin") {
     return {
       ustBaslik: anaSayfaMi ? "Çalışma yaklaşımımız" : "Nasıl çalışıyoruz?",
-      baslik: profil.yaklasimBaslik || ton.hakkimizdaBaslik,
+      baslik: donusum.hakkimizdaBaslik || profil.yaklasimBaslik || ton.hakkimizdaBaslik,
       aciklama: anaSayfaMi
         ? `${profil.kisaYaklasim} ${proje.firmaAdi}, ${yerMetni} taleplere düzenli iletişimle yanıt verir.`
         : profil.detayliYaklasim,
@@ -663,7 +674,7 @@ function genelIcerik(
 
     return {
       ustBaslik: bolum.ustBaslik || sunum.hizmetUstBasligi,
-      baslik: bolum.baslik || sunum.hizmetSayfasiAdi,
+      baslik: donusum.hizmetlerBaslik,
       aciklama: anaSayfaMi
         ? `${profil.kararOlcutleri} Temel hizmetleri inceleyin; ayrıntılı kapsam için kısa bilgi paylaşmanız yeterlidir.`
         : `${profil.kararOlcutleri} Her seçeneğin kapsamı mevcut durum ve beklentiye göre netleştirilir; başlamadan önce süreç hakkında açık bilgi verilir.`,
@@ -684,61 +695,32 @@ function genelIcerik(
     if (surecBolumuMu) {
       return {
         ustBaslik: bolum.ustBaslik || "Çalışma süreci",
-        baslik: bolum.baslik || profil.yaklasimBaslik,
-        aciklama: bolum.aciklama || "Her aşama, bir sonraki adımı anlaşılır kılacak biçimde planlanır.",
-        listeElemanlari: [
-          {
-            baslik: "İhtiyacı anlayalım",
-            aciklama: profil.iletisimIstegi,
-            baglanti: "",
-          },
-          {
-            baslik: "Kapsamı netleştirelim",
-            aciklama: profil.kararOlcutleri,
-            baglanti: "",
-          },
-          {
-            baslik: "Planlı biçimde ilerleyelim",
-            aciklama: profil.kisaYaklasim,
-            baglanti: "",
-          },
-          {
-            baslik: "Kontrol ederek tamamlayalım",
-            aciklama: profil.sonKontrol,
-            baglanti: "",
-          },
-        ],
+        baslik: donusum.surecBaslik,
+        aciklama: "",
+        listeElemanlari: donusum.surecAdimlari.map((oge, index) => ({
+          baslik: oge.baslik,
+          aciklama:
+            sayfaRolu === "hizmet"
+              ? `${oge.aciklama} ${hizmetDetayiniGetir(
+                  profil,
+                  hizmetler[index % hizmetler.length],
+                  false,
+                )}`
+              : oge.aciklama,
+          baglanti: "",
+        })),
       };
     }
 
     return {
       ustBaslik: anaSayfaMi ? "Neden bizi tercih etmelisiniz?" : "Çalışma ilkelerimiz",
-      baslik: anaSayfaMi
-        ? "Karar vermenizi kolaylaştıran açık ve düzenli süreç"
-        : "İhtiyacı doğru anlayan, ayrıntıları baştan netleştiren yaklaşım",
-      aciklama: "Güvenin yalnızca sonuçla değil; doğru bilgilendirme, açık kapsam ve süreç boyunca ulaşılabilir olmakla kurulduğuna inanıyoruz.",
-      listeElemanlari: [
-        {
-          baslik: "Doğru ön değerlendirme",
-          aciklama: profil.kararOlcutleri,
-          baglanti: "",
-        },
-        {
-          baslik: "Açık ve planlı süreç",
-          aciklama: profil.kisaYaklasim,
-          baglanti: "",
-        },
-        {
-          baslik: "Kontrollü tamamlama",
-          aciklama: profil.sonKontrol,
-          baglanti: "",
-        },
-        {
-          baslik: "Kolay iletişim",
-          aciklama: profil.iletisimIstegi,
-          baglanti: "",
-        },
-      ],
+      baslik: donusum.guvenBaslik,
+      aciklama: "",
+      listeElemanlari: donusum.guvenUnsurlari.map((oge) => ({
+        baslik: oge.baslik,
+        aciklama: oge.aciklama,
+        baglanti: "",
+      })),
     };
   }
 
@@ -747,15 +729,16 @@ function genelIcerik(
 
     return {
       ustBaslik: bolum.ustBaslik || sunum.galeriSayfasiAdi,
-      baslik: anaSayfaMi
-        ? bolum.baslik || "Hizmetlerimizi gerçek ayrıntılarıyla inceleyin"
-        : bolum.baslik || "Farklı ihtiyaçlar için çalışma örnekleri",
-      aciklama: anaSayfaMi
-        ? `${proje.firmaAdi} hizmetlerinin çalışma yaklaşımını ve öne çıkan ayrıntılarını görseller üzerinden keşfedin.`
-        : "Görselleri yalnızca sonuç olarak değil, hizmetin kapsamını ve uygulama detaylarını anlamanıza yardımcı olacak örnekler olarak inceleyebilirsiniz.",
-      listeElemanlari: bolum.listeElemanlari.map((eleman) => ({
-        baslik: eleman.baslik,
-        aciklama: `${hizmetDetayiniGetir(profil, eleman.baslik, false)} Çalışmadan öne çıkan ayrıntı.`,
+      baslik: donusum.galeriBaslik,
+      aciklama: `${(anaSayfaMi
+        ? donusum.galeriBasliklari.slice(0, 3)
+        : donusum.galeriBasliklari.slice(3, 6)
+      ).join(", ")} başlıklarındaki görsel ayrıntıları inceleyin.`,
+      listeElemanlari: bolum.listeElemanlari.map((eleman, index) => ({
+        baslik: donusum.galeriBasliklari[index % donusum.galeriBasliklari.length],
+        aciklama: anaSayfaMi
+          ? `${donusum.galeriBasliklari[index % donusum.galeriBasliklari.length]} için malzeme, uygulama veya kullanım ayrıntısını görsel üzerinden inceleyin.`
+          : `${donusum.galeriBasliklari[index % donusum.galeriBasliklari.length]} başlığında hazırlık, işçilik ve son kontrol noktalarını yakından değerlendirin.`,
         baglanti: eleman.baglanti,
       })),
       butonlar: anaSayfaMi && proje.siteTipi === "cok-sayfa"
@@ -765,42 +748,28 @@ function genelIcerik(
   }
 
   if (bolum.tur === "sss") {
-    const sunum = sektorSunumProfiliniGetir(proje.sektor);
-
     return {
       ustBaslik: bolum.ustBaslik || "Sık sorulan sorular",
-      baslik: bolum.baslik || sunum.sssBasligi,
-      aciklama: bolum.aciklama || "Karar vermeden önce hizmet kapsamı ve süreçle ilgili temel soruların yanıtlarını inceleyin.",
-      listeElemanlari: [
-        {
-          baslik: "Başlamak için hangi bilgileri paylaşmalıyım?",
-          aciklama: profil.iletisimIstegi,
-          baglanti: "",
-        },
-        {
-          baslik: "Hizmet kapsamı nasıl belirleniyor?",
-          aciklama: profil.kararOlcutleri,
-          baglanti: "",
-        },
-        {
-          baslik: "Süreç nasıl ilerliyor?",
-          aciklama: profil.kisaYaklasim,
-          baglanti: "",
-        },
-        {
-          baslik: "Tamamlanırken nelere dikkat ediliyor?",
-          aciklama: profil.sonKontrol,
-          baglanti: "",
-        },
-      ],
+      baslik: donusum.sssBaslik,
+      aciklama: "",
+      listeElemanlari: donusum.sorular.map((oge, index) => ({
+        baslik: oge.baslik,
+        aciklama:
+          sayfaRolu === "hizmet"
+            ? `${oge.aciklama} ${hizmetler[index % hizmetler.length]} değerlendirilirken bu nokta hizmet kapsamına göre ayrıca açıklanır.`
+            : oge.aciklama,
+        baglanti: "",
+      })),
     };
   }
 
   if (bolum.tur === "iletisim") {
     return {
       ustBaslik: anaSayfaMi ? "Bilgi ve planlama" : "İletişim",
-      baslik: anaSayfaMi ? profil.ctaMetni : `${proje.firmaAdi} ile iletişime geçin`,
-      aciklama: `${profil.iletisimIstegi} Telefon veya WhatsApp üzerinden kısa bilgi paylaşarak hizmet kapsamını kolayca netleştirebilirsiniz.`,
+      baslik: donusum.iletisimBaslik,
+      aciklama: anaSayfaMi
+        ? `${profil.iletisimIstegi} WhatsApp üzerinden kısa bilgi paylaşarak ilk adımı kolayca atabilirsiniz.`
+        : `${profil.iletisimIstegi} ${bolge ? `${bolge} için ` : ""}güncel uygunluk, konum ve sonraki adımları doğrudan sorabilirsiniz.`,
       butonlar: iletisimButonlari(proje),
     };
   }
@@ -821,7 +790,7 @@ function genelIcerik(
     return {
       ustBaslik: randevuSayfasiMi ? "Talep oluşturun" : "Kısa bilgi bırakın",
       baslik: randevuSayfasiMi
-        ? profil.ctaMetni
+        ? donusum.iletisimBaslik
         : "İhtiyacınızı birkaç bilgiyle anlatın",
       aciklama: `${profil.iletisimIstegi} İletişim bilgilerinizi bıraktığınızda uygunluk ve sonraki adımlar hakkında dönüş yapılabilir.`,
     };

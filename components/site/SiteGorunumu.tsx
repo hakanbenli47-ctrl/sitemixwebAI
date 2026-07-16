@@ -353,8 +353,8 @@ function bolumNumarasi(index: number) {
   return String(index + 1).padStart(2, "0");
 }
 
-function turkceSlugOlustur(metin: string) {
-  return metin
+function turkceSlugOlustur(metin: unknown) {
+  return String(metin ?? "")
     .toLocaleLowerCase("tr-TR")
     .replace(/ğ/g, "g")
     .replace(/ü/g, "u")
@@ -1203,6 +1203,8 @@ function BolumRender({
           />
 
           <GaleriBolumu bolum={bolum} />
+
+          <Butonlar bolum={bolum} dahiliBaglantiAc={dahiliBaglantiAc} />
         </>
       ) : bolum.tur === "iletisim" ? (
         <IletisimBolumu bolum={bolum} proje={proje} />
@@ -1217,6 +1219,8 @@ function BolumRender({
           />
 
           <ListeBolumu bolum={bolum} dahiliBaglantiAc={dahiliBaglantiAc} />
+
+          <Butonlar bolum={bolum} dahiliBaglantiAc={dahiliBaglantiAc} />
         </>
       ) : (
         <MetinBolumu bolum={bolum} dahiliBaglantiAc={dahiliBaglantiAc} />

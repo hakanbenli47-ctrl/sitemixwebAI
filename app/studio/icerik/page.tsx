@@ -27,6 +27,7 @@ import {
   useState,
 } from "react";
 import styles from "./icerik.module.css";
+import { projeyeOzelTopluIcerikOlustur } from "@/data/icerikSablonlari";
 import type {
   ButonVerisi,
   ListeElemani,
@@ -91,35 +92,6 @@ const listeDestekleyenBolumler: SiteBolumu["tur"][] = [
   "istatistik",
 ];
 
-const topluIcerikSablonu = `Sayfa: Ana Sayfa
-Bölüm: Açılış alanı
-Küçük başlık: Antalya web tasarım ve dijital sistem
-Ana başlık: İşletmenize özel hızlı ve güvenilir web sitesi
-Açıklama: Firmanız için mobil uyumlu, WhatsApp bağlantılı ve müşterinin kolayca iletişime geçebileceği profesyonel web sitesi hazırlanır.
-Buton: WhatsApp'tan bilgi al | https://wa.me/905000000000
-Buton: Hizmetleri incele | /hizmetler
-
-Sayfa: Ana Sayfa
-Bölüm: Hakkımızda
-Küçük başlık: Hakkımızda
-Ana başlık: İşletmenizi internette daha güçlü gösteriyoruz
-Açıklama: Sizi doğru anlatan, güven veren ve ziyaretçiyi iletişime yönlendiren sade ama etkili web siteleri hazırlarız.
-
-Sayfa: Hizmetler
-Bölüm: Hizmetler
-Ana başlık: Hizmetlerimiz
-Açıklama: İşletmenizin ihtiyacına göre hazırlanan temel hizmetleri inceleyin.
-Hizmetler:
-- Tek sayfa web sitesi | Küçük işletmeler için hızlı, mobil uyumlu ve net tanıtım sitesi.
-- Çok sayfalı web sitesi | Hizmet, galeri, hakkımızda ve iletişim sayfalarıyla daha kapsamlı yapı.
-- WhatsApp ve arama butonları | Ziyaretçinin tek dokunuşla size ulaşmasını sağlar.
-- Google uyumlu temel yapı | Başlık, açıklama ve sayfa düzeni arama görünürlüğü düşünülerek hazırlanır.
-
-Sayfa: İletişim
-Bölüm: İletişim
-Ana başlık: Hemen iletişime geçin
-Açıklama: Web sitesi, demo çalışma veya fiyat bilgisi için bize WhatsApp üzerinden yazabilirsiniz.`;
-
 interface TopluIcerikBloku {
   sayfa?: string;
   bolum?: string;
@@ -153,8 +125,8 @@ function idOlustur() {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
-function slugOlustur(metin: string) {
-  return metin
+function slugOlustur(metin: unknown) {
+  return String(metin ?? "")
     .toLocaleLowerCase("tr-TR")
     .replace(/ğ/g, "g")
     .replace(/ü/g, "u")
@@ -259,79 +231,58 @@ function bolumleriSirala(bolumler: SiteBolumu[]) {
     }));
 }
 
-function butonVarMi(
-  butonlar: ButonVerisi[],
-  kontrol: (buton: ButonVerisi) => boolean,
-) {
-  return butonlar.some(kontrol);
-}
-
 function anaSayfaButonlariniOlustur(
   proje: ProjeVerisi,
   mevcutButonlar: ButonVerisi[],
 ) {
-  const butonlar = [...mevcutButonlar];
+  const gecerliButonlar = mevcutButonlar.filter(
+    (buton) =>
+      String(buton.metin ?? "").trim() &&
+      String(buton.baglanti ?? "").trim(),
+  );
 
-  if (
-    proje.whatsapp.trim() &&
-    !butonVarMi(
-      butonlar,
+  const iletisimButonu =
+    gecerliButonlar.find(
       (buton) =>
         buton.baglanti.includes("wa.me") ||
-        slugOlustur(buton.metin).includes("whatsapp"),
-    )
-  ) {
-    butonlar.unshift({
-      id: idOlustur(),
-      metin: "WhatsApp’tan ulaşın",
-      baglanti: `https://wa.me/${whatsappTemizle(proje.whatsapp)}`,
-    });
-  }
-
-  if (
-    proje.telefon.trim() &&
-    !butonVarMi(
-      butonlar,
-      (buton) =>
         buton.baglanti.startsWith("tel:") ||
+        slugOlustur(buton.metin).includes("whatsapp") ||
         slugOlustur(buton.metin).includes("telefon"),
-    )
-  ) {
-    const whatsappIndex = butonlar.findIndex(
-      (buton) =>
-        buton.baglanti.includes("wa.me") ||
-        slugOlustur(buton.metin).includes("whatsapp"),
-    );
+    ) ??
+    (String(proje.whatsapp ?? "").trim()
+      ? {
+          id: idOlustur(),
+          metin: "WhatsApp’tan bilgi alın",
+          baglanti: `https://wa.me/${whatsappTemizle(proje.whatsapp)}`,
+        }
+      : String(proje.telefon ?? "").trim()
+        ? {
+            id: idOlustur(),
+            metin: "Telefonla bilgi alın",
+            baglanti: `tel:${telefonTemizle(proje.telefon)}`,
+          }
+        : null);
 
-    const telefonButonu: ButonVerisi = {
-      id: idOlustur(),
-      metin: "Telefonla arayın",
-      baglanti: `tel:${telefonTemizle(proje.telefon)}`,
-    };
-
-    if (whatsappIndex >= 0) {
-      butonlar.splice(whatsappIndex + 1, 0, telefonButonu);
-    } else {
-      butonlar.unshift(telefonButonu);
-    }
-  }
-
-  if (
-    !butonVarMi(
-      butonlar,
+  const hizmetButonu =
+    gecerliButonlar.find(
       (buton) =>
         buton.baglanti.includes("hizmet") ||
         slugOlustur(buton.metin).includes("hizmet"),
-    )
-  ) {
-    butonlar.push({
+    ) ?? {
       id: idOlustur(),
       metin: "Hizmetleri inceleyin",
-      baglanti: "/hizmetler",
-    });
-  }
+      baglanti:
+        proje.siteTipi === "tek-sayfa" ? "#hizmetler" : "/hizmetler",
+    };
 
-  return butonlar;
+  const digerButonlar = gecerliButonlar.filter(
+    (buton) =>
+      buton.id !== iletisimButonu?.id && buton.id !== hizmetButonu.id,
+  );
+
+  return [iletisimButonu, hizmetButonu, ...digerButonlar]
+    .filter((buton): buton is ButonVerisi => Boolean(buton))
+    .slice(0, 2);
 }
 
 function projeyiDuzenle(proje: ProjeVerisi): ProjeVerisi {
@@ -840,6 +791,12 @@ export default function KolayIcerikDuzenleyici() {
       const duzenlenmisProje = projeyiDuzenle(hamProje);
 
       setProje(duzenlenmisProje);
+      setTopluIcerik(projeyeOzelTopluIcerikOlustur(duzenlenmisProje));
+      setTopluBilgi(
+        `${duzenlenmisProje.sektorAdi} ve ${
+          duzenlenmisProje.siteTipi === "tek-sayfa" ? "tek sayfa" : "çok sayfa"
+        } yapısı için işletme bilgileriyle hazırlandı.`,
+      );
 
       localStorage.setItem(
         "sitemix-aktif-proje",
@@ -1405,9 +1362,9 @@ export default function KolayIcerikDuzenleyici() {
           <h1>{proje.firmaAdi}</h1>
 
           <p>
-            Sayfalar ve içerikler doğru sıraya getirildi. İstersen tek tek
-            düzenle, istersen toplu içerik alanına hazır metni yapıştırıp
-            bütün bölümlere tek seferde uygula.
+            Girişte verdiğin işletme bilgileri, seçtiğin sektör ve site yapısı
+            kullanılarak içerikler hazırlandı. Aşağıdan kontrol edip bütün
+            bölümlere tek seferde uygulayabilirsin.
           </p>
         </div>
 
@@ -1431,18 +1388,20 @@ export default function KolayIcerikDuzenleyici() {
           <button
             type="button"
             onClick={() => {
-              setTopluIcerik(topluIcerikSablonu);
-              setTopluBilgi("Örnek şablon hazırlandı. Üzerini değiştirip uygula.");
+              setTopluIcerik(projeyeOzelTopluIcerikOlustur(proje));
+              setTopluBilgi(
+                `${proje.sektorAdi} için işletme bilgileri yeniden yerleştirildi.`,
+              );
             }}
           >
-            Örnek şablonu getir
+            İşletmeye özel içeriği yenile
           </button>
         </div>
 
         <textarea
           value={topluIcerik}
           onChange={(event) => setTopluIcerik(event.target.value)}
-          placeholder="ChatGPT’den aldığın içerik metnini buraya yapıştır. Sayfa, Bölüm, Küçük başlık, Ana başlık, Açıklama, Buton ve Hizmetler satırlarını okuyup doğru alanlara yerleştirir."
+          placeholder="İşletmeye özel sayfa ve bölüm içerikleri burada hazırlanır. Metinleri kontrol edip doğrudan uygulayabilirsin."
           rows={12}
         />
 

@@ -17,8 +17,8 @@ import styles from "./yayin.module.css";
 const AKTIF_PROJE_ANAHTARI = "sitemix-aktif-proje";
 const PROJELER_ANAHTARI = "sitemix-projeler";
 
-function adresiTemizle(deger: string) {
-  return deger
+function adresiTemizle(deger: unknown) {
+  return String(deger ?? "")
     .trim()
     .toLocaleLowerCase("tr-TR")
     .replace(/^https?:\/\//i, "")

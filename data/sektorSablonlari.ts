@@ -154,6 +154,20 @@ function hizmetBolgesiMetni(bilgi: SablonBilgileri) {
   return bilgi.hizmetBolgesi?.trim() || konumMetni(bilgi) || bilgi.adres.trim();
 }
 
+function kucukHarf(metin: unknown) {
+  return String(metin ?? "").toLocaleLowerCase("tr-TR");
+}
+
+function whatsappNumarasi(telefon: unknown) {
+  let numara = String(telefon ?? "").replace(/\D/g, "");
+
+  if (numara.startsWith("0")) {
+    numara = `90${numara.slice(1)}`;
+  }
+
+  return numara;
+}
+
 const hizmetHaritasi: Record<string, string[]> = {
   kuafor: ["Saç kesimi", "Saç boyama", "Saç bakımı", "Özel gün hazırlığı"],
   berber: ["Saç kesimi", "Sakal tıraşı", "Cilt bakımı", "Damat tıraşı"],
@@ -222,12 +236,12 @@ function anaSayfaBolumleri(
       varyasyon: "buyuk-baslik",
       ustBaslik: konum ? `${bilgi.sektorAdi} · ${konum}` : bilgi.sektorAdi,
       baslik: bilgi.firmaAdi,
-      aciklama: `${bilgi.firmaAdi}, ${konumVurgusu}${bilgi.sektorAdi.toLocaleLowerCase("tr-TR")} alanında güvenilir, ulaşılabilir ve ihtiyaca uygun çözümler sunar.`,
+      aciklama: `${bilgi.firmaAdi}, ${konumVurgusu}${kucukHarf(bilgi.sektorAdi)} alanında güvenilir, ulaşılabilir ve ihtiyaca uygun çözümler sunar.`,
       butonlar: [
         buton(
           bilgi.whatsapp ? "WhatsApp’tan ulaşın" : "İletişime geçin",
           bilgi.whatsapp
-            ? `https://wa.me/${bilgi.whatsapp.replace(/\D/g, "")}`
+            ? `https://wa.me/${whatsappNumarasi(bilgi.whatsapp)}`
             : "/iletisim",
         ),
         buton("Hizmetleri inceleyin", "/hizmetler"),
@@ -279,7 +293,7 @@ function anaSayfaBolumleri(
           ? [buton("Telefonla arayın", `tel:${bilgi.telefon.replace(/\s/g, "")}`)]
           : []),
         ...(bilgi.whatsapp
-          ? [buton("WhatsApp’tan yazın", `https://wa.me/${bilgi.whatsapp.replace(/\D/g, "")}`)]
+          ? [buton("WhatsApp’tan yazın", `https://wa.me/${whatsappNumarasi(bilgi.whatsapp)}`)]
           : []),
       ],
     }),
@@ -298,7 +312,7 @@ function standartSayfalar(
       bolum("hero", 0, {
         ustBaslik: "Hakkımızda",
         baslik: bilgi.firmaAdi,
-        aciklama: `${bilgi.firmaAdi}, ${bilgi.sektorAdi.toLocaleLowerCase("tr-TR")} alanında güven, düzenli iletişim ve kaliteli sonuç odaklı çalışır.${konum ? ` ${konum} bölgesindeki müşterilerine ulaşılabilir hizmet sunar.` : ""}`,
+        aciklama: `${bilgi.firmaAdi}, ${kucukHarf(bilgi.sektorAdi)} alanında güven, düzenli iletişim ve kaliteli sonuç odaklı çalışır.${konum ? ` ${konum} bölgesindeki müşterilerine ulaşılabilir hizmet sunar.` : ""}`,
       }),
       bolum("metin", 1, {
         varyasyon: "sag-gorsel",
@@ -348,7 +362,7 @@ function standartSayfalar(
         aciklama: bilgi.adres || (konum ? `${konum} ve çevresinde hizmet veriyoruz.` : "Bilgi ve teklif için bize ulaşın."),
         butonlar: [
           ...(bilgi.telefon ? [buton("Telefonla arayın", `tel:${bilgi.telefon.replace(/\s/g, "")}`)] : []),
-          ...(bilgi.whatsapp ? [buton("WhatsApp’tan yazın", `https://wa.me/${bilgi.whatsapp.replace(/\D/g, "")}`)] : []),
+          ...(bilgi.whatsapp ? [buton("WhatsApp’tan yazın", `https://wa.me/${whatsappNumarasi(bilgi.whatsapp)}`)] : []),
           ...(bilgi.eposta ? [buton("E-posta gönderin", `mailto:${bilgi.eposta}`)] : []),
         ],
       }),

@@ -43,8 +43,8 @@ interface ProjeVerisi {
   guncellenmeTarihi: string;
 }
 
-function slugOlustur(metin: string) {
-  return metin
+function slugOlustur(metin: unknown) {
+  return String(metin ?? "")
     .toLocaleLowerCase("tr-TR")
     .replace(/ğ/g, "g")
     .replace(/ü/g, "u")
@@ -141,8 +141,8 @@ export default function DuzenleyiciSayfasi() {
     const ayniSayfaVarMi = proje.sayfalar.some(
       (sayfa) =>
         sayfa.slug === yeniSlug ||
-        sayfa.ad.toLocaleLowerCase("tr-TR") ===
-          temizAd.toLocaleLowerCase("tr-TR"),
+        String(sayfa.ad ?? "").toLocaleLowerCase("tr-TR") ===
+          String(temizAd ?? "").toLocaleLowerCase("tr-TR"),
     );
 
     if (ayniSayfaVarMi) {

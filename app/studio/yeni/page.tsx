@@ -57,8 +57,8 @@ const baslangicFormu: ProjeFormu = {
   slug: "",
 };
 
-function slugOlustur(metin: string) {
-  return metin
+function slugOlustur(metin: unknown) {
+  return String(metin ?? "")
     .toLocaleLowerCase("tr-TR")
     .replace(/ğ/g, "g")
     .replace(/ü/g, "u")
@@ -201,7 +201,7 @@ export default function YeniProjeSayfasi() {
         tema: "",
         sayfalar,
         seoBaslik: `${form.firmaAdi.trim()} | ${sektorAdi}`,
-        seoAciklama: `${form.firmaAdi.trim()}, ${gorunenKonum || form.sehir.trim()} bölgesinde ${sektorAdi.toLocaleLowerCase("tr-TR")} hizmetleri sunar.`,
+        seoAciklama: `${form.firmaAdi.trim()}, ${gorunenKonum || form.sehir.trim()} bölgesinde ${String(sektorAdi ?? "").toLocaleLowerCase("tr-TR")} hizmetleri sunar.`,
         seoKelimeler: [
           form.firmaAdi.trim(),
           sektorAdi,

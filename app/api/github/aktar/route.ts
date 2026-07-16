@@ -62,8 +62,8 @@ function bekle(ms: number) {
   });
 }
 
-function turkceSlugOlustur(metin: string) {
-  const slug = metin
+function turkceSlugOlustur(metin: unknown) {
+  const slug = String(metin ?? "")
     .toLocaleLowerCase("tr-TR")
     .replace(/ğ/g, "g")
     .replace(/ü/g, "u")

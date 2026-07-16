@@ -122,7 +122,8 @@ export default function ProjelerSayfasi() {
   const [depolamaHatasi, setDepolamaHatasi] = useState(false);
 
   useEffect(() => {
-    try {
+    const yuklemeZamanlayicisi = window.setTimeout(() => {
+      try {
       const kayitliProjeler = projeleriOku();
       const aktifProje = aktifProjeyiOku();
 
@@ -154,13 +155,16 @@ export default function ProjelerSayfasi() {
       if (!kaydedildi) {
         setDepolamaHatasi(true);
       }
-    } catch (error) {
-      console.error("Projeler hazırlanamadı:", error);
-      setProjeler([]);
-      setDepolamaHatasi(true);
-    } finally {
-      setYukleniyor(false);
-    }
+      } catch (error) {
+        console.error("Projeler hazırlanamadı:", error);
+        setProjeler([]);
+        setDepolamaHatasi(true);
+      } finally {
+        setYukleniyor(false);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(yuklemeZamanlayicisi);
   }, []);
 
   function projeyiAc(

@@ -4,235 +4,43 @@ export interface Sektor {
   kategori: string;
 }
 
+// İşletme Bulucu'da web sitesi satışı için kullanılan gerçek hedef liste.
+// Sıra, satış ekranındaki sektör sırasıyla aynı tutulur.
 export const sektorler: Sektor[] = [
-  {
-    id: "kuafor",
-    ad: "Kuaför",
-    kategori: "Güzellik ve Bakım",
-  },
-  {
-    id: "berber",
-    ad: "Berber",
-    kategori: "Güzellik ve Bakım",
-  },
-  {
-    id: "guzellik-salonu",
-    ad: "Güzellik Salonu",
-    kategori: "Güzellik ve Bakım",
-  },
-  {
-    id: "estetik-merkezi",
-    ad: "Estetik Merkezi",
-    kategori: "Güzellik ve Bakım",
-  },
-  {
-    id: "temizlik",
-    ad: "Temizlik Firması",
-    kategori: "Yerel Hizmetler",
-  },
-  {
-    id: "nakliyat",
-    ad: "Nakliyat Firması",
-    kategori: "Yerel Hizmetler",
-  },
-  {
-    id: "teknik-servis",
-    ad: "Teknik Servis",
-    kategori: "Yerel Hizmetler",
-  },
-  {
-    id: "oto-yikama",
-    ad: "Oto Yıkama",
-    kategori: "Otomotiv",
-  },
-  {
-    id: "oto-servis",
-    ad: "Oto Servis",
-    kategori: "Otomotiv",
-  },
-  {
-    id: "arac-kaplama",
-    ad: "Araç Kaplama ve Cam Filmi",
-    kategori: "Otomotiv",
-  },
-  {
-    id: "arac-kiralama",
-    ad: "Araç Kiralama",
-    kategori: "Otomotiv",
-  },
-  {
-    id: "restoran",
-    ad: "Restoran",
-    kategori: "Yeme ve İçme",
-  },
-  {
-    id: "kafe",
-    ad: "Kafe",
-    kategori: "Yeme ve İçme",
-  },
-  {
-    id: "pastane",
-    ad: "Pastane",
-    kategori: "Yeme ve İçme",
-  },
-  {
-    id: "catering",
-    ad: "Catering",
-    kategori: "Yeme ve İçme",
-  },
-  {
-    id: "klinik",
-    ad: "Klinik",
-    kategori: "Sağlık",
-  },
-  {
-    id: "dis-klinigi",
-    ad: "Diş Kliniği",
-    kategori: "Sağlık",
-  },
-  {
-    id: "veteriner",
-    ad: "Veteriner",
-    kategori: "Sağlık",
-  },
-  {
-    id: "psikolog",
-    ad: "Psikolog",
-    kategori: "Sağlık",
-  },
-  {
-    id: "diyetisyen",
-    ad: "Diyetisyen",
-    kategori: "Sağlık",
-  },
-  {
-    id: "mermer",
-    ad: "Mermer ve Doğal Taş",
-    kategori: "İnşaat ve Üretim",
-  },
-  {
-    id: "mobilya",
-    ad: "Mobilya",
-    kategori: "İnşaat ve Üretim",
-  },
-  {
-    id: "dekorasyon",
-    ad: "Dekorasyon",
-    kategori: "İnşaat ve Üretim",
-  },
-  {
-    id: "insaat",
-    ad: "İnşaat Firması",
-    kategori: "İnşaat ve Üretim",
-  },
-  {
-    id: "mimarlik",
-    ad: "Mimarlık Ofisi",
-    kategori: "İnşaat ve Üretim",
-  },
-  {
-    id: "emlak",
-    ad: "Emlak",
-    kategori: "Gayrimenkul",
-  },
-  {
-    id: "otel",
-    ad: "Otel",
-    kategori: "Turizm",
-  },
-  {
-    id: "pansiyon",
-    ad: "Pansiyon",
-    kategori: "Turizm",
-  },
-  {
-    id: "turizm",
-    ad: "Turizm Firması",
-    kategori: "Turizm",
-  },
-  {
-    id: "transfer",
-    ad: "Transfer Hizmeti",
-    kategori: "Turizm",
-  },
-  {
-    id: "kurs",
-    ad: "Kurs Merkezi",
-    kategori: "Eğitim",
-  },
-  {
-    id: "kres",
-    ad: "Kreş",
-    kategori: "Eğitim",
-  },
-  {
-    id: "ozel-okul",
-    ad: "Özel Okul",
-    kategori: "Eğitim",
-  },
-  {
-    id: "avukat",
-    ad: "Avukatlık Bürosu",
-    kategori: "Profesyonel Hizmetler",
-  },
-  {
-    id: "muhasebe",
-    ad: "Muhasebe Bürosu",
-    kategori: "Profesyonel Hizmetler",
-  },
-  {
-    id: "danismanlik",
-    ad: "Danışmanlık",
-    kategori: "Profesyonel Hizmetler",
-  },
-  {
-    id: "sigorta",
-    ad: "Sigorta Acentesi",
-    kategori: "Profesyonel Hizmetler",
-  },
-  {
-    id: "spor-salonu",
-    ad: "Spor Salonu",
-    kategori: "Spor",
-  },
-  {
-    id: "pilates",
-    ad: "Pilates Stüdyosu",
-    kategori: "Spor",
-  },
-  {
-    id: "fotografci",
-    ad: "Fotoğrafçı",
-    kategori: "Organizasyon",
-  },
-  {
-    id: "dugun-salonu",
-    ad: "Düğün Salonu",
-    kategori: "Organizasyon",
-  },
-  {
-    id: "organizasyon",
-    ad: "Organizasyon Firması",
-    kategori: "Organizasyon",
-  },
-  {
-    id: "yazilim",
-    ad: "Yazılım Firması",
-    kategori: "Dijital Hizmetler",
-  },
-  {
-    id: "ajans",
-    ad: "Dijital Ajans",
-    kategori: "Dijital Hizmetler",
-  },
-  {
-    id: "portfolyo",
-    ad: "Kişisel Portfolyo",
-    kategori: "Dijital Hizmetler",
-  },
-  {
-    id: "ozel",
-    ad: "Diğer / Özel Sektör",
-    kategori: "Diğer",
-  },
+  { id: "oto-yikama", ad: "Oto Yıkama", kategori: "Otomotiv" },
+  { id: "oto-detaylandirma", ad: "Oto Detaylandırma", kategori: "Otomotiv" },
+  { id: "arac-kaplama", ad: "Araç Kaplama", kategori: "Otomotiv" },
+  { id: "cam-balkon", ad: "Cam Balkon", kategori: "Yapı ve Uygulama" },
+  { id: "tente", ad: "Tente", kategori: "Yapı ve Uygulama" },
+  { id: "tadilat", ad: "Tadilat", kategori: "Yapı ve Uygulama" },
+  { id: "dekorasyon", ad: "Dekorasyon", kategori: "Yapı ve Uygulama" },
+  { id: "temizlik", ad: "Temizlik Şirketi", kategori: "Temizlik ve Hijyen" },
+  { id: "koltuk-yikama", ad: "Koltuk Yıkama", kategori: "Temizlik ve Hijyen" },
+  { id: "hali-yikama", ad: "Halı Yıkama", kategori: "Temizlik ve Hijyen" },
+  { id: "ilaclama", ad: "İlaçlama", kategori: "Temizlik ve Hijyen" },
+  { id: "guzellik-salonu", ad: "Güzellik Salonu", kategori: "Güzellik ve Bakım" },
+  { id: "kuafor", ad: "Kuaför", kategori: "Güzellik ve Bakım" },
+  { id: "berber", ad: "Berber", kategori: "Güzellik ve Bakım" },
+  { id: "diyetisyen", ad: "Diyetisyen", kategori: "Sağlık ve Danışmanlık" },
+  { id: "psikolog", ad: "Psikolog", kategori: "Sağlık ve Danışmanlık" },
+  { id: "fizyoterapist", ad: "Fizyoterapist", kategori: "Sağlık ve Danışmanlık" },
+  { id: "dis-klinigi", ad: "Diş Kliniği", kategori: "Sağlık ve Danışmanlık" },
+  { id: "veteriner", ad: "Veteriner Kliniği", kategori: "Sağlık ve Danışmanlık" },
+  { id: "emlak", ad: "Emlak Danışmanı", kategori: "Gayrimenkul ve Tasarım" },
+  { id: "mimarlik", ad: "Mimarlık Ofisi", kategori: "Gayrimenkul ve Tasarım" },
+  { id: "fotografci", ad: "Fotoğrafçı", kategori: "Etkinlik ve Yaratıcı İşler" },
+  { id: "dugun-salonu", ad: "Düğün Salonu", kategori: "Etkinlik ve Yaratıcı İşler" },
+  { id: "spor-salonu", ad: "Spor Salonu", kategori: "Eğitim ve Spor" },
+  { id: "anaokulu", ad: "Anaokulu", kategori: "Eğitim ve Spor" },
+  { id: "ozel-egitim-kursu", ad: "Özel Eğitim Kursu", kategori: "Eğitim ve Spor" },
+  { id: "matbaa", ad: "Matbaa", kategori: "Üretim ve Perakende" },
+  { id: "cicekci", ad: "Çiçekçi", kategori: "Üretim ve Perakende" },
+  { id: "pastane", ad: "Pastane", kategori: "Üretim ve Perakende" },
+  { id: "mobilya", ad: "Mobilyacı", kategori: "Üretim ve Perakende" },
+  { id: "elektrikci", ad: "Elektrikçi", kategori: "Teknik Servis" },
+  { id: "tesisatci", ad: "Tesisatçı", kategori: "Teknik Servis" },
+  { id: "kombi-servisi", ad: "Kombi Servisi", kategori: "Teknik Servis" },
+  { id: "nakliyat", ad: "Nakliyat", kategori: "Ulaşım ve Taşıma" },
+  { id: "transfer", ad: "Transfer", kategori: "Ulaşım ve Taşıma" },
+  { id: "arac-kiralama", ad: "Araç Kiralama", kategori: "Ulaşım ve Taşıma" },
 ];

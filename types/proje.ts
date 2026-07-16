@@ -16,6 +16,7 @@ export interface ProjeVerisi {
   slug: string;
   tema: string;
   sayfalar: SiteSayfasi[];
+  sablonSurumu?: number;
 
   domain?: string;
   vercelUrl?: string;

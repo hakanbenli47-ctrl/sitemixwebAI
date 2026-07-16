@@ -3,6 +3,9 @@ import type {
   SiteBolumu,
   SiteSayfasi,
 } from "@/data/sektorSablonlari";
+import { sektorHizmetleriniGetir } from "@/data/sektorSablonlari";
+import { sektorFormProfiliniGetir } from "@/data/sektorFormProfilleri";
+import { sektorIcerikProfiliniGetir } from "@/data/sektorIcerikProfilleri";
 import { sektorStokGorselleriniGetir } from "@/data/sektorStokGorselleri";
 import type { ProjeVerisi } from "@/types/proje";
 
@@ -154,6 +157,7 @@ function projeOzetiniOlustur(proje: ProjeVerisi) {
       id: sayfa.id,
       ad: sayfa.ad,
       slug: sayfa.slug,
+      rol: sayfa.rol,
       bolumler: sayfa.bolumler.map((bolum) => ({
         id: bolum.id,
         tur: bolum.tur,
@@ -181,6 +185,11 @@ async function yapayZekaIcerigiOlustur(
   }
 
   const konum = [proje.ilce, proje.sehir].filter(Boolean).join(", ");
+  const sektorYonergesi = {
+    hizmetler: sektorHizmetleriniGetir(proje.sektor),
+    anlatim: sektorIcerikProfiliniGetir(proje.sektor),
+    talepFormu: sektorFormProfiliniGetir(proje.sektor),
+  };
 
   const talimat = `Türkiye'deki küçük ve orta ölçekli işletmeler için dönüşüm ve yerel SEO odaklı web sitesi metinleri hazırla.
 
@@ -188,13 +197,21 @@ Kurallar:
 - Doğal ve profesyonel Türkçe kullan.
 - Firma adı, sektör, şehir, ilçe ve hizmet bölgesini bağlama uygun biçimde kullan; gereksiz tekrar yapma.
 - İçerikleri gerçekten sektöre özel yaz. Boş reklam cümlelerinden kaçın.
+- Ziyaretçinin karar verirken sorduğu kapsam, süreç, uygunluk, hazırlık ve teslim sorularını doğal sırayla yanıtla.
+- Ana sayfada önce hizmeti ve faydayı anlat; güven gerekçelerini sonra ver. Aynı çağrı butonunu her bölümde tekrarlayan saldırgan satış dili kullanma.
+- İletişime yönlendirmeyi yumuşak ve bağlama uygun yap: önce inceleme, sonra kapsamı netleştirme, en sonda teklif/randevu/uygunluk talebi.
 - Kullanıcının vermediği kuruluş yılı, çalışan sayısı, sertifika, ödül, fiyat, garanti, başarı oranı veya resmi yetki uydurma.
-- Sağlık ve hukuk alanlarında kesin sonuç vaat etme.
+- Sağlık alanlarında tanı koyma, kesin sonuç vaat etme ve hassas sağlık verisi isteme. Acil durum yönlendirmesini yalnızca ilgili talep formu notunda kullan.
+- Ekip bölümünde gerçek kişi adı, unvanı veya uzmanlık belgesi uydurma.
 - Başlıkları kısa; açıklamaları çoğunlukla 1-3 cümle tut.
+- Her sayfanın rolüne sadık kal. Galeri başlıkları gerçek çalışma kanıtı gibi konuşmamalı; gösterilen uygulama türünü açıklamalı.
 - Sayfa, bölüm ve liste öğesi ID'lerini aynen koru. Yeni sayfa veya bölüm ekleme ve mevcut olanı silme.
 - Galeri öğelerine de sektöre uygun başlık ve kısa açıklama yaz.
 - SEO başlığı yaklaşık 45-60 karakter, SEO açıklaması yaklaşık 130-160 karakter olsun.
-- SEO kelimeleri firma, sektör, ${konum || "hizmet bölgesi"} ve temel hizmetleri kapsasın.`;
+- SEO kelimeleri firma, sektör, ${konum || "hizmet bölgesi"} ve temel hizmetleri kapsasın.
+
+Sektörün içerik ve karar yapısı:
+${JSON.stringify(sektorYonergesi)}`;
 
   const cevap = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
@@ -352,32 +369,18 @@ function uretilenIcerigiUygula(
   };
 }
 
-function hashOlustur(metin: string) {
-  let hash = 0;
-
-  for (let index = 0; index < metin.length; index += 1) {
-    hash = (hash * 31 + metin.charCodeAt(index)) >>> 0;
-  }
-
-  return hash;
-}
-
 function gorselGerekenBolumMu(bolum: SiteBolumu) {
-  return ["hero", "metin", "hizmetler", "urunler", "galeri", "ekip"].includes(
-    bolum.tur,
-  );
+  return ["hero", "metin", "urunler", "galeri"].includes(bolum.tur);
 }
 
 function listeGorseliGerekenBolumMu(bolum: SiteBolumu) {
-  return ["hizmetler", "urunler", "galeri", "ekip"].includes(bolum.tur);
+  return ["urunler", "galeri"].includes(bolum.tur);
 }
 
 function stokGorselleriDoldur(proje: ProjeVerisi): ProjeVerisi {
   const stoklar = sektorStokGorselleriniGetir(proje.sektor);
-  const baslangic = hashOlustur(
-    `${proje.firmaAdi}-${proje.sektor}-${proje.sehir}-${proje.ilce}`,
-  );
-  let sira = baslangic % stoklar.length;
+  let sira = 0;
+  let hakkimizdaGorseliAtandi = false;
 
   function siradakiGorsel() {
     const gorsel = stoklar[sira % stoklar.length];
@@ -407,8 +410,14 @@ function stokGorselleriDoldur(proje: ProjeVerisi): ProjeVerisi {
         }
       }
 
-      if (bolum.tur === "metin" && !gorsel.trim()) {
+      if (
+        bolum.tur === "metin" &&
+        sayfa.rol === "hakkimizda" &&
+        !hakkimizdaGorseliAtandi &&
+        !gorsel.trim()
+      ) {
         gorsel = siradakiGorsel();
+        hakkimizdaGorseliAtandi = true;
       }
 
       const listeElemanlari = bolum.listeElemanlari.map((eleman) => {

@@ -3,14 +3,24 @@ import {
   hizmetDetayiniGetir,
   sektorIcerikProfiliniGetir,
 } from "@/data/sektorIcerikProfilleri";
-import { sektorSunumProfiliniGetir } from "@/data/sektorSunumProfilleri";
+import {
+  sektorSunumProfiliniGetir,
+  type SayfaRolu,
+} from "@/data/sektorSunumProfilleri";
 import type {
   ButonVerisi,
   ListeElemani,
   SiteBolumu,
   SiteSayfasi,
 } from "@/data/sektorSablonlari";
-import { sektorSayfalariOlustur } from "@/data/sektorSablonlari";
+import {
+  GUNCEL_SABLON_SURUMU,
+  sektorSayfalariOlustur,
+} from "@/data/sektorSablonlari";
+import {
+  telefonBaglantisi,
+  whatsappBaglantisi,
+} from "@/lib/iletisim";
 import type { ProjeVerisi } from "@/types/proje";
 
 type HazirButon = Pick<ButonVerisi, "metin" | "baglanti">;
@@ -252,18 +262,16 @@ function hizmetBolgesiMetni(proje: ProjeVerisi) {
   return String(proje.hizmetBolgesi ?? "").trim() || konumMetni(proje);
 }
 
-function whatsappNumarasi(telefon: string) {
-  let numara = String(telefon ?? "").replace(/\D/g, "");
+function sayfaRolunuGetir(sayfa: SiteSayfasi): SayfaRolu {
+  if (sayfa.rol) return sayfa.rol;
+  if (sayfa.anaSayfa || !String(sayfa.slug ?? "").trim()) return "ana";
 
-  if (numara.startsWith("0")) {
-    numara = `90${numara.slice(1)}`;
-  }
-
-  return numara;
-}
-
-function telefonNumarasi(telefon: string) {
-  return String(telefon ?? "").replace(/[^\d+]/g, "");
+  const anahtar = metniKucult(sayfa.slug || sayfa.ad);
+  if (anahtar.includes("hakk")) return "hakkimizda";
+  if (anahtar.includes("iletisim")) return "iletisim";
+  if (sayfa.bolumler.some((bolum) => bolum.tur === "form")) return "aksiyon";
+  if (sayfa.bolumler.some((bolum) => bolum.tur === "galeri")) return "galeri";
+  return "hizmet";
 }
 
 function iletisimHedefi(proje: ProjeVerisi) {
@@ -298,19 +306,19 @@ function galeriHedefi(proje: ProjeVerisi) {
 
 function anaSayfaButonlari(proje: ProjeVerisi): HazirButon[] {
   const butonlar: HazirButon[] = [];
-  const whatsapp = whatsappNumarasi(proje.whatsapp);
-  const telefon = telefonNumarasi(proje.telefon);
+  const whatsapp = whatsappBaglantisi(proje.whatsapp);
+  const telefon = telefonBaglantisi(proje.telefon);
   const sunum = sektorSunumProfiliniGetir(proje.sektor);
 
   if (whatsapp) {
     butonlar.push({
       metin: proje.sektor === "temizlik" ? "WhatsApp’tan teklif alın" : "WhatsApp’tan bilgi alın",
-      baglanti: `https://wa.me/${whatsapp}`,
+      baglanti: whatsapp,
     });
   } else if (telefon) {
     butonlar.push({
       metin: "Telefonla bilgi alın",
-      baglanti: `tel:${telefon}`,
+      baglanti: telefon,
     });
   } else {
     butonlar.push({ metin: "Bilgi alın", baglanti: iletisimHedefi(proje) });
@@ -326,22 +334,22 @@ function anaSayfaButonlari(proje: ProjeVerisi): HazirButon[] {
 
 function iletisimButonlari(proje: ProjeVerisi): HazirButon[] {
   const butonlar: HazirButon[] = [];
-  const telefon = telefonNumarasi(proje.telefon);
-  const whatsapp = whatsappNumarasi(proje.whatsapp);
+  const telefon = telefonBaglantisi(proje.telefon);
+  const whatsapp = whatsappBaglantisi(proje.whatsapp);
 
   if (telefon) {
     butonlar.push({
       metin: proje.telefon.trim()
         ? `Telefon: ${proje.telefon.trim()}`
         : "Telefonla arayın",
-      baglanti: `tel:${telefon}`,
+      baglanti: telefon,
     });
   }
 
   if (whatsapp) {
     butonlar.push({
       metin: "WhatsApp’tan yazın",
-      baglanti: `https://wa.me/${whatsapp}`,
+      baglanti: whatsapp,
     });
   }
 
@@ -362,7 +370,8 @@ function temizlikIcerigi(
 ): Partial<HazirBolumIcerigi> | null {
   const bolge = hizmetBolgesiMetni(proje);
   const yerVurgusu = bolge ? `${bolge} ve çevresinde` : "Hizmet bölgenizde";
-  const anaSayfaMi = sayfa.anaSayfa || !String(sayfa.slug ?? "").trim();
+  const sayfaRolu = sayfaRolunuGetir(sayfa);
+  const anaSayfaMi = sayfaRolu === "ana";
 
   if (bolum.tur === "hero" && anaSayfaMi) {
     return {
@@ -374,9 +383,7 @@ function temizlikIcerigi(
   }
 
   if (bolum.tur === "hero") {
-    const sayfaAnahtari = metniKucult(sayfa.slug || sayfa.ad);
-
-    if (sayfaAnahtari.includes("hakk")) {
+    if (sayfaRolu === "hakkimizda") {
       return {
         ustBaslik: "Hakkımızda",
         baslik: `${proje.firmaAdi} ile düzenli ve özenli temizlik`,
@@ -384,7 +391,7 @@ function temizlikIcerigi(
       };
     }
 
-    if (sayfaAnahtari.includes("hizmet")) {
+    if (sayfaRolu === "hizmet") {
       return {
         ustBaslik: "Temizlik hizmetleri",
         baslik: "Her alan için ihtiyaca uygun çalışma planı",
@@ -393,7 +400,7 @@ function temizlikIcerigi(
       };
     }
 
-    if (sayfaAnahtari.includes("galeri")) {
+    if (sayfaRolu === "galeri") {
       return {
         ustBaslik: "Çalışmalarımız",
         baslik: "Temizlik uygulamalarından gerçek detaylar",
@@ -445,6 +452,20 @@ function temizlikIcerigi(
   }
 
   if (bolum.tur === "neden-biz") {
+    if (bolum.varyasyon === "adimlar") {
+      return {
+        ustBaslik: "Temizlik süreci",
+        baslik: "Talebinizden son kontrole dört açık adım",
+        aciklama: "Alan ve öncelikler netleştirilir; ekip, zaman ve çalışma sırası buna göre planlanır.",
+        listeElemanlari: [
+          { baslik: "Alanı anlayalım", aciklama: "Alan türü, büyüklük, kullanım durumu ve öncelikli bölümler konuşulur.", baglanti: "" },
+          { baslik: "Kapsamı yazalım", aciklama: "Yapılacak işler, ekip ihtiyacı, süre ve kullanılacak ürünler açıklanır.", baglanti: "" },
+          { baslik: "Planlı çalışalım", aciklama: "Belirlenen sırayla, alanın kullanımını gözeterek temizlik uygulanır.", baglanti: "" },
+          { baslik: "Birlikte kontrol edelim", aciklama: "Öncelikli alanlar ve belirlenen kapsam iş sonunda gözden geçirilir.", baglanti: "" },
+        ],
+      };
+    }
+
     return {
       ustBaslik: anaSayfaMi ? "Neden bizi tercih etmelisiniz?" : "Çalışma anlayışımız",
       baslik: anaSayfaMi
@@ -563,8 +584,8 @@ function genelIcerik(
 ): Partial<HazirBolumIcerigi> {
   const ton = kategoriTonunuGetir(proje);
   const bolge = hizmetBolgesiMetni(proje);
-  const anaSayfaMi = sayfa.anaSayfa || !String(sayfa.slug ?? "").trim();
-  const sayfaAnahtari = metniKucult(sayfa.slug || sayfa.ad);
+  const sayfaRolu = sayfaRolunuGetir(sayfa);
+  const anaSayfaMi = sayfaRolu === "ana";
   const mevcutIcerik = proje.sayfalar
     .flatMap((sayfaVerisi) =>
       sayfaVerisi.bolumler.flatMap((bolumVerisi) => [
@@ -588,7 +609,7 @@ function genelIcerik(
   }
 
   if (bolum.tur === "hero") {
-    if (sayfaAnahtari.includes("hakk")) {
+    if (sayfaRolu === "hakkimizda") {
       return {
         ustBaslik: "Hakkımızda",
         baslik: profil.yaklasimBaslik,
@@ -596,11 +617,7 @@ function genelIcerik(
       };
     }
 
-    if (
-      ["hizmet", "menu", "urun", "ilan", "oda"].some((anahtar) =>
-        sayfaAnahtari.includes(anahtar),
-      )
-    ) {
+    if (sayfaRolu === "hizmet") {
       return {
         ustBaslik: bolum.ustBaslik || sayfa.ad,
         baslik:
@@ -611,7 +628,7 @@ function genelIcerik(
       };
     }
 
-    if (sayfaAnahtari.includes("galeri") || sayfaAnahtari.includes("proje")) {
+    if (sayfaRolu === "galeri") {
       return {
         ustBaslik: "Çalışmalarımız",
         baslik: "Uygulama ve hizmet ayrıntılarını yakından inceleyin",
@@ -799,13 +816,7 @@ function genelIcerik(
   }
 
   if (bolum.tur === "form") {
-    const randevuSayfasiMi =
-      sayfaAnahtari.includes("randevu") ||
-      sayfaAnahtari.includes("rezervasyon") ||
-      sayfaAnahtari.includes("teklif") ||
-      sayfaAnahtari.includes("gorusme") ||
-      sayfaAnahtari.includes("görüşme") ||
-      sayfaAnahtari.includes("talep");
+    const randevuSayfasiMi = sayfaRolu === "aksiyon";
 
     return {
       ustBaslik: randevuSayfasiMi ? "Talep oluşturun" : "Kısa bilgi bırakın",
@@ -878,7 +889,9 @@ export function projeyeOzelIcerigiUygula(proje: ProjeVerisi): ProjeVerisi {
     (sayfa) => sayfa.anaSayfa || !sayfa.slug.trim(),
   );
   const profesyonelYapiVar = Boolean(
-    anaSayfa?.bolumler.some((bolum) => bolum.tur === "sss") &&
+    proje.sablonSurumu === GUNCEL_SABLON_SURUMU &&
+      proje.sayfalar.every((sayfa) => Boolean(sayfa.rol)) &&
+      anaSayfa?.bolumler.some((bolum) => bolum.tur === "sss") &&
       anaSayfa.bolumler.some((bolum) => bolum.tur === "istatistik") &&
       anaSayfa.bolumler.some(
         (bolum) =>
@@ -917,7 +930,10 @@ export function projeyeOzelIcerigiUygula(proje: ProjeVerisi): ProjeVerisi {
       const sayfaAnahtari = sayfa.anaSayfa
         ? "__ana__"
         : metniKucult(sayfa.slug || sayfa.ad);
-      const eskiSayfa = eskiSayfaHaritasi.get(sayfaAnahtari);
+      const eskiSayfa =
+        proje.sayfalar.find(
+          (aday) => sayfaRolunuGetir(aday) === sayfa.rol,
+        ) ?? eskiSayfaHaritasi.get(sayfaAnahtari);
 
       if (!eskiSayfa) {
         return sayfa;
@@ -943,11 +959,18 @@ export function projeyeOzelIcerigiUygula(proje: ProjeVerisi): ProjeVerisi {
             gorsel: eskiBolum.gorsel || bolum.gorsel,
             arkaPlanGorseli:
               eskiBolum.arkaPlanGorseli || bolum.arkaPlanGorseli,
-            listeElemanlari: bolum.listeElemanlari.map((eleman, index) => ({
-              ...eleman,
-              gorsel:
-                eskiBolum.listeElemanlari[index]?.gorsel || eleman.gorsel,
-            })),
+            listeElemanlari: bolum.listeElemanlari.map((eleman, index) => {
+              const eskiEleman =
+                eskiBolum.listeElemanlari.find(
+                  (aday) =>
+                    metniKucult(aday.baslik) === metniKucult(eleman.baslik),
+                ) ?? eskiBolum.listeElemanlari[index];
+
+              return {
+                ...eleman,
+                gorsel: eskiEleman?.gorsel || eleman.gorsel,
+              };
+            }),
           };
         }),
       };
@@ -956,6 +979,7 @@ export function projeyeOzelIcerigiUygula(proje: ProjeVerisi): ProjeVerisi {
     kaynakProje = {
       ...proje,
       sayfalar: yeniSayfalar,
+      sablonSurumu: GUNCEL_SABLON_SURUMU,
     };
   }
 
@@ -963,9 +987,11 @@ export function projeyeOzelIcerigiUygula(proje: ProjeVerisi): ProjeVerisi {
 
   return {
     ...kaynakProje,
+    sablonSurumu: GUNCEL_SABLON_SURUMU,
     tema: kaynakProje.tema || sunum.varsayilanTema,
     sayfalar: kaynakProje.sayfalar.map((sayfa) => ({
       ...sayfa,
+      rol: sayfaRolunuGetir(sayfa),
       bolumler: sayfa.bolumler.map((bolum) => {
         const icerik = hazirBolumIcerigiOlustur(
           kaynakProje,

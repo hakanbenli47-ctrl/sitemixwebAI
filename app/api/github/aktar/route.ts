@@ -272,6 +272,8 @@ async function kaynakDosyalariOku() {
     sektorSablonlari,
     sektorSunumProfilleri,
     sektorIcerikProfilleri,
+    sektorFormProfilleri,
+    iletisimYardimcilari,
     projeTipi,
   ] = await Promise.all([
       readFile(
@@ -291,6 +293,11 @@ async function kaynakDosyalariOku() {
         path.join(kokDizin, "data", "sektorIcerikProfilleri.ts"),
         "utf8",
       ),
+      readFile(
+        path.join(kokDizin, "data", "sektorFormProfilleri.ts"),
+        "utf8",
+      ),
+      readFile(path.join(kokDizin, "lib", "iletisim.ts"), "utf8"),
       readFile(path.join(kokDizin, "types", "proje.ts"), "utf8"),
     ]);
 
@@ -300,6 +307,8 @@ async function kaynakDosyalariOku() {
     sektorSablonlari,
     sektorSunumProfilleri,
     sektorIcerikProfilleri,
+    sektorFormProfilleri,
+    iletisimYardimcilari,
     projeTipi,
   };
 }
@@ -784,6 +793,8 @@ npm run dev
     "data/sektorSablonlari.ts": kaynaklar.sektorSablonlari,
     "data/sektorSunumProfilleri.ts": kaynaklar.sektorSunumProfilleri,
     "data/sektorIcerikProfilleri.ts": kaynaklar.sektorIcerikProfilleri,
+    "data/sektorFormProfilleri.ts": kaynaklar.sektorFormProfilleri,
+    "lib/iletisim.ts": kaynaklar.iletisimYardimcilari,
     "data/proje.ts": projeTs,
     "types/proje.ts": kaynaklar.projeTipi,
     ...yerelGorselSonucu.gorselDosyalari,

@@ -277,6 +277,26 @@
   font-weight: 700;
 }
 
+.topluOnizleme {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 1px solid #c9c5b9;
+  background: #f7f4ec;
+  color: #243128;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.topluOnizleme ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: 18px;
+  color: #8b352d;
+}
+
 .hizliGorselPaneli {
   margin-top: 20px;
   padding: 28px;

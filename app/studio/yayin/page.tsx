@@ -122,7 +122,8 @@ export default function YayinAyarlariSayfasi() {
     useState(false);
 
   useEffect(() => {
-    try {
+    const yuklemeZamanlayicisi = window.setTimeout(() => {
+      try {
       const kayit =
         window.localStorage.getItem(
           AKTIF_PROJE_ANAHTARI,
@@ -147,18 +148,21 @@ export default function YayinAyarlariSayfasi() {
           ", ",
         ),
       );
-    } catch (error) {
-      console.error(
-        "Yayın ayarları yüklenemedi:",
-        error,
-      );
+      } catch (error) {
+        console.error(
+          "Yayın ayarları yüklenemedi:",
+          error,
+        );
 
-      setHata(
-        "Yayın ayarları yüklenirken bir hata oluştu.",
-      );
-    } finally {
-      setYukleniyor(false);
-    }
+        setHata(
+          "Yayın ayarları yüklenirken bir hata oluştu.",
+        );
+      } finally {
+        setYukleniyor(false);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(yuklemeZamanlayicisi);
   }, []);
 
   const kullanilacakAdres = useMemo(() => {

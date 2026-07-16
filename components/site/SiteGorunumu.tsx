@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import {
   ArrowRight,
   ExternalLink,
@@ -10,12 +11,18 @@ import {
   Phone,
   X,
 } from "lucide-react";
-import { AnimatePresence, motion, type Variants } from "motion/react";
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+  type Variants,
+} from "motion/react";
 import {
   type CSSProperties,
   type FormEvent,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import styles from "./siteGorunumu.module.css";
@@ -24,7 +31,14 @@ import type {
   SiteBolumu,
   SiteSayfasi,
 } from "@/data/sektorSablonlari";
+import { sektorHizmetleriniGetir } from "@/data/sektorSablonlari";
+import { sektorFormProfiliniGetir } from "@/data/sektorFormProfilleri";
 import { temaKarakterleriniGetir } from "@/data/sektorSunumProfilleri";
+import {
+  epostaGecerliMi,
+  telefonBaglantisi,
+  whatsappBaglantisi,
+} from "@/lib/iletisim";
 import type { ProjeVerisi } from "@/types/proje";
 
 interface TemaRenkleri {
@@ -47,8 +61,8 @@ const temaRenkleri: Record<string, TemaRenkleri> = {
     arkaPlan: "#F6F2E8",
     ikinciArkaPlan: "#E8F0E6",
     yazi: "#101A22",
-    solukYazi: "#66716C",
-    vurgu: "#1F8A5B",
+    solukYazi: "#4F5B55",
+    vurgu: "#176B46",
     cizgi: "#D7D0C1",
     butonYazi: "#FFFFFF",
   },
@@ -77,8 +91,8 @@ const temaRenkleri: Record<string, TemaRenkleri> = {
     arkaPlan: "#EFE3D1",
     ikinciArkaPlan: "#DED0B7",
     yazi: "#2A1B12",
-    solukYazi: "#786454",
-    vurgu: "#6F7D45",
+    solukYazi: "#604C3D",
+    vurgu: "#59662E",
     cizgi: "#C8B698",
     butonYazi: "#FFFFFF",
   },
@@ -97,8 +111,8 @@ const temaRenkleri: Record<string, TemaRenkleri> = {
     arkaPlan: "#EEF8F8",
     ikinciArkaPlan: "#DCEFF0",
     yazi: "#10282B",
-    solukYazi: "#5F797B",
-    vurgu: "#1E9C9A",
+    solukYazi: "#486265",
+    vurgu: "#086B6B",
     cizgi: "#BBD9DA",
     butonYazi: "#FFFFFF",
   },
@@ -107,7 +121,7 @@ const temaRenkleri: Record<string, TemaRenkleri> = {
     arkaPlan: "#FFF1EC",
     ikinciArkaPlan: "#F7DCD4",
     yazi: "#301111",
-    solukYazi: "#815E5A",
+    solukYazi: "#6F4945",
     vurgu: "#C53232",
     cizgi: "#E0B8AE",
     butonYazi: "#FFFFFF",
@@ -117,7 +131,7 @@ const temaRenkleri: Record<string, TemaRenkleri> = {
     arkaPlan: "#EEF1E6",
     ikinciArkaPlan: "#DDE4D2",
     yazi: "#1D2A1F",
-    solukYazi: "#66715F",
+    solukYazi: "#526048",
     vurgu: "#9A6A3E",
     cizgi: "#C6CEBB",
     butonYazi: "#FFFFFF",
@@ -127,8 +141,8 @@ const temaRenkleri: Record<string, TemaRenkleri> = {
     arkaPlan: "#ECEBE6",
     ikinciArkaPlan: "#DBD9D1",
     yazi: "#171A1A",
-    solukYazi: "#636866",
-    vurgu: "#C65A32",
+    solukYazi: "#515654",
+    vurgu: "#9D3F20",
     cizgi: "#BFC0B9",
     butonYazi: "#FFFFFF",
   },
@@ -138,7 +152,7 @@ const temaRenkleri: Record<string, TemaRenkleri> = {
     ikinciArkaPlan: "#1B1131",
     yazi: "#F2EEFF",
     solukYazi: "#B8ACD6",
-    vurgu: "#8B5CF6",
+    vurgu: "#7040D8",
     cizgi: "rgba(242, 238, 255, 0.16)",
     butonYazi: "#FFFFFF",
   },
@@ -167,8 +181,8 @@ const temaRenkleri: Record<string, TemaRenkleri> = {
     arkaPlan: "#F4E6CF",
     ikinciArkaPlan: "#E7D0AC",
     yazi: "#23170D",
-    solukYazi: "#765E43",
-    vurgu: "#D36B2D",
+    solukYazi: "#5F482F",
+    vurgu: "#A84716",
     cizgi: "#D3B98E",
     butonYazi: "#FFFFFF",
   },
@@ -177,8 +191,8 @@ const temaRenkleri: Record<string, TemaRenkleri> = {
     arkaPlan: "#F8FCFA",
     ikinciArkaPlan: "#E7F3EF",
     yazi: "#0E2521",
-    solukYazi: "#637D77",
-    vurgu: "#2C8C78",
+    solukYazi: "#4B6660",
+    vurgu: "#166C5B",
     cizgi: "#C7DDD7",
     butonYazi: "#FFFFFF",
   },
@@ -187,7 +201,7 @@ const temaRenkleri: Record<string, TemaRenkleri> = {
     arkaPlan: "#FFF4E2",
     ikinciArkaPlan: "#F3D7AF",
     yazi: "#2B160C",
-    solukYazi: "#7B604E",
+    solukYazi: "#684934",
     vurgu: "#B83D24",
     cizgi: "#DDBE91",
     butonYazi: "#FFFFFF",
@@ -197,7 +211,7 @@ const temaRenkleri: Record<string, TemaRenkleri> = {
     arkaPlan: "#F1E7D8",
     ikinciArkaPlan: "#E1D0B9",
     yazi: "#251B14",
-    solukYazi: "#786A5D",
+    solukYazi: "#594A3D",
     vurgu: "#284B63",
     cizgi: "#C9B69B",
     butonYazi: "#FFFFFF",
@@ -207,7 +221,7 @@ const temaRenkleri: Record<string, TemaRenkleri> = {
     arkaPlan: "#EFF4FA",
     ikinciArkaPlan: "#DCE8F4",
     yazi: "#101A2B",
-    solukYazi: "#667489",
+    solukYazi: "#4F6075",
     vurgu: "#2563EB",
     cizgi: "#C4D2E4",
     butonYazi: "#FFFFFF",
@@ -228,7 +242,7 @@ const temaRenkleri: Record<string, TemaRenkleri> = {
     ikinciArkaPlan: "#EEE9E1",
     yazi: "#111111",
     solukYazi: "#66615B",
-    vurgu: "#D946A6",
+    vurgu: "#A8267B",
     cizgi: "#D8D1C7",
     butonYazi: "#FFFFFF",
   },
@@ -237,8 +251,8 @@ const temaRenkleri: Record<string, TemaRenkleri> = {
     arkaPlan: "#F2F0EA",
     ikinciArkaPlan: "#E2E0DA",
     yazi: "#1A1A18",
-    solukYazi: "#6F6D68",
-    vurgu: "#A67C52",
+    solukYazi: "#56534F",
+    vurgu: "#74502F",
     cizgi: "#C9C5BC",
     butonYazi: "#FFFFFF",
   },
@@ -247,8 +261,8 @@ const temaRenkleri: Record<string, TemaRenkleri> = {
     arkaPlan: "#F6F2E8",
     ikinciArkaPlan: "#E8F0E6",
     yazi: "#101A22",
-    solukYazi: "#66716C",
-    vurgu: "#1F8A5B",
+    solukYazi: "#4F5B55",
+    vurgu: "#176B46",
     cizgi: "#D7D0C1",
     butonYazi: "#FFFFFF",
   },
@@ -427,14 +441,21 @@ function ozelBaglantiMi(baglanti: string) {
   );
 }
 
-function whatsappNumarasiniDuzenle(telefon: unknown) {
-  let numara = String(telefon ?? "").replace(/\D/g, "");
+function dahiliHrefOlustur(baglanti: string) {
+  const deger = baglanti.trim();
 
-  if (numara.startsWith("0")) {
-    numara = `90${numara.slice(1)}`;
+  if (!deger || deger === "/") {
+    return "/";
   }
 
-  return numara;
+  if (ozelBaglantiMi(deger) || deger.startsWith("#")) {
+    return deger;
+  }
+
+  const yol = temizBaglantiOlustur(deger);
+  const hash = baglantidakiHash(deger);
+
+  return `${yol ? `/${yol}` : "/"}${hash ? `#${hash}` : ""}`;
 }
 
 function varyasyonSinifi(varyasyon: string) {
@@ -466,12 +487,12 @@ function anaSayfayiBul(sayfalar: SiteSayfasi[]) {
   );
 }
 
-function bolumeKaydir(bolumId: string) {
+function bolumeKaydir(bolumId: string, hareketiAzalt = false) {
   window.setTimeout(() => {
     const hedef = document.getElementById(`bolum-${bolumId}`);
 
     hedef?.scrollIntoView({
-      behavior: "smooth",
+      behavior: hareketiAzalt ? "auto" : "smooth",
       block: "start",
     });
   }, 500);
@@ -566,7 +587,9 @@ function Butonlar({
           <motion.a
             key={buton.id}
             variants={listeElemaniGecisi}
-            href={ozelBaglanti ? buton.baglanti : "#"}
+            href={ozelBaglanti
+              ? buton.baglanti
+              : dahiliHrefOlustur(buton.baglanti)}
             target={hariciBaglantiMi(buton.baglanti) ? "_blank" : undefined}
             rel="noreferrer"
             onClick={(event) => {
@@ -891,7 +914,13 @@ function ListeBolumu({
                   duration: 0.4,
                 }}
               >
-                <img src={eleman.gorsel} alt={eleman.baslik} />
+                <Image
+                  src={eleman.gorsel}
+                  alt={eleman.baslik}
+                  width={1200}
+                  height={800}
+                  unoptimized
+                />
               </motion.div>
             )}
 
@@ -985,23 +1014,25 @@ function IletisimBolumu({
   bolum: SiteBolumu;
   proje: ProjeVerisi;
 }) {
+  const telefonAdresi = telefonBaglantisi(proje.telefon);
+  const whatsappAdresi = whatsappBaglantisi(proje.whatsapp);
   const iletisimler = [
-    proje.telefon
+    telefonAdresi
       ? {
           id: "telefon",
           etiket: "Telefon",
           deger: proje.telefon,
-          baglanti: `tel:${proje.telefon.replace(/\s/g, "")}`,
+          baglanti: telefonAdresi,
           ikon: Phone,
         }
       : null,
 
-    proje.whatsapp
+    whatsappAdresi
       ? {
           id: "whatsapp",
           etiket: "WhatsApp",
           deger: proje.whatsapp,
-          baglanti: `https://wa.me/${whatsappNumarasiniDuzenle(proje.whatsapp)}`,
+          baglanti: whatsappAdresi,
           ikon: MessageCircle,
         }
       : null,
@@ -1099,6 +1130,15 @@ function FormBolumu({
   bolum: SiteBolumu;
   proje: ProjeVerisi;
 }) {
+  const profil = sektorFormProfiliniGetir(proje.sektor);
+  const hizmetler = sektorHizmetleriniGetir(proje.sektor);
+  const whatsappAdresi = whatsappBaglantisi(proje.whatsapp);
+  const epostaVar = epostaGecerliMi(proje.eposta);
+  const telefonAdresi = telefonBaglantisi(proje.telefon);
+  const gonderimMumkun = Boolean(
+    whatsappAdresi || epostaVar || telefonAdresi,
+  );
+
   function formuGonder(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -1106,41 +1146,47 @@ function FormBolumu({
     const veriler = new FormData(form);
     const ad = String(veriler.get("ad") ?? "").trim();
     const telefon = String(veriler.get("telefon") ?? "").trim();
-    const mesaj = String(veriler.get("mesaj") ?? "").trim();
+    const alanSatirlari = profil.alanlar
+      .map((alan) => {
+        const deger = String(veriler.get(alan.ad) ?? "").trim();
+        return deger ? `${alan.etiket}: ${deger}` : "";
+      })
+      .filter(Boolean);
     const metin = [
       `Merhaba, ${proje.firmaAdi} web sitesinden bilgi almak istiyorum.`,
       ad ? `Ad soyad: ${ad}` : "",
       telefon ? `Telefon: ${telefon}` : "",
-      mesaj ? `Talep: ${mesaj}` : "",
+      ...alanSatirlari,
     ]
       .filter(Boolean)
       .join("\n");
-    const whatsapp = whatsappNumarasiniDuzenle(proje.whatsapp);
+    const mesajliWhatsappAdresi = whatsappBaglantisi(proje.whatsapp, metin);
 
-    if (whatsapp) {
+    if (mesajliWhatsappAdresi) {
+      window.open(mesajliWhatsappAdresi, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    if (epostaVar) {
       window.open(
-        `https://wa.me/${whatsapp}?text=${encodeURIComponent(metin)}`,
-        "_blank",
-        "noopener,noreferrer",
+        `mailto:${proje.eposta.trim()}?subject=${encodeURIComponent("Web sitesi bilgi talebi")}&body=${encodeURIComponent(metin)}`,
+        "_self",
       );
       return;
     }
 
-    if (proje.eposta.trim()) {
-      window.location.href = `mailto:${proje.eposta.trim()}?subject=${encodeURIComponent("Web sitesi bilgi talebi")}&body=${encodeURIComponent(metin)}`;
-      return;
-    }
-
-    if (proje.telefon.trim()) {
-      window.location.href = `tel:${proje.telefon.replace(/\s/g, "")}`;
+    if (telefonAdresi) {
+      window.open(telefonAdresi, "_self");
     }
   }
 
-  const gonderimEtiketi = proje.whatsapp.trim()
-    ? "WhatsApp ile gönder"
-    : proje.eposta.trim()
-      ? "E-posta ile gönder"
-      : "Telefonla iletişime geç";
+  const gonderimEtiketi = whatsappAdresi
+    ? `${profil.gonderimEtiketi} · WhatsApp`
+    : epostaVar
+      ? `${profil.gonderimEtiketi} · E-posta`
+      : telefonAdresi
+        ? "Telefonla iletişime geç"
+        : "İletişim bilgisi eksik";
 
   return (
     <div className={styles.formYerlesimi}>
@@ -1154,8 +1200,8 @@ function FormBolumu({
         {bolum.ustBaslik.trim() && (
           <span className={styles.kucukBaslik}>{bolum.ustBaslik}</span>
         )}
-        {bolum.baslik.trim() && <h2>{bolum.baslik}</h2>}
-        {bolum.aciklama.trim() && <p>{bolum.aciklama}</p>}
+        <h2>{profil.baslik || bolum.baslik}</h2>
+        <p>{profil.aciklama || bolum.aciklama}</p>
       </motion.div>
 
       <motion.form
@@ -1180,17 +1226,56 @@ function FormBolumu({
             required
           />
         </motion.label>
-        <motion.label variants={listeElemaniGecisi}>
-          <span>İhtiyacınızı kısaca anlatın</span>
-          <textarea name="mesaj" rows={5} required />
-        </motion.label>
-        <motion.button type="submit" variants={listeElemaniGecisi}>
+        {profil.alanlar.map((alan) => {
+          const secenekler =
+            alan.ad === "hizmet" && !alan.secenekler?.length
+              ? hizmetler
+              : alan.secenekler ?? [];
+
+          return (
+            <motion.label key={alan.ad} variants={listeElemaniGecisi}>
+              <span>{alan.etiket}</span>
+              {alan.tur === "textarea" ? (
+                <textarea
+                  name={alan.ad}
+                  rows={4}
+                  placeholder={alan.yerTutucu}
+                  required={alan.gerekli}
+                />
+              ) : alan.tur === "select" ? (
+                <select name={alan.ad} required={alan.gerekli} defaultValue="">
+                  <option value="" disabled>
+                    Seçiniz
+                  </option>
+                  {secenekler.map((secenek) => (
+                    <option key={secenek} value={secenek}>
+                      {secenek}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  name={alan.ad}
+                  type={alan.tur}
+                  min={alan.min}
+                  placeholder={alan.yerTutucu}
+                  required={alan.gerekli}
+                />
+              )}
+            </motion.label>
+          );
+        })}
+        <motion.button
+          type="submit"
+          variants={listeElemaniGecisi}
+          disabled={!gonderimMumkun}
+        >
           <span>{gonderimEtiketi}</span>
           <ArrowRight size={18} />
         </motion.button>
         <small>
-          Gönder butonu sizi seçili iletişim kanalına yönlendirir; bilgileriniz
-          bu sitede saklanmaz.
+          {profil.gizlilikNotu ||
+            "Gönder butonu sizi seçili iletişim kanalına yönlendirir; bilgileriniz bu sitede saklanmaz."}
         </small>
       </motion.form>
     </div>
@@ -1418,6 +1503,10 @@ export default function SiteGorunumu({
   });
 
   const [mobilMenuAcik, setMobilMenuAcik] = useState(false);
+  const hareketiAzalt = useReducedMotion();
+  const mobilMenuRef = useRef<HTMLDivElement>(null);
+  const menuAcButonuRef = useRef<HTMLButtonElement>(null);
+  const menuKapatButonuRef = useRef<HTMLButtonElement>(null);
 
   const siraliSayfalar = useMemo(() => {
     return sayfalariSirala(proje.sayfalar);
@@ -1455,6 +1544,56 @@ export default function SiteGorunumu({
     };
   }, [anaSayfa, gercekRotaKullan, siraliSayfalar]);
 
+  useEffect(() => {
+    if (!mobilMenuAcik) {
+      return;
+    }
+
+    const oncekiTasacakDegeri = document.body.style.overflow;
+    const menuAcButonu = menuAcButonuRef.current;
+    document.body.style.overflow = "hidden";
+    menuKapatButonuRef.current?.focus();
+
+    function klavyeyiYonet(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setMobilMenuAcik(false);
+        return;
+      }
+
+      if (event.key !== "Tab" || !mobilMenuRef.current) {
+        return;
+      }
+
+      const odaklanabilirler = Array.from(
+        mobilMenuRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      );
+      const ilk = odaklanabilirler[0];
+      const son = odaklanabilirler.at(-1);
+
+      if (!ilk || !son) {
+        return;
+      }
+
+      if (event.shiftKey && document.activeElement === ilk) {
+        event.preventDefault();
+        son.focus();
+      } else if (!event.shiftKey && document.activeElement === son) {
+        event.preventDefault();
+        ilk.focus();
+      }
+    }
+
+    document.addEventListener("keydown", klavyeyiYonet);
+
+    return () => {
+      document.body.style.overflow = oncekiTasacakDegeri;
+      document.removeEventListener("keydown", klavyeyiYonet);
+      menuAcButonu?.focus();
+    };
+  }, [mobilMenuAcik]);
+
   const aktifSayfa = useMemo(() => {
     return (
       siraliSayfalar.find((sayfa) => sayfa.id === aktifSayfaId) ??
@@ -1477,13 +1616,13 @@ export default function SiteGorunumu({
     }
 
     if (bolumId) {
-      bolumeKaydir(bolumId);
+      bolumeKaydir(bolumId, Boolean(hareketiAzalt));
       return;
     }
 
     window.scrollTo({
       top: 0,
-      behavior: "smooth",
+      behavior: hareketiAzalt ? "auto" : "smooth",
     });
   }
 
@@ -1556,7 +1695,7 @@ export default function SiteGorunumu({
       );
 
       if (aktifSayfadakiBolum) {
-        bolumeKaydir(aktifSayfadakiBolum.id);
+        bolumeKaydir(aktifSayfadakiBolum.id, Boolean(hareketiAzalt));
         return;
       }
     }
@@ -1644,10 +1783,11 @@ export default function SiteGorunumu({
       style={cssDegiskenleri}
     >
       <header className={styles.siteHeader}>
-        <button
-          type="button"
+        <a
+          href={anaSayfa ? sayfaYoluOlustur(anaSayfa) : "/"}
           className={styles.firmaLogo}
-          onClick={() => {
+          onClick={(event) => {
+            event.preventDefault();
             if (anaSayfa) {
               sayfaDegistir(anaSayfa.id);
             }
@@ -1655,27 +1795,34 @@ export default function SiteGorunumu({
         >
           <span>{proje.firmaAdi}</span>
           <small>{proje.sektorAdi}</small>
-        </button>
+        </a>
 
         <nav className={styles.masaustuMenu}>
           {menuSayfalari.map((sayfa, index) => (
-            <button
-              type="button"
+            <a
+              href={sayfaYoluOlustur(sayfa)}
               key={sayfa.id}
               className={aktifSayfaId === sayfa.id ? styles.aktifMenu : ""}
-              onClick={() => sayfaDegistir(sayfa.id)}
+              aria-current={aktifSayfaId === sayfa.id ? "page" : undefined}
+              onClick={(event) => {
+                event.preventDefault();
+                sayfaDegistir(sayfa.id);
+              }}
             >
               <span>{bolumNumarasi(index)}</span>
               {sayfa.menuBasligi}
-            </button>
+            </a>
           ))}
         </nav>
 
         <button
           type="button"
+          ref={menuAcButonuRef}
           className={styles.mobilMenuButonu}
           onClick={() => setMobilMenuAcik(true)}
           aria-label="Menüyü aç"
+          aria-expanded={mobilMenuAcik}
+          aria-controls="mobil-site-menusu"
         >
           <Menu size={24} />
         </button>
@@ -1684,19 +1831,27 @@ export default function SiteGorunumu({
       <AnimatePresence>
         {mobilMenuAcik && (
           <motion.div
+            ref={mobilMenuRef}
+            id="mobil-site-menusu"
             className={styles.mobilMenu}
-            initial={{
-              opacity: 0,
-              clipPath: "circle(0% at 92% 6%)",
-            }}
-            animate={{
-              opacity: 1,
-              clipPath: "circle(150% at 92% 6%)",
-            }}
-            exit={{
-              opacity: 0,
-              clipPath: "circle(0% at 92% 6%)",
-            }}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site menüsü"
+            initial={
+              hareketiAzalt
+                ? { opacity: 0 }
+                : { opacity: 0, clipPath: "circle(0% at 92% 6%)" }
+            }
+            animate={
+              hareketiAzalt
+                ? { opacity: 1 }
+                : { opacity: 1, clipPath: "circle(150% at 92% 6%)" }
+            }
+            exit={
+              hareketiAzalt
+                ? { opacity: 0 }
+                : { opacity: 0, clipPath: "circle(0% at 92% 6%)" }
+            }
             transition={{
               duration: 0.65,
               ease: [0.22, 1, 0.36, 1],
@@ -1707,6 +1862,7 @@ export default function SiteGorunumu({
 
               <button
                 type="button"
+                ref={menuKapatButonuRef}
                 onClick={() => setMobilMenuAcik(false)}
                 aria-label="Menüyü kapat"
               >
@@ -1720,16 +1876,20 @@ export default function SiteGorunumu({
               animate="gorunur"
             >
               {menuSayfalari.map((sayfa, index) => (
-                <motion.button
-                  type="button"
+                <motion.a
+                  href={sayfaYoluOlustur(sayfa)}
                   key={sayfa.id}
                   variants={listeElemaniGecisi}
-                  onClick={() => sayfaDegistir(sayfa.id)}
+                  aria-current={aktifSayfaId === sayfa.id ? "page" : undefined}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    sayfaDegistir(sayfa.id);
+                  }}
                 >
                   <span>{bolumNumarasi(index)}</span>
                   <strong>{sayfa.menuBasligi}</strong>
                   <ArrowRight size={22} />
-                </motion.button>
+                </motion.a>
               ))}
             </motion.nav>
           </motion.div>
@@ -1789,19 +1949,23 @@ export default function SiteGorunumu({
         <div className={styles.footerOrta}>
           <nav>
             {menuSayfalari.map((sayfa) => (
-              <button
-                type="button"
+              <a
+                href={sayfaYoluOlustur(sayfa)}
                 key={sayfa.id}
-                onClick={() => sayfaDegistir(sayfa.id)}
+                aria-current={aktifSayfaId === sayfa.id ? "page" : undefined}
+                onClick={(event) => {
+                  event.preventDefault();
+                  sayfaDegistir(sayfa.id);
+                }}
               >
                 {sayfa.menuBasligi}
-              </button>
+              </a>
             ))}
           </nav>
 
           <div className={styles.footerIletisim}>
-            {proje.telefon && (
-              <a href={`tel:${proje.telefon.replace(/\s/g, "")}`}>
+            {telefonBaglantisi(proje.telefon) && (
+              <a href={telefonBaglantisi(proje.telefon)}>
                 {proje.telefon}
               </a>
             )}
@@ -1823,10 +1987,10 @@ export default function SiteGorunumu({
         </div>
       </footer>
 
-      {proje.whatsapp && (
+      {whatsappBaglantisi(proje.whatsapp) && (
         <motion.a
           className={styles.sabitWhatsapp}
-          href={`https://wa.me/${whatsappNumarasiniDuzenle(proje.whatsapp)}`}
+          href={whatsappBaglantisi(proje.whatsapp)}
           target="_blank"
           rel="noreferrer"
           initial={{

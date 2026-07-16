@@ -45,29 +45,33 @@ export default function SiteOnizlemeSayfasi() {
     useState<AktarimDurumu | null>(null);
 
   useEffect(() => {
-    const kayit = localStorage.getItem(
-      "sitemix-aktif-proje",
-    );
-
-    if (!kayit) {
-      setYukleniyor(false);
-      return;
-    }
-
-    try {
-      const projeVerisi = JSON.parse(
-        kayit,
-      ) as ProjeVerisi;
-
-      setProje(projeVerisi);
-    } catch (error) {
-      console.error(
-        "Önizleme yüklenemedi:",
-        error,
+    const yuklemeZamanlayicisi = window.setTimeout(() => {
+      const kayit = localStorage.getItem(
+        "sitemix-aktif-proje",
       );
-    } finally {
-      setYukleniyor(false);
-    }
+
+      if (!kayit) {
+        setYukleniyor(false);
+        return;
+      }
+
+      try {
+        const projeVerisi = JSON.parse(
+          kayit,
+        ) as ProjeVerisi;
+
+        setProje(projeVerisi);
+      } catch (error) {
+        console.error(
+          "Önizleme yüklenemedi:",
+          error,
+        );
+      } finally {
+        setYukleniyor(false);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(yuklemeZamanlayicisi);
   }, []);
 
   async function githubaAktar() {

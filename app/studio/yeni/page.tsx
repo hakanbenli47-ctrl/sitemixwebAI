@@ -16,8 +16,17 @@ import {
 import { useMemo, useState } from "react";
 import { projeyeOzelIcerigiUygula } from "@/data/icerikSablonlari";
 import { sektorler } from "@/data/sektorler";
-import { sektorSayfalariOlustur } from "@/data/sektorSablonlari";
+import {
+  GUNCEL_SABLON_SURUMU,
+  sektorSayfalariOlustur,
+} from "@/data/sektorSablonlari";
 import { sektorVarsayilanTemasiniGetir } from "@/data/sektorSunumProfilleri";
+import {
+  epostaGecerliMi,
+  iletisimKanaliVarMi,
+  turkiyeTelefonunuDuzenle,
+  whatsappNumarasiniDuzenle,
+} from "@/lib/iletisim";
 import type { ProjeVerisi } from "@/types/proje";
 
 type SiteTipi = "tek-sayfa" | "cok-sayfa";
@@ -158,6 +167,26 @@ export default function YeniProjeSayfasi() {
       return;
     }
 
+    if (form.telefon.trim() && !turkiyeTelefonunuDuzenle(form.telefon)) {
+      setHata("Telefonu 05xx xxx xx xx veya alan kodlu sabit numara biçiminde yazmalısın.");
+      return;
+    }
+
+    if (form.whatsapp.trim() && !whatsappNumarasiniDuzenle(form.whatsapp)) {
+      setHata("WhatsApp numarası geçerli bir Türkiye cep telefonu olmalı.");
+      return;
+    }
+
+    if (form.eposta.trim() && !epostaGecerliMi(form.eposta)) {
+      setHata("Geçerli bir e-posta adresi yazmalısın.");
+      return;
+    }
+
+    if (!iletisimKanaliVarMi(form)) {
+      setHata("Yayınlanan formun çalışması için telefon, WhatsApp veya e-posta bilgilerinden en az birini eklemelisin.");
+      return;
+    }
+
     setKaydediliyor(true);
     setHata("");
 
@@ -202,6 +231,7 @@ export default function YeniProjeSayfasi() {
         slug: form.slug.trim(),
         tema: sektorVarsayilanTemasiniGetir(form.sektor),
         sayfalar,
+        sablonSurumu: GUNCEL_SABLON_SURUMU,
         seoBaslik: `${form.firmaAdi.trim()} | ${sektorAdi}`,
         seoAciklama: `${form.firmaAdi.trim()}, ${gorunenKonum || form.sehir.trim()} bölgesinde ${String(sektorAdi ?? "").toLocaleLowerCase("tr-TR")} hizmetleri sunar.`,
         seoKelimeler: [
@@ -225,7 +255,7 @@ export default function YeniProjeSayfasi() {
           },
           body: JSON.stringify({
             proje: icerikliProje,
-            yalnizcaEksikleriDoldur: true,
+            yalnizcaEksikleriDoldur: false,
           }),
         });
 

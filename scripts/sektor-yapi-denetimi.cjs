@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require("fs");
 const path = require("path");
 const ts = require("typescript");
@@ -32,6 +33,7 @@ function tsModulunuYukle(dosya, bagimliliklar = {}) {
 }
 
 const kok = path.resolve(__dirname, "..");
+const iletisim = tsModulunuYukle(path.join(kok, "lib/iletisim.ts"));
 const sektorler = tsModulunuYukle(path.join(kok, "data/sektorler.ts"));
 const profiller = tsModulunuYukle(
   path.join(kok, "data/sektorIcerikProfilleri.ts"),
@@ -44,7 +46,14 @@ const sablonlar = tsModulunuYukle(
   {
     "@/data/sektorIcerikProfilleri": profiller,
     "@/data/sektorSunumProfilleri": sunumlar,
+    "@/lib/iletisim": iletisim,
   },
+);
+const formlar = tsModulunuYukle(
+  path.join(kok, "data/sektorFormProfilleri.ts"),
+);
+const gorseller = tsModulunuYukle(
+  path.join(kok, "data/sektorStokGorselleri.ts"),
 );
 const icerikler = tsModulunuYukle(
   path.join(kok, "data/icerikSablonlari.ts"),
@@ -53,8 +62,20 @@ const icerikler = tsModulunuYukle(
     "@/data/sektorIcerikProfilleri": profiller,
     "@/data/sektorSunumProfilleri": sunumlar,
     "@/data/sektorSablonlari": sablonlar,
+    "@/lib/iletisim": iletisim,
   },
 );
+
+const beklenenSektorler = [
+  "oto-yikama", "oto-detaylandirma", "arac-kaplama", "cam-balkon", "tente",
+  "tadilat", "dekorasyon", "temizlik", "koltuk-yikama", "hali-yikama",
+  "ilaclama", "guzellik-salonu", "kuafor", "berber", "diyetisyen",
+  "psikolog", "fizyoterapist", "dis-klinigi", "veteriner", "emlak",
+  "mimarlik", "fotografci", "dugun-salonu", "spor-salonu", "anaokulu",
+  "ozel-egitim-kursu", "matbaa", "cicekci", "pastane", "mobilya",
+  "elektrikci", "tesisatci", "kombi-servisi", "nakliyat", "transfer",
+  "arac-kiralama",
+];
 
 const temaKimlikleri = new Set([
   "aurora",
@@ -82,9 +103,38 @@ const sorunlar = [];
 let sayfaSayisi = 0;
 let bolumSayisi = 0;
 
+if (
+  JSON.stringify(sektorler.sektorler.map((sektor) => sektor.id)) !==
+  JSON.stringify(beklenenSektorler)
+) {
+  sorunlar.push("Sektör listesi İşletme Bulucu sırası ve kapsamıyla eşleşmiyor");
+}
+
 for (const sektor of sektorler.sektorler) {
   const sunum = sunumlar.sektorSunumProfiliniGetir(sektor.id);
   const profil = profiller.sektorIcerikProfiliniGetir(sektor.id);
+  const formProfili = formlar.sektorFormProfiliniGetir(sektor.id);
+  const stokGorseller = gorseller.sektorStokGorselleriniGetir(sektor.id);
+
+  if (profil === profiller.sektorIcerikProfiliniGetir("__bilinmeyen__")) {
+    sorunlar.push(`${sektor.id}: özel içerik profili bulunamadı`);
+  }
+
+  if (sunum === sunumlar.sektorSunumProfiliniGetir("__bilinmeyen__")) {
+    sorunlar.push(`${sektor.id}: özel sunum profili bulunamadı`);
+  }
+
+  if (formProfili === formlar.sektorFormProfiliniGetir("__bilinmeyen__")) {
+    sorunlar.push(`${sektor.id}: özel talep formu bulunamadı`);
+  }
+
+  if (formProfili.alanlar.length < 3) {
+    sorunlar.push(`${sektor.id}: talep formu sektöre göre yetersiz`);
+  }
+
+  if (stokGorseller.length < 6 || new Set(stokGorseller).size !== stokGorseller.length) {
+    sorunlar.push(`${sektor.id}: görsel havuzu yetersiz veya tekrarlı`);
+  }
 
   if (!temaKimlikleri.has(sunum.varsayilanTema)) {
     sorunlar.push(`${sektor.id}: geçersiz varsayılan tema`);
@@ -181,6 +231,30 @@ for (const sektor of sektorler.sektorler) {
       sorunlar.push(`${sektor.id}: çok sayfa yapısı yetersiz`);
     }
 
+    const roller = new Set();
+    const sluglar = new Set();
+
+    for (const sayfa of sonuc.sayfalar) {
+      if (!sayfa.rol) {
+        sorunlar.push(`${sektor.id}/${siteTipi}: sayfa rolü eksik: ${sayfa.ad}`);
+      }
+
+      if (roller.has(sayfa.rol)) {
+        sorunlar.push(`${sektor.id}/${siteTipi}: yinelenen sayfa rolü: ${sayfa.rol}`);
+      }
+      roller.add(sayfa.rol);
+
+      const slug = sayfa.slug.trim();
+      if (slug && sluglar.has(slug)) {
+        sorunlar.push(`${sektor.id}/${siteTipi}: yinelenen slug: ${slug}`);
+      }
+      if (slug) sluglar.add(slug);
+    }
+
+    if (sonuc.sablonSurumu !== sablonlar.GUNCEL_SABLON_SURUMU) {
+      sorunlar.push(`${sektor.id}/${siteTipi}: şablon sürümü güncel değil`);
+    }
+
     if (sonuc.tema !== sunum.varsayilanTema) {
       sorunlar.push(`${sektor.id}/${siteTipi}: varsayılan tema uygulanmadı`);
     }
@@ -218,6 +292,56 @@ const siteCss = fs.readFileSync(
   path.join(kok, "components/site/siteGorunumu.module.css"),
   "utf8",
 );
+
+function renkAydinligi(hex) {
+  const sayi = Number.parseInt(hex.slice(1), 16);
+  const kanallar = [sayi >> 16, (sayi >> 8) & 255, sayi & 255].map(
+    (kanal) => {
+      const deger = kanal / 255;
+      return deger <= 0.04045
+        ? deger / 12.92
+        : ((deger + 0.055) / 1.055) ** 2.4;
+    },
+  );
+
+  return 0.2126 * kanallar[0] + 0.7152 * kanallar[1] + 0.0722 * kanallar[2];
+}
+
+function kontrastOrani(birinci, ikinci) {
+  const a = renkAydinligi(birinci);
+  const b = renkAydinligi(ikinci);
+  return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+}
+
+const siteBileseni = fs.readFileSync(
+  path.join(kok, "components/site/SiteGorunumu.tsx"),
+  "utf8",
+);
+const temaBlogu = siteBileseni
+  .split("const temaRenkleri")[1]
+  .split("const bolumGecisi")[0];
+
+for (const eslesme of temaBlogu.matchAll(/^  (\w+): \{([\s\S]*?)^  \},/gm)) {
+  const renk = (anahtar) =>
+    eslesme[2].match(new RegExp(`${anahtar}: "(#[0-9A-Fa-f]{6})"`))?.[1];
+  const arkaPlan = renk("arkaPlan");
+  const ikinciArkaPlan = renk("ikinciArkaPlan");
+  const yazi = renk("yazi");
+  const solukYazi = renk("solukYazi");
+  const vurgu = renk("vurgu");
+  const butonYazi = renk("butonYazi");
+
+  for (const [alan, onPlan, zemin] of [
+    ["yazı", yazi, arkaPlan],
+    ["soluk yazı", solukYazi, arkaPlan],
+    ["soluk yazı / ikinci zemin", solukYazi, ikinciArkaPlan],
+    ["buton", butonYazi, vurgu],
+  ]) {
+    if (onPlan && zemin && kontrastOrani(onPlan, zemin) < 4.5) {
+      sorunlar.push(`${eslesme[1]}: ${alan} kontrastı 4.5 altında`);
+    }
+  }
+}
 
 for (const gerekliSinif of [
   ".varyasyon_kartli",

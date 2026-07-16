@@ -14,34 +14,8 @@ import {
   Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-
-interface SiteSayfasi {
-  id: string;
-  ad: string;
-  slug: string;
-  menuBasligi: string;
-  menuGoster: boolean;
-  anaSayfa: boolean;
-  sira: number;
-  bolumler: unknown[];
-}
-
-interface ProjeVerisi {
-  id: string;
-  firmaAdi: string;
-  sektor: string;
-  sektorAdi: string;
-  siteTipi: "tek-sayfa" | "cok-sayfa";
-  telefon: string;
-  whatsapp: string;
-  eposta: string;
-  adres: string;
-  slug: string;
-  tema: string;
-  sayfalar: SiteSayfasi[];
-  olusturulmaTarihi: string;
-  guncellenmeTarihi: string;
-}
+import type { SiteSayfasi } from "@/data/sektorSablonlari";
+import type { ProjeVerisi } from "@/types/proje";
 
 function slugOlustur(metin: unknown) {
   return String(metin ?? "")
@@ -80,23 +54,27 @@ export default function DuzenleyiciSayfasi() {
   const [kaydedildi, setKaydedildi] = useState(false);
 
   useEffect(() => {
-    const kayitliProje = localStorage.getItem("sitemix-aktif-proje");
+    const yuklemeZamanlayicisi = window.setTimeout(() => {
+      const kayitliProje = localStorage.getItem("sitemix-aktif-proje");
 
-    if (!kayitliProje) {
-      setYukleniyor(false);
-      return;
-    }
+      if (!kayitliProje) {
+        setYukleniyor(false);
+        return;
+      }
 
-    try {
-      const projeVerisi = JSON.parse(kayitliProje) as ProjeVerisi;
+      try {
+        const projeVerisi = JSON.parse(kayitliProje) as ProjeVerisi;
 
-      setProje(projeVerisi);
-    } catch (error) {
-      console.error("Proje okunamadı:", error);
-      localStorage.removeItem("sitemix-aktif-proje");
-    } finally {
-      setYukleniyor(false);
-    }
+        setProje(projeVerisi);
+      } catch (error) {
+        console.error("Proje okunamadı:", error);
+        localStorage.removeItem("sitemix-aktif-proje");
+      } finally {
+        setYukleniyor(false);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(yuklemeZamanlayicisi);
   }, []);
 
   function projeyiKaydet(guncelProje: ProjeVerisi) {
@@ -152,6 +130,7 @@ export default function DuzenleyiciSayfasi() {
 
     const yeniSayfa: SiteSayfasi = {
       id: idOlustur(),
+      rol: "ozel",
       ad: temizAd,
       slug: yeniSlug,
       menuBasligi: temizAd,

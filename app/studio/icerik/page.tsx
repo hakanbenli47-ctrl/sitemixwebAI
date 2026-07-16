@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import NextImage from "next/image";
 import { useRouter } from "next/navigation";
 import {
   ArrowDown,
@@ -19,6 +20,7 @@ import {
   MessageCircle,
   Phone,
   Plus,
+  RotateCcw,
   Save,
   Trash2,
   Upload,
@@ -40,7 +42,9 @@ import type {
   SiteBolumu,
   SiteSayfasi,
 } from "@/data/sektorSablonlari";
+import { GUNCEL_SABLON_SURUMU } from "@/data/sektorSablonlari";
 import { sektorSunumProfiliniGetir } from "@/data/sektorSunumProfilleri";
+import { telefonBaglantisi, whatsappBaglantisi } from "@/lib/iletisim";
 import type { ProjeVerisi } from "@/types/proje";
 
 const listeDestekleyenBolumler: SiteBolumu["tur"][] = [
@@ -65,6 +69,12 @@ interface TopluIcerikBloku {
   listeElemanlari: Array<
     Pick<ListeElemani, "baslik" | "aciklama" | "baglanti">
   >;
+}
+
+interface TopluIcerikOnizlemesi {
+  blokSayisi: number;
+  eslesenSayisi: number;
+  sorunlar: string[];
 }
 
 interface GorselHedefi {
@@ -112,20 +122,6 @@ function slugOlustur(metin: unknown) {
     .trim()
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-");
-}
-
-function telefonTemizle(telefon: string) {
-  return telefon.replace(/[^\d+]/g, "");
-}
-
-function whatsappTemizle(telefon: string) {
-  let temizNumara = telefon.replace(/\D/g, "");
-
-  if (temizNumara.startsWith("0")) {
-    temizNumara = `90${temizNumara.slice(1)}`;
-  }
-
-  return temizNumara;
 }
 
 function bolumAdi(tur: SiteBolumu["tur"]) {
@@ -198,17 +194,17 @@ function anaSayfaButonlariniOlustur(
         slugOlustur(buton.metin).includes("whatsapp") ||
         slugOlustur(buton.metin).includes("telefon"),
     ) ??
-    (String(proje.whatsapp ?? "").trim()
+    (whatsappBaglantisi(proje.whatsapp)
       ? {
           id: idOlustur(),
           metin: "WhatsApp’tan bilgi alın",
-          baglanti: `https://wa.me/${whatsappTemizle(proje.whatsapp)}`,
+          baglanti: whatsappBaglantisi(proje.whatsapp),
         }
-      : String(proje.telefon ?? "").trim()
+      : telefonBaglantisi(proje.telefon)
         ? {
             id: idOlustur(),
             metin: "Telefonla bilgi alın",
-            baglanti: `tel:${telefonTemizle(proje.telefon)}`,
+            baglanti: telefonBaglantisi(proje.telefon),
           }
         : null);
 
@@ -814,11 +810,15 @@ export default function KolayIcerikDuzenleyici() {
   const [hata, setHata] = useState("");
   const [topluIcerik, setTopluIcerik] = useState("");
   const [topluBilgi, setTopluBilgi] = useState("");
+  const [topluOnizleme, setTopluOnizleme] =
+    useState<TopluIcerikOnizlemesi | null>(null);
+  const [geriAlmaVar, setGeriAlmaVar] = useState(false);
   const [acikGorselSayfalari, setAcikGorselSayfalari] = useState<string[]>([]);
 
   useEffect(() => {
     const yuklemeZamanlayicisi = window.setTimeout(() => {
       const kayit = localStorage.getItem("sitemix-aktif-proje");
+      setGeriAlmaVar(Boolean(localStorage.getItem("sitemix-proje-yedegi")));
 
       if (!kayit) {
         setYukleniyor(false);
@@ -827,7 +827,11 @@ export default function KolayIcerikDuzenleyici() {
 
       try {
         const hamProje = JSON.parse(kayit) as ProjeVerisi;
-        const duzenlenmisProje = projeyiDuzenle(hamProje);
+        const guncelSablonluProje =
+          hamProje.sablonSurumu === GUNCEL_SABLON_SURUMU
+            ? hamProje
+            : projeyeOzelIcerigiUygula(hamProje);
+        const duzenlenmisProje = projeyiDuzenle(guncelSablonluProje);
 
         setProje(duzenlenmisProje);
         setTopluIcerik(projeyeOzelTopluIcerikOlustur(duzenlenmisProje));
@@ -945,7 +949,7 @@ export default function KolayIcerikDuzenleyici() {
       : [];
   }, [proje, secilenSayfa, secilenBolum]);
 
-  function projeyiKaydet(guncelProje: ProjeVerisi) {
+  function projeyiKaydet(guncelProje: ProjeVerisi, yedekle = false) {
     const kaydedilecek = {
       ...guncelProje,
       guncellenmeTarihi: new Date().toISOString(),
@@ -954,6 +958,11 @@ export default function KolayIcerikDuzenleyici() {
     setProje(kaydedilecek);
 
     try {
+      if (yedekle && proje) {
+        localStorage.setItem("sitemix-proje-yedegi", JSON.stringify(proje));
+        setGeriAlmaVar(true);
+      }
+
       localStorage.setItem(
         "sitemix-aktif-proje",
         JSON.stringify(kaydedilecek),
@@ -969,6 +978,28 @@ export default function KolayIcerikDuzenleyici() {
       setHata(
         "Tarayıcı depolama alanı doldu. Büyük görsellerden bazılarını kaldır.",
       );
+    }
+  }
+
+  function sonTopluDegisikligiGeriAl() {
+    const yedek = localStorage.getItem("sitemix-proje-yedegi");
+
+    if (!yedek) {
+      return;
+    }
+
+    try {
+      const oncekiProje = JSON.parse(yedek) as ProjeVerisi;
+      localStorage.removeItem("sitemix-proje-yedegi");
+      setGeriAlmaVar(false);
+      projeyiKaydet(oncekiProje);
+      setTopluIcerik(projeyeOzelTopluIcerikOlustur(oncekiProje));
+      setTopluOnizleme(null);
+      setTopluBilgi("Son toplu içerik değişikliği geri alındı.");
+    } catch {
+      localStorage.removeItem("sitemix-proje-yedegi");
+      setGeriAlmaVar(false);
+      setHata("Geri alma kaydı okunamadı.");
     }
   }
 
@@ -1048,7 +1079,9 @@ export default function KolayIcerikDuzenleyici() {
   }
 
   function hizliWhatsappButonuEkle() {
-    if (!secilenBolum || !proje?.whatsapp.trim()) {
+    const baglanti = whatsappBaglantisi(proje?.whatsapp);
+
+    if (!secilenBolum || !baglanti) {
       setHata(
         "WhatsApp butonu eklemek için proje bilgilerinde WhatsApp numarası bulunmalı.",
       );
@@ -1058,14 +1091,16 @@ export default function KolayIcerikDuzenleyici() {
     const whatsappButonu: ButonVerisi = {
       id: idOlustur(),
       metin: "WhatsApp’tan ulaşın",
-      baglanti: `https://wa.me/${whatsappTemizle(proje.whatsapp)}`,
+      baglanti,
     };
 
     bolumGuncelle("butonlar", [...secilenBolum.butonlar, whatsappButonu]);
   }
 
   function hizliTelefonButonuEkle() {
-    if (!secilenBolum || !proje?.telefon.trim()) {
+    const baglanti = telefonBaglantisi(proje?.telefon);
+
+    if (!secilenBolum || !baglanti) {
       setHata(
         "Telefon butonu eklemek için proje bilgilerinde telefon numarası bulunmalı.",
       );
@@ -1075,7 +1110,7 @@ export default function KolayIcerikDuzenleyici() {
     const telefonButonu: ButonVerisi = {
       id: idOlustur(),
       metin: "Telefonla arayın",
-      baglanti: `tel:${telefonTemizle(proje.telefon)}`,
+      baglanti,
     };
 
     bolumGuncelle("butonlar", [...secilenBolum.butonlar, telefonButonu]);
@@ -1279,8 +1314,79 @@ export default function KolayIcerikDuzenleyici() {
     setSecilenBolumId(bolumler[0]?.id ?? "");
   }
 
+  function topluIcerigiOnizle() {
+    if (!proje) {
+      return;
+    }
+
+    const bloklar = topluIcerigiCozumle(topluIcerik);
+    const sorunlar: string[] = [];
+    let eslesenSayisi = 0;
+
+    bloklar.forEach((blok, index) => {
+      const sayfaAdaylari = blok.sayfa?.trim()
+        ? proje.sayfalar.filter((sayfa) =>
+            sayfaEslesir(sayfa, blok.sayfa || ""),
+          )
+        : proje.sayfalar.filter(
+            (sayfa) =>
+              sayfa.id === (secilenSayfaId || proje.sayfalar[0]?.id),
+          );
+
+      if (sayfaAdaylari.length !== 1) {
+        sorunlar.push(
+          `${index + 1}. blok: “${blok.sayfa || "seçili sayfa"}” için ${
+            sayfaAdaylari.length === 0 ? "eşleşme bulunamadı" : "birden fazla sayfa eşleşti"
+          }.`,
+        );
+        return;
+      }
+
+      const hedefSayfa = sayfaAdaylari[0];
+      const bolumAdaylari = blok.bolum?.trim()
+        ? hedefSayfa.bolumler.filter((bolum) =>
+            bolumEslesir(bolum, blok.bolum || ""),
+          )
+        : hedefSayfa.bolumler.filter(
+            (bolum) =>
+              bolum.id === (secilenBolumId || hedefSayfa.bolumler[0]?.id),
+          );
+
+      if (bolumAdaylari.length !== 1) {
+        sorunlar.push(
+          `${index + 1}. blok: ${hedefSayfa.ad} / “${blok.bolum || "seçili bölüm"}” için ${
+            bolumAdaylari.length === 0 ? "eşleşme bulunamadı" : "birden fazla bölüm eşleşti"
+          }.`,
+        );
+        return;
+      }
+
+      eslesenSayisi += 1;
+    });
+
+    const onizleme = {
+      blokSayisi: bloklar.length,
+      eslesenSayisi,
+      sorunlar,
+    };
+
+    setTopluOnizleme(onizleme);
+    setHata(
+      bloklar.length === 0
+        ? "Toplu içerik alanına uygulanacak metin bulunamadı."
+        : sorunlar.length > 0
+          ? "İçerik uygulanmadı. Ön izlemedeki eşleşme sorunlarını düzelt."
+          : "",
+    );
+  }
+
   function topluIcerigiUygula() {
     if (!proje) {
+      return;
+    }
+
+    if (!topluOnizleme || topluOnizleme.sorunlar.length > 0) {
+      topluIcerigiOnizle();
       return;
     }
 
@@ -1349,10 +1455,13 @@ export default function KolayIcerikDuzenleyici() {
       return;
     }
 
-    projeyiKaydet({
-      ...proje,
-      sayfalar,
-    });
+    projeyiKaydet(
+      {
+        ...proje,
+        sayfalar,
+      },
+      true,
+    );
 
     if (ilkUygulananSayfaId) {
       setSecilenSayfaId(ilkUygulananSayfaId);
@@ -1360,6 +1469,7 @@ export default function KolayIcerikDuzenleyici() {
     }
 
     setTopluBilgi(`${uygulananSayisi} bölüm toplu içerikle güncellendi.`);
+    setTopluOnizleme(null);
     setHata("");
   }
 
@@ -1582,7 +1692,7 @@ export default function KolayIcerikDuzenleyici() {
               const guncelProje = projeyeOzelIcerigiUygula(proje);
               const ilkSayfa = guncelProje.sayfalar[0];
 
-              projeyiKaydet(guncelProje);
+              projeyiKaydet(guncelProje, true);
               setTopluIcerik(
                 projeyeOzelTopluIcerikOlustur(guncelProje),
               );
@@ -1604,17 +1714,52 @@ export default function KolayIcerikDuzenleyici() {
 
         <textarea
           value={topluIcerik}
-          onChange={(event) => setTopluIcerik(event.target.value)}
+          onChange={(event) => {
+            setTopluIcerik(event.target.value);
+            setTopluOnizleme(null);
+          }}
           placeholder="İşletmeye özel sayfa ve bölüm içerikleri burada hazırlanır. Metinleri kontrol edip doğrudan uygulayabilirsin."
           rows={10}
         />
 
         <div className={styles.topluAksiyonlar}>
-          <button type="button" onClick={topluIcerigiUygula}>
+          <button type="button" onClick={topluIcerigiOnizle}>
             <FileText size={17} />
-            Toplu içeriği uygula
+            Değişiklikleri ön izle
           </button>
+
+          {topluOnizleme && topluOnizleme.sorunlar.length === 0 && (
+            <button type="button" onClick={topluIcerigiUygula}>
+              <Check size={17} />
+              Onayla ve uygula
+            </button>
+          )}
+
+          {geriAlmaVar && (
+            <button type="button" onClick={sonTopluDegisikligiGeriAl}>
+              <RotateCcw size={17} />
+              Son toplu değişikliği geri al
+            </button>
+          )}
         </div>
+
+        {topluOnizleme && (
+          <div className={styles.topluOnizleme} role="status">
+            <strong>
+              {topluOnizleme.eslesenSayisi}/{topluOnizleme.blokSayisi} bölüm
+              eşleşti
+            </strong>
+            {topluOnizleme.sorunlar.length > 0 ? (
+              <ul>
+                {topluOnizleme.sorunlar.map((sorun) => (
+                  <li key={sorun}>{sorun}</li>
+                ))}
+              </ul>
+            ) : (
+              <span>Hazır. İçerik henüz uygulanmadı; sonucu onaylayabilirsin.</span>
+            )}
+          </div>
+        )}
 
         {topluBilgi && <p className={styles.topluBilgi}>{topluBilgi}</p>}
       </section>
@@ -1764,7 +1909,13 @@ export default function KolayIcerikDuzenleyici() {
                     >
                       <div className={styles.gorselOnizleme}>
                         {hedef.mevcutGorsel ? (
-                          <img src={hedef.mevcutGorsel} alt={hedef.etiket} />
+                          <NextImage
+                            src={hedef.mevcutGorsel}
+                            alt={hedef.etiket}
+                            width={640}
+                            height={420}
+                            unoptimized
+                          />
                         ) : (
                           <FileImage size={30} />
                         )}
@@ -1997,9 +2148,12 @@ export default function KolayIcerikDuzenleyici() {
                   </div>
 
                   {secilenBolum.gorsel ? (
-                    <img
+                    <NextImage
                       src={secilenBolum.gorsel}
                       alt=""
+                      width={1200}
+                      height={800}
+                      unoptimized
                       className={styles.yuklenenGorsel}
                     />
                   ) : (
@@ -2037,9 +2191,12 @@ export default function KolayIcerikDuzenleyici() {
                   </div>
 
                   {secilenBolum.arkaPlanGorseli ? (
-                    <img
+                    <NextImage
                       src={secilenBolum.arkaPlanGorseli}
                       alt=""
+                      width={1600}
+                      height={900}
+                      unoptimized
                       className={styles.yuklenenGorsel}
                     />
                   ) : (
@@ -2197,7 +2354,13 @@ export default function KolayIcerikDuzenleyici() {
                       {listeGorseliKullanir(secilenBolum) &&
                       (eleman.gorsel ? (
                         <div className={styles.elemanGorselAlani}>
-                          <img src={eleman.gorsel} alt="" />
+                          <NextImage
+                            src={eleman.gorsel}
+                            alt=""
+                            width={640}
+                            height={420}
+                            unoptimized
+                          />
 
                           <button
                             type="button"

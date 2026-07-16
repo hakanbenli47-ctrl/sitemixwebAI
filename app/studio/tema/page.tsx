@@ -12,30 +12,13 @@ import {
   Smartphone,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { sektorTemaOnerileriniGetir } from "@/data/sektorSunumProfilleri";
+import {
+  sektorTasariminiGetir,
+  sektorTasarimSecenekleriniGetir,
+  type SektorTasarimSecenegi,
+  type TemaKimligi,
+} from "@/data/sektorTasarimlari";
 import styles from "./tema.module.css";
-
-type TemaKimligi =
-  | "aurora"
-  | "obsidian"
-  | "ivory"
-  | "terra"
-  | "noir"
-  | "lagoon"
-  | "ruby"
-  | "sage"
-  | "copper"
-  | "neon"
-  | "mono"
-  | "royal"
-  | "sand"
-  | "clinic"
-  | "bistro"
-  | "artisan"
-  | "skyline"
-  | "forest"
-  | "studio"
-  | "marble";
 
 interface Tema {
   id: TemaKimligi;
@@ -76,6 +59,7 @@ interface ProjeVerisi {
   adres: string;
   slug: string;
   tema: TemaKimligi | "";
+  tasarim?: string;
   sayfalar: SiteSayfasi[];
   githubAktarildiMi?: boolean;
   githubRepoAdi?: string;
@@ -412,7 +396,7 @@ export default function TemaSecimSayfasi() {
   const router = useRouter();
 
   const [proje, setProje] = useState<ProjeVerisi | null>(null);
-  const [secilenTema, setSecilenTema] = useState<TemaKimligi | null>(null);
+  const [secilenTasarim, setSecilenTasarim] = useState<string | null>(null);
   const [yukleniyor, setYukleniyor] = useState(true);
   const [hata, setHata] = useState("");
 
@@ -427,12 +411,14 @@ export default function TemaSecimSayfasi() {
 
       try {
         const projeVerisi = JSON.parse(kayitliProje) as ProjeVerisi;
+        const baslangicTasarimi = sektorTasariminiGetir(
+          projeVerisi.sektor,
+          projeVerisi.tasarim,
+          projeVerisi.tema,
+        );
 
         setProje(projeVerisi);
-
-        if (projeVerisi.tema) {
-          setSecilenTema(projeVerisi.tema);
-        }
+        setSecilenTasarim(baslangicTasarimi?.id ?? null);
       } catch (error) {
         console.error("Proje yüklenemedi:", error);
         localStorage.removeItem("sitemix-aktif-proje");
@@ -444,35 +430,17 @@ export default function TemaSecimSayfasi() {
     return () => window.clearTimeout(yuklemeZamanlayicisi);
   }, []);
 
-  const siraliTemalar = useMemo(() => {
-    if (!proje) {
-      return temalar;
-    }
-
-    const oneriler = sektorTemaOnerileriniGetir(proje.sektor);
-
-    return [...temalar].sort((a, b) => {
-      const aSirasi = oneriler.indexOf(a.id);
-      const bSirasi = oneriler.indexOf(b.id);
-      const aUygun = aSirasi !== -1;
-      const bUygun = bSirasi !== -1;
-
-      if (aUygun === bUygun) {
-        if (aUygun && aSirasi !== bSirasi) {
-          return aSirasi - bSirasi;
-        }
-
-        return 0;
-      }
-
-      return aUygun ? -1 : 1;
-    });
+  const tasarimSecenekleri = useMemo(() => {
+    return proje ? sektorTasarimSecenekleriniGetir(proje.sektor) : [];
   }, [proje]);
 
-  const aktifTema = temalar.find((tema) => tema.id === secilenTema);
+  const aktifTasarim = tasarimSecenekleri.find(
+    (tasarim) => tasarim.id === secilenTasarim,
+  );
+  const aktifTema = temalar.find((tema) => tema.id === aktifTasarim?.tema);
 
-  function temaSec(temaId: TemaKimligi) {
-    setSecilenTema(temaId);
+  function tasarimSec(tasarim: SektorTasarimSecenegi) {
+    setSecilenTasarim(tasarim.id);
     setHata("");
   }
 
@@ -481,14 +449,15 @@ export default function TemaSecimSayfasi() {
       return;
     }
 
-    if (!secilenTema) {
-      setHata("Devam etmek için bir tema seçmelisin.");
+    if (!aktifTasarim) {
+      setHata("Devam etmek için bir site tasarımı seçmelisin.");
       return;
     }
 
     const guncelProje: ProjeVerisi = {
       ...proje,
-      tema: secilenTema,
+      tema: aktifTasarim.tema,
+      tasarim: aktifTasarim.id,
       guncellenmeTarihi: new Date().toISOString(),
     };
 
@@ -575,12 +544,12 @@ export default function TemaSecimSayfasi() {
 
       <section className={styles.baslikAlani}>
         <div>
-          <span>TEMA SEÇİMİ</span>
+          <span>SEKTÖRE ÖZEL TASARIM</span>
 
           <h1>
-            Sitenin görsel
+            {proje.sektorAdi} için
             <br />
-            karakterini belirle.
+            doğru site düzeni.
           </h1>
         </div>
 
@@ -607,23 +576,26 @@ export default function TemaSecimSayfasi() {
           <div className={styles.listeBasligi}>
             <div>
               <Palette size={20} />
-              <h2>Temalar</h2>
+              <h2>{proje.sektorAdi} tasarımları</h2>
             </div>
 
-            <p>{temalar.length} tema</p>
+            <p>{tasarimSecenekleri.length} profesyonel düzen</p>
           </div>
 
           <div className={styles.temaIzgarasi}>
-            {siraliTemalar.map((tema) => {
-              const aktif = secilenTema === tema.id;
-              const sektoreUygun = sektorTemaOnerileriniGetir(
-                proje.sektor,
-              ).includes(tema.id);
+            {tasarimSecenekleri.map((tasarim) => {
+              const tema = temalar.find((aday) => aday.id === tasarim.tema);
+              const aktif = secilenTasarim === tasarim.id;
+
+              if (!tema) {
+                return null;
+              }
 
               return (
                 <button
                   type="button"
-                  key={tema.id}
+                  key={tasarim.id}
+                  aria-pressed={aktif}
                   className={`${styles.temaSecenegi} ${
                     aktif ? styles.aktif : ""
                   }`}
@@ -638,16 +610,20 @@ export default function TemaSecimSayfasi() {
                       "--tema-buton-yazi": tema.butonYazi,
                     } as React.CSSProperties
                   }
-                  onClick={() => temaSec(tema.id)}
+                  onClick={() => tasarimSec(tasarim)}
                 >
-                  <div className={styles.temaOnizleme}>
+                  <div
+                    className={styles.temaOnizleme}
+                    data-duzen={tasarim.duzen}
+                    data-kart-stili={tasarim.kartStili}
+                  >
                     <div className={styles.ornekMenu}>
                       <strong>{proje.firmaAdi}</strong>
                       <span />
                     </div>
 
                     <div className={styles.ornekHero}>
-                      <small>{tema.kategori}</small>
+                      <small>{tasarim.etiket}</small>
 
                       <div className={styles.ornekBaslik}>
                         <span />
@@ -664,12 +640,18 @@ export default function TemaSecimSayfasi() {
 
                       <div className={styles.ornekButon} />
                     </div>
+
+                    <div className={styles.ornekKartlar}>
+                      <i />
+                      <i />
+                      <i />
+                    </div>
                   </div>
 
                   <div className={styles.temaBilgisi}>
                     <div>
-                      <span>{tema.kategori}</span>
-                      <h3>{tema.ad}</h3>
+                      <span>{tasarim.etiket}</span>
+                      <h3>{tasarim.ad}</h3>
                     </div>
 
                     {aktif && (
@@ -679,17 +661,19 @@ export default function TemaSecimSayfasi() {
                     )}
                   </div>
 
-                  <p>{tema.aciklama}</p>
+                  <p>{tasarim.aciklama}</p>
 
                   <div className={styles.karakterSatiri}>
-                    <strong>{tema.karakter}</strong>
+                    <strong>
+                      {tasarim.duzen} · {tasarim.yogunluk} · {tasarim.gorselOrani}
+                    </strong>
                   </div>
 
-                  {sektoreUygun && (
-                    <small className={styles.onerilen}>
-                      SEKTÖR İÇİN ÖNERİLEN
-                    </small>
-                  )}
+                  <small className={styles.onerilen}>
+                    {tasarim === tasarimSecenekleri[0]
+                      ? "SEKTÖR İÇİN ÖNCELİKLİ"
+                      : "SEKTÖRE ÖZEL ALTERNATİF"}
+                  </small>
                 </button>
               );
             })}
@@ -698,14 +682,16 @@ export default function TemaSecimSayfasi() {
 
         <aside className={styles.sagAlan}>
           <div className={styles.sabitAlan}>
-            <span className={styles.sagEtiket}>SEÇİLEN TEMA</span>
+            <span className={styles.sagEtiket}>SEÇİLEN SİTE DÜZENİ</span>
 
-            {aktifTema ? (
+            {aktifTema && aktifTasarim ? (
               <>
-                <h2>{aktifTema.ad}</h2>
-                <p>{aktifTema.aciklama}</p>
+                <h2>{aktifTasarim.ad}</h2>
+                <p>{aktifTasarim.aciklama}</p>
 
-                <div className={styles.seciliTemaKart}
+                <div
+                  className={styles.seciliTemaKart}
+                  data-duzen={aktifTasarim.duzen}
                   style={
                     {
                       "--tema-arka": aktifTema.arkaPlan,
@@ -718,10 +704,38 @@ export default function TemaSecimSayfasi() {
                     } as React.CSSProperties
                   }
                 >
-                  <span>{aktifTema.kategori}</span>
+                  <span>{aktifTasarim.etiket}</span>
                   <strong>{proje.firmaAdi}</strong>
-                  <p>{aktifTema.karakter}</p>
+                  <p>{aktifTema.ad} renk sistemi</p>
                 </div>
+
+                <div className={styles.tasarimDetaylari}>
+                  <div>
+                    <small>Sayfa kurgusu</small>
+                    <strong>{aktifTasarim.duzen}</strong>
+                  </div>
+                  <div>
+                    <small>Görsel düzeni</small>
+                    <strong>{aktifTasarim.gorselOrani}</strong>
+                  </div>
+                  <div>
+                    <small>İçerik yoğunluğu</small>
+                    <strong>{aktifTasarim.yogunluk}</strong>
+                  </div>
+                  <div>
+                    <small>Kart biçimi</small>
+                    <strong>{aktifTasarim.kartStili}</strong>
+                  </div>
+                </div>
+
+                <ul className={styles.tasarimOzellikleri}>
+                  {aktifTasarim.ozellikler.map((ozellik) => (
+                    <li key={ozellik}>
+                      <Check size={15} />
+                      <span>{ozellik}</span>
+                    </li>
+                  ))}
+                </ul>
 
                 <div className={styles.renkler}>
                   <div>
@@ -782,7 +796,7 @@ export default function TemaSecimSayfasi() {
             </button>
 
             <small className={styles.not}>
-              Tema daha sonra değiştirilebilir. Girilen içerikler silinmez.
+              Tasarım daha sonra değiştirilebilir. Girilen içerikler silinmez.
             </small>
           </div>
         </aside>

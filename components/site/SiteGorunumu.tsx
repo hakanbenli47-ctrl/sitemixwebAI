@@ -34,6 +34,7 @@ import type {
 import { sektorHizmetleriniGetir } from "@/data/sektorSablonlari";
 import { sektorFormProfiliniGetir } from "@/data/sektorFormProfilleri";
 import { temaKarakterleriniGetir } from "@/data/sektorSunumProfilleri";
+import { sektorTasariminiGetir } from "@/data/sektorTasarimlari";
 import {
   epostaGecerliMi,
   telefonBaglantisi,
@@ -1755,8 +1756,14 @@ export default function SiteGorunumu({
     );
   }
 
-  const renkler = temaRenkleri[proje.tema] ?? temaRenkleri.standard;
-  const temaKarakterSiniflari = temaKarakterleriniGetir(proje.tema)
+  const tasarim = sektorTasariminiGetir(
+    proje.sektor,
+    proje.tasarim,
+    proje.tema,
+  );
+  const etkinTema = tasarim?.tema ?? proje.tema;
+  const renkler = temaRenkleri[etkinTema] ?? temaRenkleri.standard;
+  const temaKarakterSiniflari = temaKarakterleriniGetir(etkinTema)
     .map((karakter) => styles[`tema_${karakter}`] ?? "")
     .filter(Boolean)
     .join(" ");
@@ -1779,8 +1786,13 @@ export default function SiteGorunumu({
 
   return (
     <main
-      className={`${styles.site} ${styles[`tema_${proje.tema}`] ?? ""} ${temaKarakterSiniflari}`}
+      className={`${styles.site} ${styles[`tema_${etkinTema}`] ?? ""} ${temaKarakterSiniflari}`}
       style={cssDegiskenleri}
+      data-tasarim-aile={tasarim?.aile}
+      data-tasarim-duzen={tasarim?.duzen}
+      data-kart-stili={tasarim?.kartStili}
+      data-yogunluk={tasarim?.yogunluk}
+      data-gorsel-orani={tasarim?.gorselOrani}
     >
       <header className={styles.siteHeader}>
         <a
@@ -1814,6 +1826,28 @@ export default function SiteGorunumu({
             </a>
           ))}
         </nav>
+
+        {(whatsappBaglantisi(proje.whatsapp) ||
+          telefonBaglantisi(proje.telefon)) && (
+          <a
+            className={styles.headerAksiyon}
+            href={
+              whatsappBaglantisi(proje.whatsapp) ||
+              telefonBaglantisi(proje.telefon)
+            }
+            target={whatsappBaglantisi(proje.whatsapp) ? "_blank" : undefined}
+            rel={whatsappBaglantisi(proje.whatsapp) ? "noreferrer" : undefined}
+          >
+            {whatsappBaglantisi(proje.whatsapp) ? (
+              <MessageCircle size={17} />
+            ) : (
+              <Phone size={17} />
+            )}
+            <span>
+              {whatsappBaglantisi(proje.whatsapp) ? "Bilgi alın" : "Hemen arayın"}
+            </span>
+          </a>
+        )}
 
         <button
           type="button"
@@ -1892,6 +1926,25 @@ export default function SiteGorunumu({
                 </motion.a>
               ))}
             </motion.nav>
+
+            <div className={styles.mobilHizliIletisim}>
+              {telefonBaglantisi(proje.telefon) && (
+                <a href={telefonBaglantisi(proje.telefon)}>
+                  <Phone size={18} />
+                  <span>Ara</span>
+                </a>
+              )}
+              {whatsappBaglantisi(proje.whatsapp) && (
+                <a
+                  href={whatsappBaglantisi(proje.whatsapp)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <MessageCircle size={18} />
+                  <span>WhatsApp</span>
+                </a>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

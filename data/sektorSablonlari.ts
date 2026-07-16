@@ -7,12 +7,13 @@ import {
   sektorSunumProfiliniGetir,
   type SayfaRolu,
 } from "@/data/sektorSunumProfilleri";
+import { sektorAnaSayfaAkisiniGetir } from "@/data/sektorTasarimlari";
 import {
   telefonBaglantisi,
   whatsappBaglantisi,
 } from "@/lib/iletisim";
 
-export const GUNCEL_SABLON_SURUMU = 3;
+export const GUNCEL_SABLON_SURUMU = 4;
 
 export type BolumTuru =
   | "hero"
@@ -345,7 +346,7 @@ function anaSayfaBolumleri(
     }),
   };
 
-  const anaSayfaSirasi = [...sunum.anaSayfaSirasi];
+  const anaSayfaSirasi = sektorAnaSayfaAkisiniGetir(bilgi.sektor);
 
   if (sunum.galeriKullan && !anaSayfaSirasi.includes("galeri")) {
     const sssSirasi = anaSayfaSirasi.indexOf("sss");

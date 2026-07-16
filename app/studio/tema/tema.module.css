@@ -196,6 +196,7 @@
 }
 
 .temaOnizleme {
+  position: relative;
   min-height: 255px;
   overflow: hidden;
   border: 1px solid var(--tema-cizgi);
@@ -297,6 +298,113 @@
   width: 84px;
   height: 25px;
   background: var(--tema-vurgu);
+}
+
+.ornekKartlar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+  padding: 0 22px 22px;
+}
+
+.ornekKartlar i {
+  min-height: 42px;
+  display: block;
+  border: 1px solid var(--tema-cizgi);
+  background: color-mix(in srgb, var(--tema-ikinci) 72%, transparent);
+}
+
+.temaOnizleme[data-duzen="teknik"] {
+  background-image:
+    linear-gradient(90deg, transparent 32%, var(--tema-cizgi) 32%, transparent calc(32% + 1px)),
+    linear-gradient(135deg, var(--tema-arka), var(--tema-ikinci));
+}
+
+.temaOnizleme[data-duzen="teknik"] .ornekHero {
+  padding-left: 34px;
+}
+
+.temaOnizleme[data-duzen="teknik"] .ornekKartlar {
+  gap: 1px;
+}
+
+.temaOnizleme[data-duzen="sinematik"] .ornekHero {
+  min-height: 168px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background:
+    linear-gradient(0deg, color-mix(in srgb, var(--tema-yazi) 74%, transparent), transparent),
+    radial-gradient(circle at 75% 25%, var(--tema-vurgu), transparent 38%);
+  color: var(--tema-arka);
+}
+
+.temaOnizleme[data-duzen="sinematik"] .ornekMetin,
+.temaOnizleme[data-duzen="sinematik"] .ornekCizgi {
+  display: none;
+}
+
+.temaOnizleme[data-duzen="servis"] .ornekHero,
+.temaOnizleme[data-duzen="rezervasyon"] .ornekHero {
+  width: 68%;
+  padding-right: 12px;
+}
+
+.temaOnizleme[data-duzen="servis"] .ornekKartlar,
+.temaOnizleme[data-duzen="rezervasyon"] .ornekKartlar {
+  position: absolute;
+  top: 65px;
+  right: 16px;
+  width: 28%;
+  grid-template-columns: 1fr;
+  padding: 0;
+}
+
+.temaOnizleme[data-duzen="editorial"] .ornekHero {
+  padding-right: 34%;
+}
+
+.temaOnizleme[data-duzen="editorial"] .ornekKartlar {
+  position: absolute;
+  right: 20px;
+  bottom: 22px;
+  width: 34%;
+  grid-template-columns: 1fr;
+  padding: 0;
+  transform: translateY(-12px);
+}
+
+.temaOnizleme[data-duzen="klinik"],
+.temaOnizleme[data-duzen="egitim"] {
+  border-radius: 28px 28px 8px 8px;
+}
+
+.temaOnizleme[data-duzen="klinik"] .ornekKartlar i,
+.temaOnizleme[data-duzen="egitim"] .ornekKartlar i {
+  border-radius: 14px;
+}
+
+.temaOnizleme[data-duzen="katalog"] .ornekHero {
+  padding-bottom: 20px;
+}
+
+.temaOnizleme[data-duzen="katalog"] .ornekMetin,
+.temaOnizleme[data-duzen="katalog"] .ornekCizgi {
+  display: none;
+}
+
+.temaOnizleme[data-duzen="portfoy"] .ornekKartlar {
+  grid-template-columns: 1.4fr 0.8fr 0.8fr;
+  align-items: end;
+  gap: 3px;
+}
+
+.temaOnizleme[data-duzen="portfoy"] .ornekKartlar i:first-child {
+  min-height: 70px;
+}
+
+.temaOnizleme[data-duzen="zanaat"] .ornekKartlar i {
+  border-radius: 60px 60px 0 0;
 }
 
 .temaBilgisi {
@@ -439,6 +547,61 @@
   margin: 12px 0 0;
   color: var(--tema-soluk);
   font-size: 12px;
+}
+
+.tasarimDetaylari {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 28px;
+  border-top: 1px solid rgba(17, 23, 19, 0.2);
+}
+
+.tasarimDetaylari > div {
+  min-width: 0;
+  display: grid;
+  gap: 7px;
+  padding: 15px 12px 15px 0;
+  border-bottom: 1px solid rgba(17, 23, 19, 0.2);
+}
+
+.tasarimDetaylari > div:nth-child(odd) {
+  border-right: 1px solid rgba(17, 23, 19, 0.2);
+}
+
+.tasarimDetaylari small {
+  color: #626a64;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tasarimDetaylari strong {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.tasarimOzellikleri {
+  display: grid;
+  gap: 11px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tasarimOzellikleri li {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+  color: #37413a;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.tasarimOzellikleri svg {
+  margin-top: 1px;
+  color: #1e4d3a;
 }
 
 .renkler {

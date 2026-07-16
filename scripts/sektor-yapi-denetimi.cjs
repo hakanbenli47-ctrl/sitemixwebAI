@@ -44,12 +44,16 @@ const donusumler = tsModulunuYukle(
 const sunumlar = tsModulunuYukle(
   path.join(kok, "data/sektorSunumProfilleri.ts"),
 );
+const tasarimlar = tsModulunuYukle(
+  path.join(kok, "data/sektorTasarimlari.ts"),
+);
 const sablonlar = tsModulunuYukle(
   path.join(kok, "data/sektorSablonlari.ts"),
   {
     "@/data/sektorDonusumProfilleri": donusumler,
     "@/data/sektorIcerikProfilleri": profiller,
     "@/data/sektorSunumProfilleri": sunumlar,
+    "@/data/sektorTasarimlari": tasarimlar,
     "@/lib/iletisim": iletisim,
   },
 );
@@ -72,6 +76,7 @@ const icerikler = tsModulunuYukle(
     "@/data/sektorDonusumProfilleri": donusumler,
     "@/data/sektorIcerikProfilleri": profiller,
     "@/data/sektorSunumProfilleri": sunumlar,
+    "@/data/sektorTasarimlari": tasarimlar,
     "@/data/sektorSablonlari": sablonlar,
     "@/lib/iletisim": iletisim,
   },
@@ -128,6 +133,8 @@ for (const sektor of sektorler.sektorler) {
   const donusum = donusumler.sektorDonusumProfiliniGetir(sektor.id);
   const formProfili = formlar.sektorFormProfiliniGetir(sektor.id);
   const stokGorseller = gorseller.sektorStokGorselleriniGetir(sektor.id);
+  const tasarimProfili = tasarimlar.sektorTasarimProfiliniGetir(sektor.id);
+  const tasarimSecenekleri = tasarimProfili.secenekler;
 
   if (profil === profiller.sektorIcerikProfiliniGetir("__bilinmeyen__")) {
     sorunlar.push(`${sektor.id}: özel içerik profili bulunamadı`);
@@ -196,6 +203,36 @@ for (const sektor of sektorler.sektorler) {
 
   if (!temaKimlikleri.has(sunum.varsayilanTema)) {
     sorunlar.push(`${sektor.id}: geçersiz varsayılan tema`);
+  }
+
+  if (!tasarimlar.sektorTasarimKaydiVarMi(sektor.id)) {
+    sorunlar.push(`${sektor.id}: sektöre özel tasarım kaydı bulunamadı`);
+  }
+
+  if (tasarimSecenekleri.length !== 3) {
+    sorunlar.push(`${sektor.id}: tam üç tasarım seçeneği bulunmalı`);
+  }
+
+  if (tasarimSecenekleri[0]?.tema !== sunum.varsayilanTema) {
+    sorunlar.push(`${sektor.id}: öncelikli tasarım varsayılan temayla eşleşmiyor`);
+  }
+
+  if (new Set(tasarimSecenekleri.map((secenek) => secenek.id)).size !== 3) {
+    sorunlar.push(`${sektor.id}: tasarım kimlikleri benzersiz değil`);
+  }
+
+  if (new Set(tasarimSecenekleri.map((secenek) => secenek.duzen)).size !== 3) {
+    sorunlar.push(`${sektor.id}: tasarım seçeneklerinin sayfa kurguları farklı değil`);
+  }
+
+  for (const secenek of tasarimSecenekleri) {
+    if (!temaKimlikleri.has(secenek.tema)) {
+      sorunlar.push(`${sektor.id}: tasarımda geçersiz renk teması var`);
+    }
+
+    if (secenek.ozellikler.length < 3 || secenek.aciklama.length < 100) {
+      sorunlar.push(`${sektor.id}: tasarım açıklaması veya özellikleri yüzeysel`);
+    }
   }
 
   if (!sunum.temaOnerileri.includes(sunum.varsayilanTema)) {
@@ -315,6 +352,10 @@ for (const sektor of sektorler.sektorler) {
 
     if (sonuc.tema !== sunum.varsayilanTema) {
       sorunlar.push(`${sektor.id}/${siteTipi}: varsayılan tema uygulanmadı`);
+    }
+
+    if (!tasarimSecenekleri.some((secenek) => secenek.id === sonuc.tasarim)) {
+      sorunlar.push(`${sektor.id}/${siteTipi}: sektöre özel tasarım uygulanmadı`);
     }
 
     const sayfaYollari = new Set([
@@ -484,9 +525,26 @@ for (const gerekliSinif of [
   ".formYerlesimi",
   "@media (max-width: 650px)",
   "@media (prefers-reduced-motion: reduce)",
+  '[data-tasarim-aile="otomotiv-atolye"]',
+  '[data-tasarim-aile="temizlik-servisi"]',
+  '[data-tasarim-aile="klinik-guven"]',
+  '[data-tasarim-aile="emlak-portfoyu"]',
+  '[data-tasarim-aile="seyahat-rezervasyonu"]',
 ]) {
   if (!siteCss.includes(gerekliSinif)) {
     sorunlar.push(`sunum CSS'i eksik: ${gerekliSinif}`);
+  }
+}
+
+for (const veriNiteligi of [
+  "data-tasarim-aile",
+  "data-tasarim-duzen",
+  "data-kart-stili",
+  "data-yogunluk",
+  "data-gorsel-orani",
+]) {
+  if (!siteBileseni.includes(veriNiteligi)) {
+    sorunlar.push(`site görünümünde tasarım niteliği eksik: ${veriNiteligi}`);
   }
 }
 

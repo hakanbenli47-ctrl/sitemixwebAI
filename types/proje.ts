@@ -15,6 +15,7 @@ export interface ProjeVerisi {
   hizmetBolgesi?: string;
   slug: string;
   tema: string;
+  tasarim?: string;
   sayfalar: SiteSayfasi[];
   sablonSurumu?: number;
 

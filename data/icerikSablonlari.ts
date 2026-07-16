@@ -8,6 +8,7 @@ import {
   sektorSunumProfiliniGetir,
   type SayfaRolu,
 } from "@/data/sektorSunumProfilleri";
+import { sektorTasariminiGetir } from "@/data/sektorTasarimlari";
 import type {
   ButonVerisi,
   ListeElemani,
@@ -953,11 +954,17 @@ export function projeyeOzelIcerigiUygula(proje: ProjeVerisi): ProjeVerisi {
   }
 
   const sunum = sektorSunumProfiliniGetir(kaynakProje.sektor);
+  const tasarim = sektorTasariminiGetir(
+    kaynakProje.sektor,
+    kaynakProje.tasarim,
+    kaynakProje.tema,
+  );
 
   return {
     ...kaynakProje,
     sablonSurumu: GUNCEL_SABLON_SURUMU,
-    tema: kaynakProje.tema || sunum.varsayilanTema,
+    tema: tasarim?.tema || kaynakProje.tema || sunum.varsayilanTema,
+    tasarim: tasarim?.id,
     sayfalar: kaynakProje.sayfalar.map((sayfa) => ({
       ...sayfa,
       rol: sayfaRolunuGetir(sayfa),

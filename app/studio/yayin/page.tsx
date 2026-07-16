@@ -500,7 +500,9 @@ export default function YayinAyarlariSayfasi() {
             </small>
           </label>
         </div>
+ 
 
+ 
         <aside className={styles.sagAlan}>
           <span>OLUŞACAK ADRESLER</span>
 

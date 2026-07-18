@@ -11,6 +11,23 @@ export interface SektorKararNoktasi {
   deger: string;
 }
 
+export type SektorOperasyonAilesi =
+  | "otomotiv"
+  | "bakim"
+  | "temizlik"
+  | "hijyen"
+  | "teknik"
+  | "lojistik";
+
+export interface SektorOperasyonProfili {
+  aile: SektorOperasyonAilesi;
+  kod: string;
+  ustEtiket: string;
+  durum: string;
+  adimlar: [string, string, string];
+  metrikler: [SektorKararNoktasi, SektorKararNoktasi];
+}
+
 export const SECILI_IS_GORSEL_LIMITI = 4;
 
 const sektorDilleri: Record<string, SektorSahneDili> = {
@@ -244,6 +261,163 @@ const varsayilanDil: SektorSahneDili = {
   motif: "güven, süreç ve hareket",
 };
 
+const sektorOperasyonProfilleri: Record<string, SektorOperasyonProfili> = {
+  "oto-yikama": {
+    aile: "otomotiv",
+    kod: "İş emri 01",
+    ustEtiket: "ARAÇ KABUL VE İŞ EMRİ",
+    durum: "TESLİM KONTROLÜ",
+    adimlar: ["Kabul kaydı", "Yıkama reçetesi", "Son kontrol"],
+    metrikler: [
+      { etiket: "Yüzey", deger: "Kayıtlı" },
+      { etiket: "Kontrol", deger: "3 / 3" },
+    ],
+  },
+  "oto-detaylandirma": {
+    aile: "otomotiv",
+    kod: "Analiz dosyası 02",
+    ustEtiket: "YÜZEY ANALİZ DOSYASI",
+    durum: "IŞIK KONTROLÜ",
+    adimlar: ["Kusur haritası", "İşlem reçetesi", "Panel teslimi"],
+    metrikler: [
+      { etiket: "Paneller", deger: "Ölçüldü" },
+      { etiket: "Kalite", deger: "Doğrulandı" },
+    ],
+  },
+  "arac-kaplama": {
+    aile: "otomotiv",
+    kod: "Uygulama dosyası 03",
+    ustEtiket: "FİLM VE YÜZEY DOSYASI",
+    durum: "KÜRLENME TAKİBİ",
+    adimlar: ["Yüzey kabulü", "Kesim planı", "Kenar kontrolü"],
+    metrikler: [
+      { etiket: "Film", deger: "Lot kayıtlı" },
+      { etiket: "Teslim", deger: "Planlandı" },
+    ],
+  },
+  "guzellik-salonu": {
+    aile: "bakim",
+    kod: "Danışan kaydı 01",
+    ustEtiket: "KİŞİSEL BAKIM DOSYASI",
+    durum: "RANDEVU PLANLI",
+    adimlar: ["Ön görüşme", "Hijyen hazırlığı", "Bakım sonrası"],
+    metrikler: [
+      { etiket: "Uygunluk", deger: "Değerlendirildi" },
+      { etiket: "Takip", deger: "Planlandı" },
+    ],
+  },
+  kuafor: {
+    aile: "bakim",
+    kod: "Randevu dosyası 02",
+    ustEtiket: "SAÇ TEKNİK DOSYASI",
+    durum: "STİL PLANLANDI",
+    adimlar: ["Saç geçmişi", "Teknik reçete", "Ev bakım planı"],
+    metrikler: [
+      { etiket: "Renk", deger: "Formül kayıtlı" },
+      { etiket: "Süre", deger: "Planlandı" },
+    ],
+  },
+  berber: {
+    aile: "bakim",
+    kod: "Hizmet kartı 03",
+    ustEtiket: "USTA KABUL KARTI",
+    durum: "FORM ONAYLI",
+    adimlar: ["Yüz-saç analizi", "Ekipman hijyeni", "Bakım periyodu"],
+    metrikler: [
+      { etiket: "Kesim", deger: "Kişiye özel" },
+      { etiket: "Sonraki", deger: "Planlı" },
+    ],
+  },
+  temizlik: {
+    aile: "temizlik",
+    kod: "Operasyon planı 01",
+    ustEtiket: "HİJYEN OPERASYON PLANI",
+    durum: "KONTROL LİSTESİ",
+    adimlar: ["Alan keşfi", "Yüzey matrisi", "Teslim onayı"],
+    metrikler: [
+      { etiket: "Kritik alan", deger: "İşaretli" },
+      { etiket: "Görev", deger: "Atandı" },
+    ],
+  },
+  "koltuk-yikama": {
+    aile: "temizlik",
+    kod: "Kabul kaydı 02",
+    ustEtiket: "KUMAŞ KABUL PROTOKOLÜ",
+    durum: "NEM TAKİBİ",
+    adimlar: ["Etiket testi", "Leke protokolü", "Kuruma kontrolü"],
+    metrikler: [
+      { etiket: "Renk", deger: "Test edildi" },
+      { etiket: "Nem", deger: "Takipte" },
+    ],
+  },
+  "hali-yikama": {
+    aile: "temizlik",
+    kod: "Takip kaydı 03",
+    ustEtiket: "BARKODLU HALI KABULÜ",
+    durum: "İADEYE HAZIR",
+    adimlar: ["Dokuma kaydı", "Yıkama reçetesi", "Paketli iade"],
+    metrikler: [
+      { etiket: "Barkod", deger: "Eşleşti" },
+      { etiket: "Kurutma", deger: "Tamamlandı" },
+    ],
+  },
+  ilaclama: {
+    aile: "hijyen",
+    kod: "Uygulama raporu 04",
+    ustEtiket: "RİSK VE UYGULAMA RAPORU",
+    durum: "TAKİP TARİHİ VAR",
+    adimlar: ["Risk keşfi", "Güvenli uygulama", "Takip kontrolü"],
+    metrikler: [
+      { etiket: "Risk alanı", deger: "Haritalandı" },
+      { etiket: "Protokol", deger: "Kayıtlı" },
+    ],
+  },
+  elektrikci: {
+    aile: "teknik",
+    kod: "Servis kaydı 01",
+    ustEtiket: "ELEKTRİK SERVİS KAYDI",
+    durum: "KORUMA TESTİ",
+    adimlar: ["İzolasyon", "Ölçümlü teşhis", "Fonksiyon testi"],
+    metrikler: [
+      { etiket: "Hat", deger: "Ölçüldü" },
+      { etiket: "Koruma", deger: "Doğrulandı" },
+    ],
+  },
+  tesisatci: {
+    aile: "teknik",
+    kod: "Saha kaydı 02",
+    ustEtiket: "TESİSAT SERVİS KAYDI",
+    durum: "SIZDIRMAZLIK TESTİ",
+    adimlar: ["Kaynak tespiti", "Müdahale onayı", "Basınç kontrolü"],
+    metrikler: [
+      { etiket: "Kaynak", deger: "Tespit edildi" },
+      { etiket: "Akış", deger: "Test edildi" },
+    ],
+  },
+  "kombi-servisi": {
+    aile: "teknik",
+    kod: "Cihaz kaydı 03",
+    ustEtiket: "CİHAZ SERVİS KAYDI",
+    durum: "GÜVENLİK RAPORU",
+    adimlar: ["Cihaz kaydı", "Bakım ve onay", "Yanma testi"],
+    metrikler: [
+      { etiket: "Basınç", deger: "Kontrollü" },
+      { etiket: "Yanma", deger: "Doğrulandı" },
+    ],
+  },
+  nakliyat: {
+    aile: "lojistik",
+    kod: "Taşıma kaydı 01",
+    ustEtiket: "TAŞIMA MANİFESTOSU",
+    durum: "ROTA HAZIR",
+    adimlar: ["Ekspertiz", "Kodlu paketleme", "Teslim tutanağı"],
+    metrikler: [
+      { etiket: "Envanter", deger: "Kayıtlı" },
+      { etiket: "Rota", deger: "Planlandı" },
+    ],
+  },
+};
+
 const varsayilanKararNoktalari: [
   SektorKararNoktasi,
   SektorKararNoktasi,
@@ -260,6 +434,10 @@ export function sektorSahneDiliniGetir(sektor: string) {
 
 export function sektorKararNoktalariniGetir(sektor: string) {
   return sektorKararNoktalari[sektor] ?? varsayilanKararNoktalari;
+}
+
+export function sektorOperasyonProfiliniGetir(sektor: string) {
+  return sektorOperasyonProfilleri[sektor] ?? null;
 }
 
 export function sektorSahneDiliKaydiVarMi(sektor: string) {

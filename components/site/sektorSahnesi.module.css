@@ -318,6 +318,470 @@
   font-size: 6px;
 }
 
+/* Hedef iş aileleri aynı şablonu boyamak yerine kendi operasyon arayüzünü kullanır. */
+
+.ozelOperasyon {
+  min-height: max(100%, 360px);
+}
+
+.operasyonPaneli {
+  position: absolute;
+  z-index: 2;
+  inset: clamp(18px, 4cqi, 42px);
+  min-width: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: clamp(12px, 2.4cqi, 24px);
+}
+
+.operasyonPaneli > header {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: clamp(9px, 1.6cqi, 16px);
+  border-bottom: 1px solid var(--site-cizgi, var(--tema-cizgi, rgba(20, 30, 24, 0.18)));
+  font-size: clamp(6px, 1.15cqi, 10px);
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.operasyonPaneli > header span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--site-vurgu, var(--tema-vurgu, #176b46));
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.operasyonPaneli > header strong {
+  flex: 0 0 auto;
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+
+.operasyonPaneli article {
+  min-width: 0;
+}
+
+.operasyonPaneli article small,
+.operasyonPaneli article > span,
+.operasyonPaneli aside > span,
+.otomotivDurumu span,
+.teknikDurumu span,
+.lojistikDurumu span,
+.hijyenDurumu span {
+  color: var(--site-soluk-yazi, var(--tema-soluk, #4f5b55));
+  font-size: clamp(6px, 1.05cqi, 9px);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.operasyonPaneli article > strong {
+  display: block;
+  margin-top: clamp(8px, 1.6cqi, 16px);
+  color: var(--site-yazi, var(--tema-yazi, #101a22));
+  font-size: clamp(28px, 7.2cqi, 76px);
+  font-weight: 900;
+  line-height: 0.84;
+  letter-spacing: -0.065em;
+  text-wrap: balance;
+}
+
+.operasyonPaneli article p {
+  max-width: 390px;
+  margin: clamp(9px, 1.6cqi, 16px) 0 0;
+  color: var(--site-soluk-yazi, var(--tema-soluk, #4f5b55));
+  font-size: clamp(8px, 1.45cqi, 13px);
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.operasyonAdimlari {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--site-cizgi, var(--tema-cizgi, rgba(20, 30, 24, 0.18)));
+  list-style: none;
+}
+
+.operasyonAdimlari li {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: clamp(18px, 2.8cqi, 30px) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(5px, 1cqi, 10px);
+  padding: clamp(10px, 1.8cqi, 17px) clamp(6px, 1.4cqi, 14px) 0 0;
+}
+
+.operasyonAdimlari li:not(:last-child) {
+  border-right: 1px solid var(--site-cizgi, var(--tema-cizgi, rgba(20, 30, 24, 0.18)));
+}
+
+.operasyonAdimlari span {
+  color: var(--site-vurgu, var(--tema-vurgu, #176b46));
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: clamp(6px, 1cqi, 9px);
+  font-weight: 900;
+}
+
+.operasyonAdimlari strong {
+  min-width: 0;
+  font-size: clamp(7px, 1.25cqi, 11px);
+  line-height: 1.25;
+  text-wrap: pretty;
+}
+
+.operasyonMetrikleri {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  border: 1px solid var(--site-cizgi, var(--tema-cizgi, rgba(20, 30, 24, 0.18)));
+}
+
+.operasyonMetrikleri > div {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+  padding: clamp(9px, 1.8cqi, 16px);
+}
+
+.operasyonMetrikleri > div:not(:last-child) {
+  border-right: 1px solid var(--site-cizgi, var(--tema-cizgi, rgba(20, 30, 24, 0.18)));
+}
+
+.operasyonMetrikleri dt,
+.operasyonMetrikleri dd {
+  min-width: 0;
+  margin: 0;
+}
+
+.operasyonMetrikleri dt {
+  color: var(--site-soluk-yazi, var(--tema-soluk, #4f5b55));
+  font-size: clamp(5px, 0.9cqi, 8px);
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.operasyonMetrikleri dd {
+  font-size: clamp(7px, 1.25cqi, 11px);
+  font-weight: 850;
+  line-height: 1.2;
+}
+
+.otomotivIsEmri,
+.teknikEkrani,
+.lojistikManifesto,
+.hijyenRiskAlani {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(150px, 0.75fr);
+  align-items: stretch;
+  gap: clamp(12px, 2.6cqi, 28px);
+}
+
+.operasyonOtomotiv {
+  border-top: 5px solid var(--site-vurgu, var(--tema-vurgu, #176b46));
+  border-bottom: 1px solid var(--site-cizgi, var(--tema-cizgi, rgba(20, 30, 24, 0.18)));
+  padding: clamp(14px, 2.4cqi, 24px);
+  background: color-mix(in srgb, var(--site-arka-plan, var(--tema-arka, #f6f2e8)) 72%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.operasyonOtomotiv article > strong,
+.operasyonTeknik article > strong {
+  font-family: "Arial Narrow", "Roboto Condensed", Arial, sans-serif;
+  font-stretch: condensed;
+  text-transform: uppercase;
+}
+
+.otomotivDurumu,
+.teknikDurumu,
+.lojistikDurumu,
+.hijyenDurumu {
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  gap: clamp(7px, 1.2cqi, 12px);
+  padding: clamp(12px, 2.2cqi, 22px);
+  border-left: 4px solid var(--site-vurgu, var(--tema-vurgu, #176b46));
+  background: color-mix(in srgb, var(--site-ikinci-arka-plan, var(--tema-ikinci, #e8f0e6)) 78%, transparent);
+}
+
+.otomotivDurumu strong,
+.teknikDurumu strong,
+.lojistikDurumu strong,
+.hijyenDurumu strong {
+  font-size: clamp(11px, 2.3cqi, 22px);
+  line-height: 1;
+  letter-spacing: -0.035em;
+}
+
+.otomotivIsEmri .operasyonMetrikleri {
+  grid-column: 2;
+}
+
+.operasyonBakim {
+  padding: clamp(16px, 3cqi, 30px);
+  border: 1px solid var(--site-cizgi, var(--tema-cizgi, rgba(20, 30, 24, 0.18)));
+  border-radius: clamp(22px, 5cqi, 52px) clamp(22px, 5cqi, 52px) 8px clamp(22px, 5cqi, 52px);
+  background: color-mix(in srgb, var(--site-arka-plan, var(--tema-arka, #f6f2e8)) 82%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.bakimKartlari {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(160px, 0.8fr);
+  gap: clamp(12px, 2.8cqi, 30px);
+}
+
+.bakimKartlari > article {
+  display: grid;
+  align-content: center;
+  padding-left: clamp(12px, 2.8cqi, 28px);
+  border-left: 2px solid var(--site-vurgu, var(--tema-vurgu, #176b46));
+}
+
+.bakimKartlari > article > strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 500;
+}
+
+.bakimKartlari > aside {
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  gap: clamp(9px, 1.8cqi, 18px);
+  padding: clamp(14px, 2.6cqi, 26px);
+  border-radius: 999px 999px 18px 18px;
+  background: color-mix(in srgb, var(--site-ikinci-arka-plan, var(--tema-ikinci, #e8f0e6)) 88%, transparent);
+  text-align: center;
+}
+
+.bakimKartlari > aside > strong {
+  color: var(--site-vurgu, var(--tema-vurgu, #176b46));
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(12px, 2.1cqi, 20px);
+  line-height: 1.05;
+}
+
+.bakimKartlari .operasyonMetrikleri {
+  text-align: left;
+}
+
+.operasyonTemizlik {
+  padding: clamp(14px, 2.6cqi, 26px);
+  border: 1px solid var(--site-cizgi, var(--tema-cizgi, rgba(20, 30, 24, 0.18)));
+  border-radius: clamp(20px, 4cqi, 42px);
+  background: color-mix(in srgb, var(--site-arka-plan, var(--tema-arka, #f6f2e8)) 86%, transparent);
+}
+
+.temizlikMatrisi {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(150px, 0.72fr) minmax(110px, 0.38fr);
+  gap: clamp(10px, 2cqi, 20px);
+}
+
+.temizlikMatrisi article {
+  display: grid;
+  align-content: center;
+}
+
+.temizlikOnayi {
+  min-width: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  border-radius: 999px;
+  background: var(--site-vurgu, var(--tema-vurgu, #176b46));
+  color: var(--site-buton-yazi, var(--tema-buton-yazi, #fff));
+  text-align: center;
+}
+
+.temizlikOnayi span {
+  font-size: clamp(18px, 4cqi, 38px);
+  line-height: 1;
+}
+
+.temizlikOnayi strong {
+  max-width: 76px;
+  font-size: clamp(6px, 1.1cqi, 9px);
+  letter-spacing: 0.08em;
+}
+
+.operasyonHijyen {
+  padding: clamp(14px, 2.5cqi, 24px);
+  border: 2px solid var(--site-vurgu, var(--tema-vurgu, #176b46));
+  background:
+    repeating-linear-gradient(135deg, color-mix(in srgb, var(--site-vurgu, var(--tema-vurgu, #176b46)) 9%, transparent) 0 12px, transparent 12px 28px),
+    color-mix(in srgb, var(--site-arka-plan, var(--tema-arka, #f6f2e8)) 90%, transparent);
+}
+
+.operasyonHijyen .operasyonMetrikleri {
+  position: absolute;
+  right: clamp(14px, 2.5cqi, 24px);
+  bottom: clamp(72px, 10cqi, 108px);
+  width: min(42%, 290px);
+  background: var(--site-arka-plan, var(--tema-arka, #f6f2e8));
+}
+
+.operasyonTeknik {
+  padding: clamp(14px, 2.6cqi, 26px);
+  border: 1px solid var(--site-cizgi, var(--tema-cizgi, rgba(20, 30, 24, 0.18)));
+  border-left: 8px solid var(--site-vurgu, var(--tema-vurgu, #176b46));
+  background: color-mix(in srgb, var(--site-arka-plan, var(--tema-arka, #f6f2e8)) 80%, transparent);
+}
+
+.teknikEkrani {
+  position: relative;
+}
+
+.teknikEkrani > i {
+  position: absolute;
+  right: 0;
+  bottom: 7px;
+  left: 0;
+  height: 2px;
+  background: var(--site-vurgu, var(--tema-vurgu, #176b46));
+  transform-origin: left;
+}
+
+.operasyonTeknik > .operasyonMetrikleri {
+  position: absolute;
+  right: clamp(14px, 2.6cqi, 26px);
+  bottom: clamp(74px, 10cqi, 112px);
+  width: min(42%, 300px);
+}
+
+.operasyonLojistik {
+  padding: clamp(14px, 2.6cqi, 26px);
+  border-top: 6px solid var(--site-vurgu, var(--tema-vurgu, #176b46));
+  background: color-mix(in srgb, var(--site-arka-plan, var(--tema-arka, #f6f2e8)) 84%, transparent);
+}
+
+.lojistikManifesto {
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 0.7fr);
+}
+
+.rotaCizgisi {
+  position: absolute;
+  right: 0;
+  bottom: clamp(50px, 7cqi, 78px);
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.rotaCizgisi::before {
+  position: absolute;
+  right: 7px;
+  left: 7px;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, var(--site-vurgu, var(--tema-vurgu, #176b46)) 0 12px, transparent 12px 20px);
+  content: "";
+}
+
+.rotaCizgisi span,
+.rotaCizgisi i {
+  position: relative;
+  z-index: 1;
+  width: 14px;
+  height: 14px;
+  border: 3px solid var(--site-arka-plan, var(--tema-arka, #f6f2e8));
+  border-radius: 50%;
+  background: var(--site-vurgu, var(--tema-vurgu, #176b46));
+}
+
+.rotaCizgisi span:last-child {
+  margin-left: auto;
+}
+
+.rotaCizgisi i {
+  position: absolute;
+  left: 7px;
+  border-radius: 2px;
+}
+
+.operasyonLojistik > .operasyonMetrikleri {
+  position: absolute;
+  right: clamp(14px, 2.6cqi, 26px);
+  bottom: clamp(78px, 11cqi, 122px);
+  width: min(40%, 280px);
+}
+
+.tema .operasyonPaneli {
+  inset: 10px;
+  gap: 7px;
+  padding: 8px;
+  border-width: 1px;
+}
+
+.tema .operasyonPaneli > header {
+  padding-bottom: 5px;
+  font-size: 5px;
+}
+
+.tema .operasyonPaneli article > strong {
+  margin-top: 5px;
+  font-size: clamp(15px, 6.5cqi, 24px);
+}
+
+.tema .operasyonPaneli article p,
+.tema .operasyonMetrikleri,
+.tema .rotaCizgisi {
+  display: none;
+}
+
+.tema .operasyonAdimlari li {
+  grid-template-columns: 12px minmax(0, 1fr);
+  gap: 3px;
+  padding: 5px 3px 0 0;
+}
+
+.tema .operasyonAdimlari span,
+.tema .operasyonAdimlari strong {
+  font-size: 5px;
+}
+
+.tema .bakimKartlari,
+.tema .temizlikMatrisi,
+.tema .otomotivIsEmri,
+.tema .teknikEkrani,
+.tema .lojistikManifesto,
+.tema .hijyenRiskAlani {
+  grid-template-columns: minmax(0, 1fr) 90px;
+  gap: 7px;
+}
+
+.tema .temizlikOnayi {
+  display: none;
+}
+
+.tema .bakimKartlari > aside,
+.tema .otomotivDurumu,
+.tema .teknikDurumu,
+.tema .lojistikDurumu,
+.tema .hijyenDurumu {
+  padding: 7px;
+}
+
+.tema .bakimKartlari > aside > strong,
+.tema .otomotivDurumu strong,
+.tema .teknikDurumu strong,
+.tema .lojistikDurumu strong,
+.tema .hijyenDurumu strong {
+  font-size: 8px;
+}
+
 .sahne[data-aile="otomotiv-atolye"] .isik,
 .sahne[data-aile="acil-saha-servisi"] .isik,
 .sahne[data-aile="teknik-servis-saha"] .isik,
@@ -531,6 +995,75 @@
 
   .hizmetSeridi li:nth-child(3) {
     display: none;
+  }
+
+  .operasyonPaneli {
+    inset: 14px;
+    gap: 9px;
+    padding: 12px;
+    border-width: 1px;
+  }
+
+  .operasyonPaneli article > strong {
+    margin-top: 6px;
+    font-size: clamp(24px, 9cqi, 38px);
+  }
+
+  .operasyonPaneli article p {
+    display: none;
+  }
+
+  .otomotivIsEmri,
+  .teknikEkrani,
+  .lojistikManifesto,
+  .hijyenRiskAlani,
+  .bakimKartlari,
+  .temizlikMatrisi {
+    grid-template-columns: minmax(0, 1fr) minmax(82px, 0.46fr);
+    gap: 9px;
+  }
+
+  .temizlikOnayi {
+    display: none;
+  }
+
+  .bakimKartlari > aside,
+  .otomotivDurumu,
+  .teknikDurumu,
+  .lojistikDurumu,
+  .hijyenDurumu {
+    padding: 10px;
+  }
+
+  .bakimKartlari > aside > strong,
+  .otomotivDurumu strong,
+  .teknikDurumu strong,
+  .lojistikDurumu strong,
+  .hijyenDurumu strong {
+    font-size: 10px;
+  }
+
+  .operasyonHijyen .operasyonMetrikleri,
+  .operasyonTeknik > .operasyonMetrikleri,
+  .operasyonLojistik > .operasyonMetrikleri {
+    position: static;
+    width: auto;
+  }
+
+  .rotaCizgisi,
+  .teknikEkrani > i {
+    display: none;
+  }
+
+  .operasyonAdimlari li {
+    grid-template-columns: 15px minmax(0, 1fr);
+    gap: 4px;
+    padding-top: 7px;
+  }
+
+  .operasyonAdimlari span,
+  .operasyonAdimlari strong {
+    font-size: 6px;
   }
 }
 

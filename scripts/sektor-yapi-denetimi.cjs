@@ -139,6 +139,22 @@ const hedefSektorMimarisi = {
   "kombi-servisi": ["teknik-servis-saha", "signal"],
   nakliyat: ["lojistik-rota", "cargo"],
 };
+const hedefOperasyonAileleri = {
+  "oto-yikama": "otomotiv",
+  "oto-detaylandirma": "otomotiv",
+  "arac-kaplama": "otomotiv",
+  temizlik: "temizlik",
+  "koltuk-yikama": "temizlik",
+  "hali-yikama": "temizlik",
+  ilaclama: "hijyen",
+  "guzellik-salonu": "bakim",
+  kuafor: "bakim",
+  berber: "bakim",
+  elektrikci: "teknik",
+  tesisatci: "teknik",
+  "kombi-servisi": "teknik",
+  nakliyat: "lojistik",
+};
 const sorunlar = [];
 let sayfaSayisi = 0;
 let bolumSayisi = 0;
@@ -160,6 +176,7 @@ for (const sektor of sektorler.sektorler) {
   const tasarimProfili = tasarimlar.sektorTasarimProfiliniGetir(sektor.id);
   const tasarimSecenekleri = tasarimProfili.secenekler;
   const kararNoktalari = gorselDilleri.sektorKararNoktalariniGetir(sektor.id);
+  const operasyonProfili = gorselDilleri.sektorOperasyonProfiliniGetir(sektor.id);
 
   if (profil === profiller.sektorIcerikProfiliniGetir("__bilinmeyen__")) {
     sorunlar.push(`${sektor.id}: özel içerik profili bulunamadı`);
@@ -286,6 +303,7 @@ for (const sektor of sektorler.sektorler) {
   }
 
   const hedefMimari = hedefSektorMimarisi[sektor.id];
+  const hedefOperasyonAilesi = hedefOperasyonAileleri[sektor.id];
 
   if (
     hedefMimari &&
@@ -293,6 +311,16 @@ for (const sektor of sektorler.sektorler) {
       tasarimSecenekleri[0]?.tema !== hedefMimari[1])
   ) {
     sorunlar.push(`${sektor.id}: hedef iş ailesine özel tema mimarisi uygulanmadı`);
+  }
+
+  if (
+    hedefOperasyonAilesi &&
+    (!operasyonProfili ||
+      operasyonProfili.aile !== hedefOperasyonAilesi ||
+      operasyonProfili.adimlar.length !== 3 ||
+      operasyonProfili.metrikler.length !== 2)
+  ) {
+    sorunlar.push(`${sektor.id}: köklü operasyon sahnesi uygulanmadı`);
   }
 
   if (new Set(tasarimSecenekleri.map((secenek) => secenek.id)).size !== 3) {
@@ -708,6 +736,8 @@ if (sektorSahnesi.includes("kisaltma") || !sektorSahnesi.includes("{sektorAdi}")
 
 if (
   !sektorSahnesi.includes("sektorKararNoktalariniGetir") ||
+  !sektorSahnesi.includes("sektorOperasyonProfiliniGetir") ||
+  !sektorSahnesi.includes("OperasyonSahnesi") ||
   !sektorSahnesi.includes("data-duzen={duzen}") ||
   !siteBileseni.includes("sektorKararNoktalariniGetir")
 ) {
@@ -767,6 +797,20 @@ for (const gerekliSinif of [
 ]) {
   if (!siteCss.includes(gerekliSinif)) {
     sorunlar.push(`sunum CSS'i eksik: ${gerekliSinif}`);
+  }
+}
+
+for (const operasyonSinifi of [
+  ".operasyonOtomotiv",
+  ".operasyonBakim",
+  ".operasyonTemizlik",
+  ".operasyonHijyen",
+  ".operasyonTeknik",
+  ".operasyonLojistik",
+  "@container (max-width: 460px)",
+]) {
+  if (!sektorSahneCss.includes(operasyonSinifi)) {
+    sorunlar.push(`köklü operasyon sahnesi CSS'i eksik: ${operasyonSinifi}`);
   }
 }
 

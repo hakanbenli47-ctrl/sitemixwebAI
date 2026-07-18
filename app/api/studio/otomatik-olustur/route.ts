@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { sektorHizmetleriniGetir } from "@/data/sektorSablonlari";
 import { sektorFormProfiliniGetir } from "@/data/sektorFormProfilleri";
 import { sektorDonusumProfiliniGetir } from "@/data/sektorDonusumProfilleri";
-import { stokGorselleriDoldur } from "@/data/sektorGorselDoldurma";
+import { gorselsizSunumuHazirla } from "@/data/sektorGorselDoldurma";
 import { sektorIcerikProfiliniGetir } from "@/data/sektorIcerikProfilleri";
 import type { ProjeVerisi } from "@/types/proje";
 
@@ -427,7 +427,7 @@ export async function POST(request: Request) {
     );
   }
 
-  proje = stokGorselleriDoldur(proje);
+  proje = gorselsizSunumuHazirla(proje);
 
   return NextResponse.json({
     basarili: true,
@@ -435,7 +435,7 @@ export async function POST(request: Request) {
     uyarilar,
     mesaj:
       uyarilar.length > 0
-        ? "Site hazırlandı; hazır sektör metinleri ve ücretsiz stok görseller kullanıldı."
-        : "Sektöre ve konuma özel içerikler ile ücretsiz stok görseller hazırlandı.",
+        ? "Site hazırlandı; sektör metinleri ve hareketli ikon sistemi kullanıldı."
+        : "Sektöre ve konuma özel içerikler, tema ve hareketli ikon sistemi hazırlandı.",
   });
 }

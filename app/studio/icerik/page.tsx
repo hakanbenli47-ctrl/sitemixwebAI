@@ -36,7 +36,8 @@ import {
   projeyeOzelIcerigiUygula,
   projeyeOzelTopluIcerikOlustur,
 } from "@/data/icerikSablonlari";
-import { stokGorselleriDoldur } from "@/data/sektorGorselDoldurma";
+import { gorselsizSunumuHazirla } from "@/data/sektorGorselDoldurma";
+import { SECILI_IS_GORSEL_LIMITI } from "@/data/sektorGorselDili";
 import type {
   ButonVerisi,
   ListeElemani,
@@ -619,15 +620,19 @@ function gelenListeyiUygula(
 }
 
 function anaGorselKullanir(bolum: SiteBolumu) {
-  return ["metin", "video", "ozel"].includes(bolum.tur);
+  return bolum.tur === "galeri";
 }
 
 function arkaPlanGorseliKullanir(bolum: SiteBolumu) {
-  return bolum.tur === "hero";
+  if (bolum.tur === "hero") {
+    return false;
+  }
+
+  return false;
 }
 
 function listeGorseliKullanir(bolum: SiteBolumu) {
-  return ["hizmetler", "urunler", "galeri", "ekip"].includes(bolum.tur);
+  return bolum.tur === "galeri";
 }
 
 function gorselHedefiAnahtari(hedef: GorselHedefi) {
@@ -733,7 +738,9 @@ function gorselHedefleriniOlustur(
       }
 
       if (listeGorseliKullanir(bolum)) {
-        bolum.listeElemanlari.forEach((eleman, index) => {
+        bolum.listeElemanlari
+          .slice(0, SECILI_IS_GORSEL_LIMITI - 1)
+          .forEach((eleman, index) => {
           hedefler.push({
             sayfaId: sayfa.id,
             sayfaAdi,
@@ -747,7 +754,7 @@ function gorselHedefleriniOlustur(
             mevcutGorsel: eleman.gorsel,
             dolu: Boolean(eleman.gorsel),
           });
-        });
+          });
       }
     });
   });
@@ -831,7 +838,7 @@ export default function KolayIcerikDuzenleyici() {
         const guncelSablonluProje =
           hamProje.sablonSurumu === GUNCEL_SABLON_SURUMU
             ? hamProje
-            : stokGorselleriDoldur(projeyeOzelIcerigiUygula(hamProje));
+            : gorselsizSunumuHazirla(projeyeOzelIcerigiUygula(hamProje));
         const duzenlenmisProje = projeyiDuzenle(guncelSablonluProje);
 
         setProje(duzenlenmisProje);
@@ -1675,7 +1682,7 @@ export default function KolayIcerikDuzenleyici() {
               {tumGorselHedefleri.length - bosGorselHedefleri.length}/
               {tumGorselHedefleri.length}
             </strong>
-            <span>Doğru görsel alanı</span>
+            <span>Seçili iş görseli</span>
           </div>
         </article>
       </section>
@@ -1690,7 +1697,7 @@ export default function KolayIcerikDuzenleyici() {
           <button
             type="button"
             onClick={() => {
-              const guncelProje = stokGorselleriDoldur(
+              const guncelProje = gorselsizSunumuHazirla(
                 projeyeOzelIcerigiUygula(proje),
               );
               const ilkSayfa = guncelProje.sayfalar[0];
@@ -1770,12 +1777,13 @@ export default function KolayIcerikDuzenleyici() {
       <section className={styles.hizliGorselPaneli}>
         <div className={styles.hizliGorselBasligi}>
           <div>
-            <span>HIZLI GÖRSEL PLANI</span>
-            <h2>Doğru görseli doğru yere ekle</h2>
+            <span>İSTEĞE BAĞLI İŞ GÖRSELLERİ</span>
+            <h2>Temanız görselsiz kullanıma hazır</h2>
             <p>
-              Plan; seçtiğin tek veya çok sayfa yapısına, mevcut bölüm ve
-              hizmet başlıklarına göre hazırlandı. Dosyalarını aşağıdaki
-              sırayla seçmen yeterli.
+              Sektöre özel hareketli simgeler tüm boş alanları profesyonel
+              biçimde tamamlar. Yalnızca gerçek çalışmalarınızı göstermek
+              isterseniz her seçili işler alanına en fazla {SECILI_IS_GORSEL_LIMITI}
+              görsel eklemeniz yeterli.
             </p>
           </div>
 
@@ -1784,7 +1792,7 @@ export default function KolayIcerikDuzenleyici() {
               {tumGorselHedefleri.length - bosGorselHedefleri.length}/
               {tumGorselHedefleri.length}
             </strong>
-            <span>görsel hazır</span>
+            <span>seçili iş hazır</span>
           </div>
         </div>
 
@@ -1792,7 +1800,7 @@ export default function KolayIcerikDuzenleyici() {
           {bosGorselHedefleri.length > 0 ? (
             <label>
               <Upload size={17} />
-              Yalnızca boşları sırayla doldur
+              Boş iş alanlarını sırayla doldur
               <input
                 type="file"
                 accept="image/*"
@@ -1801,7 +1809,7 @@ export default function KolayIcerikDuzenleyici() {
                   topluGorselYukle(
                     event,
                     bosGorselHedefleri,
-                    "boş görsel alanlarına",
+                    "boş seçili iş alanlarına",
                   )
                 }
               />
@@ -1809,14 +1817,16 @@ export default function KolayIcerikDuzenleyici() {
           ) : (
             <span className={styles.gorsellerTamam}>
               <Check size={16} />
-              Bütün görsel alanları dolu
+              {tumGorselHedefleri.length === 0
+                ? "Bu yapı tamamen görselsiz hazır"
+                : "Seçili iş alanları hazır"}
             </span>
           )}
 
           {tumGorselHedefleri.length > 0 && (
             <label className={styles.ikincilGorselAksiyonu}>
               <Images size={17} />
-              Tümünü baştan sırayla değiştir
+              Seçili işleri baştan değiştir
               <input
                 type="file"
                 accept="image/*"
@@ -1825,7 +1835,7 @@ export default function KolayIcerikDuzenleyici() {
                   topluGorselYukle(
                     event,
                     tumGorselHedefleri,
-                    "bütün görsel alanlarına",
+                    "seçili iş alanlarına",
                   )
                 }
               />
@@ -1834,8 +1844,8 @@ export default function KolayIcerikDuzenleyici() {
         </div>
 
         <p className={styles.dosyaSirasiNotu}>
-          Hızlı toplu yükleme için dosyaları 01, 02, 03 şeklinde adlandır;
-          ekrandaki numaralarla aynı sıraya yerleşir.
+          Bu alanlar zorunlu değildir. Yükleme yapmazsanız hareketli sektör
+          simgeleri ve tipografik düzen otomatik olarak görünür.
         </p>
 
         <div className={styles.gorselSayfaGruplari}>
@@ -2137,7 +2147,7 @@ export default function KolayIcerikDuzenleyici() {
                   <div className={styles.gorselBasligi}>
                     <div>
                       <ImagePlus size={18} />
-                      <strong>Bölüm görseli</strong>
+                      <strong>Öne çıkan iş görseli · isteğe bağlı</strong>
                     </div>
 
                     {secilenBolum.gorsel && (
@@ -2162,8 +2172,8 @@ export default function KolayIcerikDuzenleyici() {
                   ) : (
                     <label className={styles.gorselYukle}>
                       <Upload size={24} />
-                      <span>Bu bölüme görsel yükleyin</span>
-                      <small>Önerilen yatay görsel · JPG, PNG veya WEBP</small>
+                      <span>Gerçek bir çalışma görseli yükleyin</span>
+                      <small>İsteğe bağlı · yatay JPG, PNG veya WEBP</small>
 
                       <input
                         type="file"
@@ -2355,6 +2365,7 @@ export default function KolayIcerikDuzenleyici() {
                       />
 
                       {listeGorseliKullanir(secilenBolum) &&
+                      index < SECILI_IS_GORSEL_LIMITI - 1 &&
                       (eleman.gorsel ? (
                         <div className={styles.elemanGorselAlani}>
                           <NextImage
@@ -2377,7 +2388,7 @@ export default function KolayIcerikDuzenleyici() {
                       ) : (
                         <label className={styles.kucukGorselYukle}>
                           <Upload size={18} />
-                          Görsel yükle
+                          İş görseli ekle
 
                           <input
                             type="file"

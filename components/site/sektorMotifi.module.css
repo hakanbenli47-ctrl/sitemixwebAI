@@ -1,0 +1,244 @@
+.motif {
+  position: relative;
+  min-height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--site-cizgi, var(--tema-cizgi, rgba(20, 30, 24, 0.18)));
+  background:
+    radial-gradient(circle at 68% 28%, color-mix(in srgb, var(--site-vurgu, var(--tema-vurgu, #176b46)) 24%, transparent), transparent 24%),
+    linear-gradient(145deg, color-mix(in srgb, var(--site-ikinci-arka-plan, var(--tema-ikinci, #e8f0e6)) 88%, transparent), color-mix(in srgb, var(--site-arka-plan, var(--tema-arka, #f6f2e8)) 96%, transparent));
+  color: var(--site-yazi, var(--tema-yazi, #101a22));
+  isolation: isolate;
+}
+
+.izgara {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(var(--site-cizgi, var(--tema-cizgi, rgba(20, 30, 24, 0.12))) 1px, transparent 1px),
+    linear-gradient(90deg, var(--site-cizgi, var(--tema-cizgi, rgba(20, 30, 24, 0.12))) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(135deg, rgba(0, 0, 0, 0.72), transparent 78%);
+  opacity: 0.45;
+}
+
+.yorunge {
+  position: absolute;
+  width: 62%;
+  aspect-ratio: 1;
+  top: 12%;
+  right: 8%;
+  border: 1px dashed color-mix(in srgb, var(--site-vurgu, var(--tema-vurgu, #176b46)) 65%, transparent);
+  border-radius: 50%;
+}
+
+.yorunge::before,
+.yorunge::after {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--site-vurgu, var(--tema-vurgu, #176b46));
+  content: "";
+}
+
+.yorunge::before {
+  width: 9px;
+  height: 9px;
+  top: 13%;
+  left: 12%;
+}
+
+.yorunge::after {
+  width: 5px;
+  height: 5px;
+  right: 5%;
+  bottom: 24%;
+}
+
+.anaIkon {
+  position: absolute;
+  width: clamp(92px, 30%, 190px);
+  aspect-ratio: 1;
+  top: 19%;
+  right: 21%;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--site-vurgu, var(--tema-vurgu, #176b46)) 58%, transparent);
+  border-radius: 30% 70% 56% 44% / 45% 40% 60% 55%;
+  background: color-mix(in srgb, var(--site-arka-plan, var(--tema-arka, #f6f2e8)) 88%, transparent);
+  color: var(--site-vurgu, var(--tema-vurgu, #176b46));
+  box-shadow: 0 28px 80px color-mix(in srgb, var(--site-yazi, var(--tema-yazi, #101a22)) 15%, transparent);
+}
+
+.anaIkon svg {
+  width: 48%;
+  height: 48%;
+  stroke-width: 1.25;
+}
+
+.destekIkon {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--site-cizgi, var(--tema-cizgi, rgba(20, 30, 24, 0.18)));
+  border-radius: 50%;
+  background: var(--site-arka-plan, var(--tema-arka, #f6f2e8));
+  color: var(--site-vurgu, var(--tema-vurgu, #176b46));
+  box-shadow: 0 12px 35px color-mix(in srgb, var(--site-yazi, var(--tema-yazi, #101a22)) 10%, transparent);
+}
+
+.destekIkon svg {
+  width: 19px;
+  height: 19px;
+  stroke-width: 1.6;
+}
+
+.destek1 {
+  top: 12%;
+  left: 14%;
+}
+
+.destek2 {
+  right: 10%;
+  bottom: 20%;
+}
+
+.destek3 {
+  left: 26%;
+  bottom: 29%;
+}
+
+.etiket {
+  position: absolute;
+  right: 7%;
+  bottom: 7%;
+  max-width: 55%;
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-left: 2px solid var(--site-vurgu, var(--tema-vurgu, #176b46));
+  background: color-mix(in srgb, var(--site-arka-plan, var(--tema-arka, #f6f2e8)) 78%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.etiket small {
+  color: var(--site-vurgu, var(--tema-vurgu, #176b46));
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.etiket strong {
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.hero {
+  width: 100%;
+  min-height: min(660px, 66vh);
+}
+
+.panel {
+  min-height: 520px;
+}
+
+.kart {
+  min-height: 190px;
+}
+
+.kart .anaIkon {
+  width: 90px;
+  top: 21%;
+  right: 24%;
+}
+
+.kart .destekIkon {
+  width: 34px;
+  height: 34px;
+}
+
+.kart .destekIkon svg {
+  width: 15px;
+  height: 15px;
+}
+
+.tema {
+  min-height: 208px;
+  border: 0;
+  border-top: 1px solid var(--tema-cizgi, rgba(20, 30, 24, 0.18));
+}
+
+.tema .anaIkon {
+  width: 86px;
+  top: 19%;
+  right: 17%;
+}
+
+.tema .destekIkon {
+  width: 30px;
+  height: 30px;
+}
+
+.tema .destekIkon svg {
+  width: 13px;
+  height: 13px;
+}
+
+.tema .etiket {
+  right: auto;
+  left: 15px;
+  bottom: 15px;
+  max-width: 56%;
+  padding: 8px 10px;
+}
+
+.mini {
+  width: 58px;
+  min-width: 58px;
+  height: 58px;
+  min-height: 58px;
+  border-radius: 18px;
+}
+
+.mini .izgara,
+.mini .yorunge {
+  display: none;
+}
+
+.mini .anaIkon {
+  inset: 0;
+  width: 100%;
+  border: 0;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--site-vurgu, #176b46) 11%, transparent);
+  box-shadow: none;
+}
+
+.mini .anaIkon svg {
+  width: 26px;
+  height: 26px;
+}
+
+@media (max-width: 760px) {
+  .hero {
+    min-height: 420px;
+  }
+
+  .panel {
+    min-height: 360px;
+  }
+
+  .etiket {
+    max-width: 70%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motif *,
+  .motif *::before,
+  .motif *::after {
+    animation: none !important;
+  }
+}

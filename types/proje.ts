@@ -27,6 +27,7 @@ export interface ProjeVerisi {
 
   otomatikIcerikOlusturulduMu?: boolean;
   otomatikGorsellerOlusturulduMu?: boolean;
+  gorselsizSunumHazirlandiMi?: boolean;
 
   githubAktarildiMi?: boolean;
   githubRepoAdi?: string;

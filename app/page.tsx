@@ -1,9 +1,9 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  Layers3,
   MonitorSmartphone,
   PanelsTopLeft,
+  Sparkles,
 } from "lucide-react";
 
 export default function AnaSayfa() {
@@ -14,11 +14,7 @@ export default function AnaSayfa() {
           <span>SITEMIX</span>
           <small>STUDIO</small>
         </Link>
- 
- 
-        <div className="surum">
-          Geliştirme sürümü
-        </div>
+        <div className="surum">36 sektöre özel yeni nesil stüdyo</div>
       </header>
 
       <section className="hero">
@@ -27,15 +23,15 @@ export default function AnaSayfa() {
         </div>
 
         <h1>
-          Kod yazmadan,
+          Görsel aramadan,
           <br />
-          özgün web siteleri oluştur.
+          sektöre özel siteler oluştur.
         </h1>
 
         <p>
-          Firma bilgilerini, sayfaları, bölümleri, görselleri ve tasarımı
-          belirle. Sitemix Studio, girdiğin verilere göre bağımsız bir web
-          sitesi oluştursun.
+          Firma bilgilerini ve sektörünü belirle. Sitemix Studio; tipografi,
+          renk, hareketli sektör simgeleri ve profesyonel içerik düzeniyle
+          görsele ihtiyaç duymadan bağımsız bir web sitesi oluştursun.
         </p>
 
         <div className="heroButonlar">
@@ -72,14 +68,14 @@ export default function AnaSayfa() {
 
         <div className="ozellikSatiri">
           <div className="ozellikIkon">
-            <Layers3 size={30} strokeWidth={1.5} />
+            <Sparkles size={30} strokeWidth={1.5} />
           </div>
 
           <div className="ozellikMetni">
-            <h2>Çeşitli tema sistemleri</h2>
+            <h2>Sektöre özel hareketli dil</h2>
             <p>
-              Aynı içerikleri farklı tema, yerleşim ve animasyonlarla
-              kullanarak birbirinden farklı siteler oluştur.
+              36 sektör için ayrı ikon kümeleri, hareket karakterleri ve tema
+              düzenleriyle görsel olmadan da güçlü siteler oluştur.
             </p>
           </div>
         </div>

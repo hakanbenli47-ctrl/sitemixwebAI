@@ -612,6 +612,14 @@
   object-fit: cover;
 }
 
+.heroMotifi {
+  min-height: min(68vh, 690px);
+}
+
+.heroMotifi > [data-site-parcasi="sektor-motifi"] {
+  min-height: inherit;
+}
+
 .gorselNumarasi {
   position: absolute;
   z-index: 3;
@@ -1030,6 +1038,18 @@
   grid-template-columns: minmax(0, 980px);
 }
 
+.metinYerlesimi.ikonluMetin {
+  grid-template-columns: minmax(340px, 0.9fr) minmax(0, 1.1fr);
+}
+
+.metinYerlesimi.ikonluMetin.tekKolonMetin .metinIcerigi {
+  order: 1;
+}
+
+.metinYerlesimi.ikonluMetin.tekKolonMetin .metinGorseli {
+  order: 2;
+}
+
 .metinYerlesimi.solGorsel,
 .metinYerlesimi.sagGorsel {
   grid-template-columns: minmax(340px, 0.9fr) minmax(0, 1.1fr);
@@ -1077,6 +1097,14 @@
   min-height: 520px;
   display: block;
   object-fit: cover;
+}
+
+.metinMotifi {
+  min-height: 520px;
+}
+
+.metinMotifi > [data-site-parcasi="sektor-motifi"] {
+  min-height: inherit;
 }
 
 .liste {
@@ -1171,6 +1199,15 @@
   padding: 30px 0;
   overflow: hidden;
   border-bottom: 1px solid var(--site-cizgi);
+}
+
+.listeSatiri.ikonluListeSatiri {
+  grid-template-columns: 70px 58px minmax(0, 1fr) 36px;
+}
+
+.listeIkon {
+  position: relative;
+  z-index: 2;
 }
 
 .listeSatiri::before {
@@ -1283,6 +1320,10 @@
   overflow: hidden;
   isolation: isolate;
   contain: paint;
+}
+
+.galeriMotifi {
+  min-height: 410px;
 }
 
 .galeri img {
@@ -2615,6 +2656,7 @@
   .tema_visual .heroBolumu,
   .metinYerlesimi.solGorsel,
   .metinYerlesimi.sagGorsel,
+  .metinYerlesimi.ikonluMetin,
   .iletisimYerlesimi,
   .haritaAlani,
   .heroBolumu.varyasyon_editoryal,
@@ -2634,6 +2676,10 @@
 
   .listeSatiri {
     grid-template-columns: 50px minmax(0, 1fr) 36px;
+  }
+
+  .listeSatiri.ikonluListeSatiri {
+    grid-template-columns: 50px 58px minmax(0, 1fr) 36px;
   }
 
   .listeGorsel {
@@ -2766,6 +2812,10 @@
     max-height: 68svh;
   }
 
+  .heroMotifi {
+    min-height: 420px;
+  }
+
   .gorselNumarasi {
     right: 12px;
     bottom: 12px;
@@ -2888,6 +2938,10 @@
     min-height: 300px;
   }
 
+  .metinMotifi {
+    min-height: 340px;
+  }
+
   .varyasyon_kartli .liste,
   .varyasyon_iki_kolon .liste,
   .varyasyon_adimlar .liste {
@@ -2914,6 +2968,10 @@
     gap: 13px;
     min-height: 140px;
     padding: 25px 0;
+  }
+
+  .listeSatiri.ikonluListeSatiri {
+    grid-template-columns: 34px 58px minmax(0, 1fr);
   }
 
   .listeGorsel {

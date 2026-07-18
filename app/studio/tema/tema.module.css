@@ -462,6 +462,23 @@
   text-transform: uppercase;
 }
 
+.gorselsizRozet {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 13px;
+  padding: 7px 9px;
+  border: 1px solid color-mix(in srgb, var(--tema-vurgu) 34%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tema-vurgu) 8%, transparent);
+  color: var(--tema-vurgu);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 .onerilen {
   display: block;
   width: fit-content;

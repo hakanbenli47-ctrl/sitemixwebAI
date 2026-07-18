@@ -13,7 +13,7 @@ import {
   whatsappBaglantisi,
 } from "@/lib/iletisim";
 
-export const GUNCEL_SABLON_SURUMU = 5;
+export const GUNCEL_SABLON_SURUMU = 6;
 
 export type BolumTuru =
   | "hero"

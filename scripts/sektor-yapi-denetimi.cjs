@@ -35,6 +35,9 @@ function tsModulunuYukle(dosya, bagimliliklar = {}) {
 const kok = path.resolve(__dirname, "..");
 const iletisim = tsModulunuYukle(path.join(kok, "lib/iletisim.ts"));
 const sektorler = tsModulunuYukle(path.join(kok, "data/sektorler.ts"));
+const gorselDilleri = tsModulunuYukle(
+  path.join(kok, "data/sektorGorselDili.ts"),
+);
 const profiller = tsModulunuYukle(
   path.join(kok, "data/sektorIcerikProfilleri.ts"),
 );
@@ -209,6 +212,10 @@ for (const sektor of sektorler.sektorler) {
     sorunlar.push(`${sektor.id}: sektöre özel tasarım kaydı bulunamadı`);
   }
 
+  if (!gorselDilleri.sektorGorselDiliKaydiVarMi(sektor.id)) {
+    sorunlar.push(`${sektor.id}: hareketli ikon dili bulunamadı`);
+  }
+
   if (tasarimSecenekleri.length !== 3) {
     sorunlar.push(`${sektor.id}: tam üç tasarım seçeneği bulunmalı`);
   }
@@ -232,6 +239,13 @@ for (const sektor of sektorler.sektorler) {
 
     if (secenek.ozellikler.length < 3 || secenek.aciklama.length < 100) {
       sorunlar.push(`${sektor.id}: tasarım açıklaması veya özellikleri yüzeysel`);
+    }
+
+    if (
+      secenek.medyaStratejisi !== "gorselsiz-ikon" ||
+      secenek.gorselLimiti !== gorselDilleri.SECILI_IS_GORSEL_LIMITI
+    ) {
+      sorunlar.push(`${sektor.id}: görselsiz medya stratejisi uygulanmadı`);
     }
   }
 
@@ -490,7 +504,7 @@ for (const sektor of sektorler.sektorler) {
       sorunlar.push(`${sektor.id}/${siteTipi}: WhatsApp bağlantısı eksik`);
     }
 
-    const gorselliSonuc = gorselDoldurma.stokGorselleriDoldur(sonuc);
+    const gorselliSonuc = gorselDoldurma.gorselsizSunumuHazirla(sonuc);
 
     if (
       process.env.DETAY_SEKTOR === sektor.id &&
@@ -530,26 +544,23 @@ for (const sektor of sektorler.sektorler) {
       );
     }
 
-    for (const bolum of gorselliSonuc.sayfalar.flatMap(
-      (sayfa) => sayfa.bolumler,
-    )) {
-      if (
-        bolum.tur === "hero" &&
-        !bolum.gorsel.trim() &&
-        !bolum.arkaPlanGorseli.trim()
-      ) {
-        sorunlar.push(`${sektor.id}/${siteTipi}: açılış görseli boş kaldı`);
-      }
+    const eklenenGorselSayisi = gorselliSonuc.sayfalar
+      .flatMap((sayfa) => sayfa.bolumler)
+      .reduce(
+        (toplam, bolum) =>
+          toplam +
+          Number(Boolean(bolum.gorsel)) +
+          Number(Boolean(bolum.arkaPlanGorseli)) +
+          bolum.listeElemanlari.filter((eleman) => eleman.gorsel).length,
+        0,
+      );
 
-      if (bolum.tur === "metin" && !bolum.gorsel.trim()) {
-        sorunlar.push(`${sektor.id}/${siteTipi}: metin görseli boş kaldı`);
-      }
+    if (eklenenGorselSayisi !== 0) {
+      sorunlar.push(`${sektor.id}/${siteTipi}: görselsiz hazırlık stok görsel ekledi`);
+    }
 
-      if (["hizmetler", "urunler", "galeri"].includes(bolum.tur)) {
-        if (bolum.listeElemanlari.some((eleman) => !eleman.gorsel.trim())) {
-          sorunlar.push(`${sektor.id}/${siteTipi}: kart görseli boş kaldı`);
-        }
-      }
+    if (!gorselliSonuc.gorselsizSunumHazirlandiMi) {
+      sorunlar.push(`${sektor.id}/${siteTipi}: görselsiz sunum işareti eksik`);
     }
   }
 }
@@ -571,12 +582,8 @@ const otomatikOlusturmaKaynagi = fs.readFileSync(
   "utf8",
 );
 
-if (
-  !otomatikOlusturmaKaynagi.includes(
-    '["hizmetler", "urunler", "galeri"].includes(bolum.tur)',
-  )
-) {
-  sorunlar.push("otomatik görsel doldurma hizmet kartlarını kapsamıyor");
+if (!otomatikOlusturmaKaynagi.includes("gorselsizSunumuHazirla")) {
+  sorunlar.push("görselsiz sunum hazırlayıcısı eksik");
 }
 
 function renkAydinligi(hex) {
@@ -603,6 +610,14 @@ const siteBileseni = fs.readFileSync(
   path.join(kok, "components/site/SiteGorunumu.tsx"),
   "utf8",
 );
+const sektorMotifi = fs.readFileSync(
+  path.join(kok, "components/site/SektorMotifi.tsx"),
+  "utf8",
+);
+
+if (!siteBileseni.includes("SektorMotifi") || !sektorMotifi.includes("motion")) {
+  sorunlar.push("hareketli sektör motifi site görünümüne bağlanmadı");
+}
 
 if (/initial="gizli"[\s\S]{0,120}whileInView=/.test(siteBileseni)) {
   sorunlar.push("görünürlük viewport animasyonuna bağımlı; bölüm boş kalabilir");
@@ -708,8 +723,9 @@ for (const semaParcasi of [
   "data-site-parcasi=\"kart\"",
   "data-site-parcasi=\"galeri\"",
   "data-site-parcasi=\"bolum-sahnesi\"",
+  "data-site-parcasi=\"sektor-motifi\"",
 ]) {
-  if (!siteBileseni.includes(semaParcasi)) {
+  if (!siteBileseni.includes(semaParcasi) && !sektorMotifi.includes(semaParcasi)) {
     sorunlar.push(`sektör şeması bağlantısı eksik: ${semaParcasi}`);
   }
 }
@@ -720,6 +736,8 @@ for (const veriNiteligi of [
   "data-kart-stili",
   "data-yogunluk",
   "data-gorsel-orani",
+  "data-medya-stratejisi",
+  "data-gorsel-limiti",
   "data-bolum-turu",
   "data-ana-sayfa",
   "data-sektor",

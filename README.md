@@ -10,8 +10,11 @@ siteleri hazırlayan Next.js tabanlı stüdyo.
    hizmet anlatımları; sayfa rolleri, bölüm sırası ve tema önerileri hazırlanır.
 3. İsteğe bağlı OpenAI yapılandırması varsa metinler, mevcut sektör profilini
    ve kullanıcının verdiği gerçek bilgileri koruyarak yeniden yazılır.
-4. Sektöre özel, doğrulanmış Unsplash görselleri uygun açılış, metin, hizmet,
-   ürün ve galeri alanlarına yerleştirilir; sahte ekip görseli oluşturulmaz.
+4. Site; fotoğraf gerektirmeden, 36 sektörün her biri için tanımlanmış hareketli
+   ikonlar, tipografi, renk, ızgara ve mikro etkileşimlerle tamamlanır.
+   Yalnızca gerçek tamamlanmış işleri göstermek için her seçili işler alanına en
+   fazla dört isteğe bağlı görsel eklenebilir; sahte ekip veya stok işletme
+   görseli oluşturulmaz.
 5. İçerik merkezinde toplu metin değişiklikleri önce ön izlenir; eşleşme
    hataları giderildikten sonra uygulanır ve son toplu işlem geri alınabilir.
 6. Talep formu araç, ölçü, tarih, konum, randevu veya hizmet kapsamı gibi
@@ -28,11 +31,11 @@ npm run build
 ```
 
 Sektör denetimi 36 sektörün tek ve çok sayfalı yapılarını; sayfa rolleri,
-sluglar, bağlantılar, form profilleri, görsel havuzları, başlık uzunlukları,
+sluglar, bağlantılar, form profilleri, hareketli ikon dilleri, başlık uzunlukları,
 sektörler arası içerik özgünlüğü, sayfa içi tekrarlar ve şablon sürümünü kontrol
 eder.
 
 ## Ortam değişkenleri
 
-Görseller için API anahtarı gerekmez. `.env.local.example` içinde GitHub
+İkon sistemi ve isteğe bağlı yerel iş görselleri için API anahtarı gerekmez. `.env.local.example` içinde GitHub
 aktarımı ve isteğe bağlı OpenAI içerik ayarları bulunur.

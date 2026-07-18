@@ -9,6 +9,7 @@ import {
   LayoutTemplate,
   Monitor,
   Palette,
+  Sparkles,
   Smartphone,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -18,6 +19,7 @@ import {
   type SektorTasarimSecenegi,
   type TemaKimligi,
 } from "@/data/sektorTasarimlari";
+import SektorMotifi from "@/components/site/SektorMotifi";
 import styles from "./tema.module.css";
 
 interface Tema {
@@ -622,30 +624,11 @@ export default function TemaSecimSayfasi() {
                       <span />
                     </div>
 
-                    <div className={styles.ornekHero}>
-                      <small>{tasarim.etiket}</small>
-
-                      <div className={styles.ornekBaslik}>
-                        <span />
-                        <span />
-                      </div>
-
-                      <div className={styles.ornekMetin}>
-                        <i />
-                        <i />
-                        <i />
-                      </div>
-
-                      <div className={styles.ornekCizgi} />
-
-                      <div className={styles.ornekButon} />
-                    </div>
-
-                    <div className={styles.ornekKartlar}>
-                      <i />
-                      <i />
-                      <i />
-                    </div>
+                    <SektorMotifi
+                      sektor={proje.sektor}
+                      varyant="tema"
+                      etiketGoster
+                    />
                   </div>
 
                   <div className={styles.temaBilgisi}>
@@ -665,9 +648,14 @@ export default function TemaSecimSayfasi() {
 
                   <div className={styles.karakterSatiri}>
                     <strong>
-                      {tasarim.duzen} · {tasarim.yogunluk} · {tasarim.gorselOrani}
+                      {tasarim.duzen} · {tasarim.yogunluk} · hareketli ikon
                     </strong>
                   </div>
+
+                  <span className={styles.gorselsizRozet}>
+                    <Sparkles size={13} />
+                    Görselsiz kullanıma hazır
+                  </span>
 
                   <small className={styles.onerilen}>
                     {tasarim === tasarimSecenekleri[0]
@@ -715,8 +703,8 @@ export default function TemaSecimSayfasi() {
                     <strong>{aktifTasarim.duzen}</strong>
                   </div>
                   <div>
-                    <small>Görsel düzeni</small>
-                    <strong>{aktifTasarim.gorselOrani}</strong>
+                    <small>Medya yaklaşımı</small>
+                    <strong>Görselsiz ikon sistemi</strong>
                   </div>
                   <div>
                     <small>İçerik yoğunluğu</small>
@@ -773,6 +761,13 @@ export default function TemaSecimSayfasi() {
                   <div>
                     <LayoutTemplate size={18} />
                     <span>{proje.sayfalar.length} sayfa yapısı</span>
+                  </div>
+
+                  <div>
+                    <Sparkles size={18} />
+                    <span>
+                      Her iş alanında en fazla {aktifTasarim.gorselLimiti} görsel
+                    </span>
                   </div>
                 </div>
               </>

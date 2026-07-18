@@ -1,0 +1,16 @@
+[
+  "components/site/SiteGorunumu.tsx",
+  "components/site/siteGorunumu.module.css",
+  "components/site/sektorSemalari.module.css",
+  "components/site/SektorSahnesi.tsx",
+  "components/site/sektorSahnesi.module.css",
+  "data/sektorSablonlari.ts",
+  "data/sektorSunumProfilleri.ts",
+  "data/sektorIcerikProfilleri.ts",
+  "data/sektorFormProfilleri.ts",
+  "data/sektorTasarimlari.ts",
+  "data/sektorDonusumProfilleri.ts",
+  "data/sektorGorselDili.ts",
+  "lib/iletisim.ts",
+  "types/proje.ts"
+]

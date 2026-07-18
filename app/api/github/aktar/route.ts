@@ -265,52 +265,86 @@ async function branchReferansiniBekle({
 
 async function kaynakDosyalariOku() {
   const kokDizin = process.cwd();
-
-  const [
-    siteGorunumu,
-    siteStilleri,
-    sektorSablonlari,
-    sektorSunumProfilleri,
-    sektorIcerikProfilleri,
-    sektorFormProfilleri,
-    iletisimYardimcilari,
-    projeTipi,
-  ] = await Promise.all([
+  const kaynakOkuyuculari: Record<string, () => Promise<string>> = {
+    "components/site/SiteGorunumu.tsx": () =>
       readFile(
         path.join(kokDizin, "components", "site", "SiteGorunumu.tsx"),
         "utf8",
       ),
+    "components/site/siteGorunumu.module.css": () =>
       readFile(
-        path.join(kokDizin, "components", "site", "siteGorunumu.module.css"),
+        path.join(
+          kokDizin,
+          "components",
+          "site",
+          "siteGorunumu.module.css",
+        ),
         "utf8",
       ),
+    "components/site/sektorSemalari.module.css": () =>
+      readFile(
+        path.join(
+          kokDizin,
+          "components",
+          "site",
+          "sektorSemalari.module.css",
+        ),
+        "utf8",
+      ),
+    "components/site/SektorSahnesi.tsx": () =>
+      readFile(
+        path.join(kokDizin, "components", "site", "SektorSahnesi.tsx"),
+        "utf8",
+      ),
+    "components/site/sektorSahnesi.module.css": () =>
+      readFile(
+        path.join(
+          kokDizin,
+          "components",
+          "site",
+          "sektorSahnesi.module.css",
+        ),
+        "utf8",
+      ),
+    "data/sektorSablonlari.ts": () =>
       readFile(path.join(kokDizin, "data", "sektorSablonlari.ts"), "utf8"),
+    "data/sektorSunumProfilleri.ts": () =>
       readFile(
         path.join(kokDizin, "data", "sektorSunumProfilleri.ts"),
         "utf8",
       ),
+    "data/sektorIcerikProfilleri.ts": () =>
       readFile(
         path.join(kokDizin, "data", "sektorIcerikProfilleri.ts"),
         "utf8",
       ),
+    "data/sektorFormProfilleri.ts": () =>
       readFile(
         path.join(kokDizin, "data", "sektorFormProfilleri.ts"),
         "utf8",
       ),
+    "data/sektorTasarimlari.ts": () =>
+      readFile(path.join(kokDizin, "data", "sektorTasarimlari.ts"), "utf8"),
+    "data/sektorDonusumProfilleri.ts": () =>
+      readFile(
+        path.join(kokDizin, "data", "sektorDonusumProfilleri.ts"),
+        "utf8",
+      ),
+    "data/sektorGorselDili.ts": () =>
+      readFile(path.join(kokDizin, "data", "sektorGorselDili.ts"), "utf8"),
+    "lib/iletisim.ts": () =>
       readFile(path.join(kokDizin, "lib", "iletisim.ts"), "utf8"),
+    "types/proje.ts": () =>
       readFile(path.join(kokDizin, "types", "proje.ts"), "utf8"),
-    ]);
-
-  return {
-    siteGorunumu,
-    siteStilleri,
-    sektorSablonlari,
-    sektorSunumProfilleri,
-    sektorIcerikProfilleri,
-    sektorFormProfilleri,
-    iletisimYardimcilari,
-    projeTipi,
   };
+  const icerikler = await Promise.all(
+    Object.entries(kaynakOkuyuculari).map(async ([dosyaYolu, oku]) => [
+      dosyaYolu,
+      await oku(),
+    ]),
+  );
+
+  return Object.fromEntries(icerikler) as Record<string, string>;
 }
 
 
@@ -481,17 +515,20 @@ async function aktarilacakDosyalariOlustur(
         start: "next start",
       },
       dependencies: {
-        "lucide-react": "^1.17.0",
-        motion: "^12.40.0",
+        "lucide-react": "1.17.0",
+        motion: "12.40.0",
         next: "16.2.9",
         react: "19.2.4",
         "react-dom": "19.2.4",
       },
       devDependencies: {
-        "@types/node": "^20",
-        "@types/react": "^19",
-        "@types/react-dom": "^19",
-        typescript: "^5",
+        "@types/node": "20.19.43",
+        "@types/react": "19.2.17",
+        "@types/react-dom": "19.2.3",
+        typescript: "5.9.3",
+      },
+      engines: {
+        node: ">=20.9.0",
       },
     },
     null,
@@ -721,7 +758,13 @@ img {
           "@/*": ["./*"],
         },
       },
-      include: ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+      include: [
+        "next-env.d.ts",
+        "**/*.ts",
+        "**/*.tsx",
+        ".next/types/**/*.ts",
+        ".next/dev/types/**/*.ts",
+      ],
       exclude: ["node_modules"],
     },
     null,
@@ -738,6 +781,9 @@ img {
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  turbopack: {
+    root: process.cwd(),
+  },
 };
 
 export default nextConfig;
@@ -788,15 +834,8 @@ npm run dev
     "app/robots.ts": robotsTs,
     "app/globals.css": globalCss,
 
-    "components/site/SiteGorunumu.tsx": kaynaklar.siteGorunumu,
-    "components/site/siteGorunumu.module.css": kaynaklar.siteStilleri,
-    "data/sektorSablonlari.ts": kaynaklar.sektorSablonlari,
-    "data/sektorSunumProfilleri.ts": kaynaklar.sektorSunumProfilleri,
-    "data/sektorIcerikProfilleri.ts": kaynaklar.sektorIcerikProfilleri,
-    "data/sektorFormProfilleri.ts": kaynaklar.sektorFormProfilleri,
-    "lib/iletisim.ts": kaynaklar.iletisimYardimcilari,
     "data/proje.ts": projeTs,
-    "types/proje.ts": kaynaklar.projeTipi,
+    ...kaynaklar,
     ...yerelGorselSonucu.gorselDosyalari,
   };
 }

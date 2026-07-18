@@ -17,23 +17,6 @@ interface SektorSahnesiProps {
   className?: string;
 }
 
-function kisaltmaOlustur(metin: string) {
-  const kelimeler = metin
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean);
-
-  if (kelimeler.length === 1) {
-    return kelimeler[0].slice(0, 2).toLocaleUpperCase("tr-TR");
-  }
-
-  return kelimeler
-    .slice(0, 2)
-    .map((kelime) => kelime[0])
-    .join("")
-    .toLocaleUpperCase("tr-TR");
-}
-
 export default function SektorSahnesi({
   sektor,
   sektorAdi,
@@ -47,7 +30,6 @@ export default function SektorSahnesi({
   const hareketiAzalt = useReducedMotion();
   const hizmetler = sektorHizmetleriniGetir(sektor).slice(0, 3);
   const sahneBasligi = baslik?.trim() || dil.etiket;
-  const kisaltma = kisaltmaOlustur(sektorAdi);
 
   return (
     <div
@@ -68,16 +50,16 @@ export default function SektorSahnesi({
 
       <div className={styles.tipografi}>
         <motion.strong
-          className={styles.kisaltma}
+          className={styles.sektorAdi}
           aria-hidden="true"
           animate={
             hareketiAzalt
               ? undefined
-              : { y: [0, -5, 0], letterSpacing: ["-0.09em", "-0.04em", "-0.09em"] }
+              : { y: [0, -5, 0], opacity: [0.9, 1, 0.9] }
           }
           transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut" }}
         >
-          {kisaltma}
+          {sektorAdi}
         </motion.strong>
 
         <div className={styles.sahneMetni}>

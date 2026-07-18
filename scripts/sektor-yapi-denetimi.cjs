@@ -644,6 +644,10 @@ if (!siteBileseni.includes("SektorSahnesi") || !sektorSahnesi.includes("motion")
   sorunlar.push("tipografik sektör sahnesi site görünümüne bağlanmadı");
 }
 
+if (sektorSahnesi.includes("kisaltma") || !sektorSahnesi.includes("{sektorAdi}")) {
+  sorunlar.push("sektör sahnesinde kısaltma kaldı veya tam sektör adı gösterilmiyor");
+}
+
 if (/initial="gizli"[\s\S]{0,120}whileInView=/.test(siteBileseni)) {
   sorunlar.push("görünürlük viewport animasyonuna bağımlı; bölüm boş kalabilir");
 }
@@ -753,7 +757,8 @@ for (const ortakResponsiveKural of [
 
 for (const sahneGuvenlikKurali of [
   "container-type: inline-size",
-  "32cqi",
+  "grid-template-columns: minmax(0, 1.15fr)",
+  ".sektorAdi",
   "max-width: 56%",
   "text-overflow: ellipsis",
 ]) {

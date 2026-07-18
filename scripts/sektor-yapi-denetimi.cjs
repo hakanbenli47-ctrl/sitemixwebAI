@@ -54,6 +54,7 @@ const sablonlar = tsModulunuYukle(
   path.join(kok, "data/sektorSablonlari.ts"),
   {
     "@/data/sektorDonusumProfilleri": donusumler,
+    "@/data/sektorGorselDili": gorselDilleri,
     "@/data/sektorIcerikProfilleri": profiller,
     "@/data/sektorSunumProfilleri": sunumlar,
     "@/data/sektorTasarimlari": tasarimlar,
@@ -77,6 +78,7 @@ const icerikler = tsModulunuYukle(
   {
     "@/data/sektorler": sektorler,
     "@/data/sektorDonusumProfilleri": donusumler,
+    "@/data/sektorGorselDili": gorselDilleri,
     "@/data/sektorIcerikProfilleri": profiller,
     "@/data/sektorSunumProfilleri": sunumlar,
     "@/data/sektorTasarimlari": tasarimlar,
@@ -138,6 +140,8 @@ const hedefSektorMimarisi = {
   tesisatci: ["teknik-servis-saha", "signal"],
   "kombi-servisi": ["teknik-servis-saha", "signal"],
   nakliyat: ["lojistik-rota", "cargo"],
+  transfer: ["seyahat-rezervasyonu", "royal"],
+  "arac-kiralama": ["seyahat-rezervasyonu", "skyline"],
 };
 const hedefOperasyonAileleri = {
   "oto-yikama": "otomotiv",
@@ -154,6 +158,8 @@ const hedefOperasyonAileleri = {
   tesisatci: "teknik",
   "kombi-servisi": "teknik",
   nakliyat: "lojistik",
+  transfer: "ulasim",
+  "arac-kiralama": "ulasim",
 };
 const sorunlar = [];
 let sayfaSayisi = 0;
@@ -318,9 +324,18 @@ for (const sektor of sektorler.sektorler) {
     (!operasyonProfili ||
       operasyonProfili.aile !== hedefOperasyonAilesi ||
       operasyonProfili.adimlar.length !== 3 ||
-      operasyonProfili.metrikler.length !== 2)
+      operasyonProfili.metrikler.length !== 2 ||
+      operasyonProfili.alanlar.length !== 3 ||
+      operasyonProfili.secenekler.length !== 3 ||
+      !operasyonProfili.panelTuru ||
+      !operasyonProfili.icerikSemasi?.heroBasligi ||
+      !operasyonProfili.icerikSemasi?.heroAciklamasi ||
+      operasyonProfili.icerikSemasi?.anaSayfaAkisi?.[0] !== "hero" ||
+      operasyonProfili.icerikSemasi?.anaSayfaAkisi?.at(-1) !== "iletisim" ||
+      new Set(operasyonProfili.icerikSemasi?.anaSayfaAkisi).size !==
+        operasyonProfili.icerikSemasi?.anaSayfaAkisi?.length)
   ) {
-    sorunlar.push(`${sektor.id}: köklü operasyon sahnesi uygulanmadı`);
+    sorunlar.push(`${sektor.id}: operasyon sahnesi veya içerik şeması eksik`);
   }
 
   if (new Set(tasarimSecenekleri.map((secenek) => secenek.id)).size !== 3) {
@@ -415,7 +430,13 @@ for (const sektor of sektorler.sektorler) {
       anaSayfaBolumleri.map((bolum) => bolum.tur),
     );
 
-    if (anaSayfaBolumleri.length < 7 || anaSayfaBolumleri.length > 9) {
+    const profesyonelAkis = operasyonProfili?.icerikSemasi?.anaSayfaAkisi;
+
+    if (
+      profesyonelAkis
+        ? anaSayfaBolumleri.length !== profesyonelAkis.length
+        : anaSayfaBolumleri.length < 7 || anaSayfaBolumleri.length > 9
+    ) {
       sorunlar.push(`${sektor.id}/${siteTipi}: ana sayfa bölüm sayısı dengesiz`);
     }
 
@@ -425,6 +446,51 @@ for (const sektor of sektorler.sektorler) {
 
     if (anaSayfaBolumleri.at(-1)?.tur !== "iletisim") {
       sorunlar.push(`${sektor.id}/${siteTipi}: iletişim bölümü ana sayfanın sonunda değil`);
+    }
+
+    if (profesyonelAkis) {
+      const akisTurleri = {
+        hero: "hero",
+        guven: "istatistik",
+        hizmetler: "hizmetler",
+        surec: "neden-biz",
+        hikaye: "metin",
+        galeri: "galeri",
+        sss: "sss",
+        iletisim: "iletisim",
+      };
+      const beklenenTurler = profesyonelAkis.map(
+        (anahtar) => akisTurleri[anahtar],
+      );
+      const gercekTurler = anaSayfaBolumleri.map((bolum) => bolum.tur);
+      const hero = anaSayfaBolumleri[0];
+
+      if (JSON.stringify(beklenenTurler) !== JSON.stringify(gercekTurler)) {
+        sorunlar.push(`${sektor.id}/${siteTipi}: içerik şeması bölüm sırasına uygulanmadı`);
+      }
+
+      if (
+        hero?.baslik !== operasyonProfili.icerikSemasi.heroBasligi ||
+        hero?.aciklama !== operasyonProfili.icerikSemasi.heroAciklamasi ||
+        hero?.butonlar[0]?.metin !== operasyonProfili.icerikSemasi.anaAksiyon ||
+        hero?.butonlar[1]?.metin !== operasyonProfili.icerikSemasi.ikincilAksiyon
+      ) {
+        sorunlar.push(`${sektor.id}/${siteTipi}: sektörel hero içerik şeması korunmadı`);
+      }
+
+      for (const [tur, etiket] of [
+        ["istatistik", operasyonProfili.icerikSemasi.guvenEtiketi],
+        ["hizmetler", operasyonProfili.icerikSemasi.hizmetEtiketi],
+        ["neden-biz", operasyonProfili.icerikSemasi.surecEtiketi],
+        ["sss", operasyonProfili.icerikSemasi.sssEtiketi],
+        ["iletisim", operasyonProfili.icerikSemasi.iletisimEtiketi],
+      ]) {
+        const semaBolumu = anaSayfaBolumleri.find((bolum) => bolum.tur === tur);
+
+        if (semaBolumu?.ustBaslik !== etiket) {
+          sorunlar.push(`${sektor.id}/${siteTipi}: ${tur} içerik etiketi uygulanmadı`);
+        }
+      }
     }
 
     const besinciBolum = anaSayfaBolumleri[4];
@@ -453,7 +519,10 @@ for (const sektor of sektorler.sektorler) {
     }
 
     for (const bolum of anaSayfaBolumleri) {
-      if (bolum.baslik.trim().split(/\s+/).length > 6) {
+      const baslikKelimeLimiti =
+        operasyonProfili && bolum.tur === "hero" ? 12 : 6;
+
+      if (bolum.baslik.trim().split(/\s+/).length > baslikKelimeLimiti) {
         sorunlar.push(`${sektor.id}/${siteTipi}: uzun ana sayfa başlığı: ${bolum.baslik}`);
       }
 
@@ -483,7 +552,11 @@ for (const sektor of sektorler.sektorler) {
       }
     }
 
-    if (sunum.galeriKullan !== anaSayfaTurleri.has("galeri")) {
+    const galeriBekleniyor = profesyonelAkis
+      ? sunum.galeriKullan && profesyonelAkis.includes("galeri")
+      : sunum.galeriKullan;
+
+    if (galeriBekleniyor !== anaSayfaTurleri.has("galeri")) {
       sorunlar.push(`${sektor.id}/${siteTipi}: galeri tercihi uygulanmadı`);
     }
 

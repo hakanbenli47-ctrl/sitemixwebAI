@@ -17,15 +17,64 @@ export type SektorOperasyonAilesi =
   | "temizlik"
   | "hijyen"
   | "teknik"
-  | "lojistik";
+  | "lojistik"
+  | "ulasim";
+
+export type SektorKararPaneliTuru =
+  | "yikama-paketi"
+  | "yuzey-analizi"
+  | "kaplama-plani"
+  | "bakim-randevusu"
+  | "sac-randevusu"
+  | "berber-randevusu"
+  | "temizlik-kapsami"
+  | "kumas-analizi"
+  | "hali-takibi"
+  | "risk-protokolu"
+  | "elektrik-teshisi"
+  | "tesisat-teshisi"
+  | "kombi-teshisi"
+  | "tasima-teklifi"
+  | "transfer-rezervasyonu"
+  | "arac-kiralama";
+
+export type ProfesyonelAnaSayfaBolumu =
+  | "hero"
+  | "guven"
+  | "hizmetler"
+  | "surec"
+  | "hikaye"
+  | "galeri"
+  | "sss"
+  | "iletisim";
+
+export interface SektorIcerikSemasi {
+  heroEtiketi: string;
+  heroBasligi: string;
+  heroAciklamasi: string;
+  anaAksiyon: string;
+  ikincilAksiyon: string;
+  guvenEtiketi: string;
+  hizmetEtiketi: string;
+  surecEtiketi: string;
+  sssEtiketi: string;
+  iletisimEtiketi: string;
+  anaSayfaAkisi: ProfesyonelAnaSayfaBolumu[];
+}
 
 export interface SektorOperasyonProfili {
   aile: SektorOperasyonAilesi;
+  panelTuru: SektorKararPaneliTuru;
   kod: string;
   ustEtiket: string;
   durum: string;
   adimlar: [string, string, string];
   metrikler: [SektorKararNoktasi, SektorKararNoktasi];
+  alanlar: [SektorKararNoktasi, SektorKararNoktasi, SektorKararNoktasi];
+  secimEtiketi: string;
+  secenekler: [string, string, string];
+  sonuc: SektorKararNoktasi;
+  icerikSemasi: SektorIcerikSemasi;
 }
 
 export const SECILI_IS_GORSEL_LIMITI = 4;
@@ -264,157 +313,531 @@ const varsayilanDil: SektorSahneDili = {
 const sektorOperasyonProfilleri: Record<string, SektorOperasyonProfili> = {
   "oto-yikama": {
     aile: "otomotiv",
+    panelTuru: "yikama-paketi",
     kod: "İş emri 01",
     ustEtiket: "ARAÇ KABUL VE İŞ EMRİ",
-    durum: "TESLİM KONTROLÜ",
+    durum: "Aynı gün uygunluk",
     adimlar: ["Kabul kaydı", "Yıkama reçetesi", "Son kontrol"],
     metrikler: [
-      { etiket: "Yüzey", deger: "Kayıtlı" },
-      { etiket: "Kontrol", deger: "3 / 3" },
+      { etiket: "Tahmini süre", deger: "45–120 dk" },
+      { etiket: "Teslim", deger: "Kontrol listeli" },
     ],
+    alanlar: [
+      { etiket: "Araç sınıfı", deger: "Binek / SUV" },
+      { etiket: "Öncelik", deger: "İç mekân + dış yüzey" },
+      { etiket: "Teslim zamanı", deger: "Bugün" },
+    ],
+    secimEtiketi: "Yıkama kapsamı",
+    secenekler: ["İç–dış", "Detaylı", "Koruma"],
+    sonuc: { etiket: "Önerilen başlangıç", deger: "Araç kabulü ve paket seçimi" },
+    icerikSemasi: {
+      heroEtiketi: "Paket seçimi ve araç kabulü",
+      heroBasligi: "Aracınız için doğru yıkama kapsamını baştan netleştirin.",
+      heroAciklamasi: "Araç sınıfını, yüzey durumunu ve teslim beklentinizi birlikte değerlendirerek gereksiz işlemlerden uzak, açık bir bakım planı oluşturuyoruz.",
+      anaAksiyon: "Yıkama planını oluşturun",
+      ikincilAksiyon: "Paketleri karşılaştırın",
+      guvenEtiketi: "Teslim standardı",
+      hizmetEtiketi: "Kapsama göre paketler",
+      surecEtiketi: "Kabulden teslim kontrolüne",
+      sssEtiketi: "Aracınızı getirmeden önce",
+      iletisimEtiketi: "Araç ve zaman bilgisi",
+      anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "galeri", "sss", "iletisim"],
+    },
   },
   "oto-detaylandirma": {
     aile: "otomotiv",
+    panelTuru: "yuzey-analizi",
     kod: "Analiz dosyası 02",
     ustEtiket: "YÜZEY ANALİZ DOSYASI",
-    durum: "IŞIK KONTROLÜ",
+    durum: "Ön analiz gerekli",
     adimlar: ["Kusur haritası", "İşlem reçetesi", "Panel teslimi"],
     metrikler: [
-      { etiket: "Paneller", deger: "Ölçüldü" },
-      { etiket: "Kalite", deger: "Doğrulandı" },
+      { etiket: "Kontrol", deger: "Panel bazlı" },
+      { etiket: "Teslim", deger: "Işık altında" },
     ],
+    alanlar: [
+      { etiket: "Boya durumu", deger: "İnce çizik / matlık" },
+      { etiket: "Hedef", deger: "Düzeltme + parlaklık" },
+      { etiket: "Koruma", deger: "Seramik seçenekli" },
+    ],
+    secimEtiketi: "Uygulama seviyesi",
+    secenekler: ["Yüzey analizi", "Boya düzeltme", "Uzun koruma"],
+    sonuc: { etiket: "Doğru sonraki adım", deger: "Işık altında yüzey değerlendirmesi" },
+    icerikSemasi: {
+      heroEtiketi: "Boya düzeltme ve yüzey koruma",
+      heroBasligi: "Yüzeyi analiz edin; uygulamayı kanıta göre seçin.",
+      heroAciklamasi: "Parlaklık vaadiyle değil, boya geçmişi, kusur seviyesi ve beklenen koruma süresiyle karar veren profesyonel bir detaylandırma akışı sunuyoruz.",
+      anaAksiyon: "Yüzey analizi isteyin",
+      ikincilAksiyon: "Uygulamaları inceleyin",
+      guvenEtiketi: "Ölçümlü işçilik",
+      hizmetEtiketi: "İhtiyaca göre uygulamalar",
+      surecEtiketi: "Analizden kontrollü teslime",
+      sssEtiketi: "Uygulama kararı öncesi",
+      iletisimEtiketi: "Araç yüzeyini değerlendirelim",
+      anaSayfaAkisi: ["hero", "galeri", "guven", "hizmetler", "surec", "sss", "iletisim"],
+    },
   },
   "arac-kaplama": {
     aile: "otomotiv",
+    panelTuru: "kaplama-plani",
     kod: "Uygulama dosyası 03",
     ustEtiket: "FİLM VE YÜZEY DOSYASI",
-    durum: "KÜRLENME TAKİBİ",
+    durum: "Film seçimi bekleniyor",
     adimlar: ["Yüzey kabulü", "Kesim planı", "Kenar kontrolü"],
     metrikler: [
-      { etiket: "Film", deger: "Lot kayıtlı" },
-      { etiket: "Teslim", deger: "Planlandı" },
+      { etiket: "Uygulama", deger: "Parça bazlı" },
+      { etiket: "Teslim", deger: "Kürlenme sonrası" },
     ],
+    alanlar: [
+      { etiket: "Kaplama alanı", deger: "Tam araç / bölgesel" },
+      { etiket: "Film amacı", deger: "Koruma / renk değişimi" },
+      { etiket: "Yüzey geçmişi", deger: "Kontrol edilecek" },
+    ],
+    secimEtiketi: "Film yaklaşımı",
+    secenekler: ["PPF", "Renk değişimi", "Cam filmi"],
+    sonuc: { etiket: "Teklif için gereken", deger: "Model, kapsam ve film tercihi" },
+    icerikSemasi: {
+      heroEtiketi: "Film, kapsam ve işçilik planı",
+      heroBasligi: "Kaplama kararını yalnız renge değil, yüzeye ve işçiliğe göre verin.",
+      heroAciklamasi: "Film türünü, uygulanacak parçaları, kenar dönüşlerini ve bakım koşullarını tekliften önce görünür hâle getiriyoruz.",
+      anaAksiyon: "Kaplama kapsamını belirleyin",
+      ikincilAksiyon: "Film seçeneklerini görün",
+      guvenEtiketi: "Malzeme ve işçilik şeffaflığı",
+      hizmetEtiketi: "Kaplama çözümleri",
+      surecEtiketi: "Yüzey kabulünden kürlenmeye",
+      sssEtiketi: "Film seçmeden önce",
+      iletisimEtiketi: "Araç modelini ve kapsamı paylaşın",
+      anaSayfaAkisi: ["hero", "hizmetler", "guven", "galeri", "surec", "sss", "iletisim"],
+    },
   },
   "guzellik-salonu": {
     aile: "bakim",
+    panelTuru: "bakim-randevusu",
     kod: "Danışan kaydı 01",
     ustEtiket: "KİŞİSEL BAKIM DOSYASI",
-    durum: "RANDEVU PLANLI",
+    durum: "Yeni randevu",
     adimlar: ["Ön görüşme", "Hijyen hazırlığı", "Bakım sonrası"],
     metrikler: [
-      { etiket: "Uygunluk", deger: "Değerlendirildi" },
-      { etiket: "Takip", deger: "Planlandı" },
+      { etiket: "Seans", deger: "45–90 dk" },
+      { etiket: "Takip", deger: "Kişiye özel" },
     ],
+    alanlar: [
+      { etiket: "Bakım alanı", deger: "Cilt / kaş / bölgesel" },
+      { etiket: "Tercih", deger: "İlk görüşme" },
+      { etiket: "Uygun zaman", deger: "Bu hafta" },
+    ],
+    secimEtiketi: "Randevu adımı",
+    secenekler: ["Hizmet", "Uzman", "Saat"],
+    sonuc: { etiket: "İlk görüşmede", deger: "Uygunluk, süre ve bakım planı" },
+    icerikSemasi: {
+      heroEtiketi: "Hizmet, süre ve randevu",
+      heroBasligi: "Bakımınızı güzel görünen bir listeden değil, size uygun bir plandan seçin.",
+      heroAciklamasi: "Uygulama kapsamını, tahmini süreyi, hijyen yaklaşımını ve bakım sonrası beklentiyi randevudan önce açıkça paylaşıyoruz.",
+      anaAksiyon: "Randevunuzu planlayın",
+      ikincilAksiyon: "Bakım menüsünü görün",
+      guvenEtiketi: "Uygunluk ve hijyen",
+      hizmetEtiketi: "Bakım menüsü",
+      surecEtiketi: "Görüşmeden bakım sonrasına",
+      sssEtiketi: "Randevu öncesi bilmeniz gerekenler",
+      iletisimEtiketi: "Size uygun zamanı bulalım",
+      anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "galeri", "sss", "iletisim"],
+    },
   },
   kuafor: {
     aile: "bakim",
+    panelTuru: "sac-randevusu",
     kod: "Randevu dosyası 02",
     ustEtiket: "SAÇ TEKNİK DOSYASI",
-    durum: "STİL PLANLANDI",
+    durum: "Danışmanlıkla başlar",
     adimlar: ["Saç geçmişi", "Teknik reçete", "Ev bakım planı"],
     metrikler: [
-      { etiket: "Renk", deger: "Formül kayıtlı" },
-      { etiket: "Süre", deger: "Planlandı" },
+      { etiket: "Süre", deger: "İşleme göre" },
+      { etiket: "Reçete", deger: "Kayıtlı" },
     ],
+    alanlar: [
+      { etiket: "Hizmet", deger: "Kesim / renk / bakım" },
+      { etiket: "Saç geçmişi", deger: "İlk görüşmede" },
+      { etiket: "Stil hedefi", deger: "Birlikte netleşir" },
+    ],
+    secimEtiketi: "Randevu akışı",
+    secenekler: ["Hizmet seç", "Süreyi gör", "Saati ayır"],
+    sonuc: { etiket: "Teknik yaklaşım", deger: "Form, renk ve ev bakım notu" },
+    icerikSemasi: {
+      heroEtiketi: "Saç danışmanlığı ve randevu",
+      heroBasligi: "Kesimden renge, saçınıza özel net bir plan oluşturun.",
+      heroAciklamasi: "Saç geçmişini, istediğiniz görünümü ve günlük bakım rutininizi birlikte değerlendirerek hizmeti ve süreyi baştan anlaşılır hâle getiriyoruz.",
+      anaAksiyon: "Saç randevusu oluşturun",
+      ikincilAksiyon: "Hizmet ve süreleri görün",
+      guvenEtiketi: "Teknik reçete",
+      hizmetEtiketi: "Saç hizmetleri",
+      surecEtiketi: "Danışmanlıktan son şekle",
+      sssEtiketi: "Saç işlemi öncesi",
+      iletisimEtiketi: "İstediğiniz görünümü anlatın",
+      anaSayfaAkisi: ["hero", "hizmetler", "galeri", "guven", "surec", "sss", "iletisim"],
+    },
   },
   berber: {
     aile: "bakim",
+    panelTuru: "berber-randevusu",
     kod: "Hizmet kartı 03",
     ustEtiket: "USTA KABUL KARTI",
-    durum: "FORM ONAYLI",
+    durum: "Bugün uygun saatler",
     adimlar: ["Yüz-saç analizi", "Ekipman hijyeni", "Bakım periyodu"],
     metrikler: [
-      { etiket: "Kesim", deger: "Kişiye özel" },
-      { etiket: "Sonraki", deger: "Planlı" },
+      { etiket: "Hizmet", deger: "30–60 dk" },
+      { etiket: "Usta", deger: "Seçilebilir" },
     ],
+    alanlar: [
+      { etiket: "Hizmet", deger: "Saç + sakal" },
+      { etiket: "Usta tercihi", deger: "Seçilebilir" },
+      { etiket: "Saat", deger: "Bugün / yarın" },
+    ],
+    secimEtiketi: "Hızlı randevu",
+    secenekler: ["Kesim", "Sakal", "Bakım paketi"],
+    sonuc: { etiket: "Net hizmet", deger: "Usta, süre ve ücret bilgisi" },
+    icerikSemasi: {
+      heroEtiketi: "Usta, hizmet ve saat seçimi",
+      heroBasligi: "Bakımınızı bekleyerek değil, saatini bilerek planlayın.",
+      heroAciklamasi: "Kesim, sakal ve bakım hizmetlerini süreleriyle birlikte görün; yüz ve saç formunuza uygun hizmet için kolayca randevu oluşturun.",
+      anaAksiyon: "Uygun saatleri görün",
+      ikincilAksiyon: "Hizmet menüsünü açın",
+      guvenEtiketi: "Hijyen ve usta standardı",
+      hizmetEtiketi: "Berber hizmetleri",
+      surecEtiketi: "Kabulden son kontrole",
+      sssEtiketi: "Randevu ve bakım soruları",
+      iletisimEtiketi: "Saatinizi ayırın",
+      anaSayfaAkisi: ["hero", "hizmetler", "guven", "galeri", "surec", "sss", "iletisim"],
+    },
   },
   temizlik: {
     aile: "temizlik",
+    panelTuru: "temizlik-kapsami",
     kod: "Operasyon planı 01",
     ustEtiket: "HİJYEN OPERASYON PLANI",
-    durum: "KONTROL LİSTESİ",
+    durum: "Ücretsiz ön değerlendirme",
     adimlar: ["Alan keşfi", "Yüzey matrisi", "Teslim onayı"],
     metrikler: [
-      { etiket: "Kritik alan", deger: "İşaretli" },
-      { etiket: "Görev", deger: "Atandı" },
+      { etiket: "Ekip", deger: "Kapsama göre" },
+      { etiket: "Teslim", deger: "Kontrol listeli" },
     ],
+    alanlar: [
+      { etiket: "Alan türü", deger: "Ev / ofis / inşaat sonrası" },
+      { etiket: "Yaklaşık alan", deger: "Metrekare ve bölüm" },
+      { etiket: "Periyot", deger: "Tek sefer / düzenli" },
+    ],
+    secimEtiketi: "Hizmet kapsamı",
+    secenekler: ["Bireysel", "Kurumsal", "Periyodik"],
+    sonuc: { etiket: "Teklifin temeli", deger: "Alan, görev listesi ve çalışma saati" },
+    icerikSemasi: {
+      heroEtiketi: "Alan, kapsam ve periyot planı",
+      heroBasligi: "Temizlik hizmetini metrekareden önce yapılacak işler üzerinden planlayın.",
+      heroAciklamasi: "Alan türünü, kritik yüzeyleri, çalışma saatini ve görev sıklığını netleştirerek karşılaştırılabilir bir hizmet kapsamı hazırlıyoruz.",
+      anaAksiyon: "Temizlik kapsamını oluşturun",
+      ikincilAksiyon: "Hizmet alanlarını görün",
+      guvenEtiketi: "Kontrol listeli teslim",
+      hizmetEtiketi: "Alan bazlı çözümler",
+      surecEtiketi: "Keşiften kalite kontrolüne",
+      sssEtiketi: "Teklif istemeden önce",
+      iletisimEtiketi: "Alan bilgilerini paylaşın",
+      anaSayfaAkisi: ["hero", "guven", "hizmetler", "surec", "hikaye", "sss", "iletisim"],
+    },
   },
   "koltuk-yikama": {
     aile: "temizlik",
+    panelTuru: "kumas-analizi",
     kod: "Kabul kaydı 02",
     ustEtiket: "KUMAŞ KABUL PROTOKOLÜ",
-    durum: "NEM TAKİBİ",
+    durum: "Fotoğraflı ön analiz",
     adimlar: ["Etiket testi", "Leke protokolü", "Kuruma kontrolü"],
     metrikler: [
-      { etiket: "Renk", deger: "Test edildi" },
-      { etiket: "Nem", deger: "Takipte" },
+      { etiket: "Kuruma", deger: "Koşula bağlı" },
+      { etiket: "Test", deger: "Kumaş bazlı" },
     ],
+    alanlar: [
+      { etiket: "Döşeme", deger: "Koltuk / köşe / yatak" },
+      { etiket: "Kumaş", deger: "Etiket veya fotoğraf" },
+      { etiket: "Leke durumu", deger: "Bölgesel / yoğun" },
+    ],
+    secimEtiketi: "Ön değerlendirme",
+    secenekler: ["Kumaşı tanı", "Lekeyi kaydet", "Kuruma planla"],
+    sonuc: { etiket: "Doğru yöntem", deger: "Renk testi ve kontrollü ekstraksiyon" },
+    icerikSemasi: {
+      heroEtiketi: "Kumaş analizi ve kuruma planı",
+      heroBasligi: "Kumaşı tanımadan yıkamaya başlamıyoruz.",
+      heroAciklamasi: "Kumaş etiketini, renk dayanımını, leke türünü ve ortamın kuruma koşullarını inceleyerek güvenli uygulama yöntemini belirliyoruz.",
+      anaAksiyon: "Fotoğrafla ön analiz isteyin",
+      ikincilAksiyon: "Yıkama kapsamını görün",
+      guvenEtiketi: "Kumaş güvenliği",
+      hizmetEtiketi: "Döşeme türüne göre hizmet",
+      surecEtiketi: "Testten kontrollü kurumaya",
+      sssEtiketi: "Yıkama ve kuruma hakkında",
+      iletisimEtiketi: "Koltuk fotoğrafını gönderin",
+      anaSayfaAkisi: ["hero", "guven", "hizmetler", "surec", "galeri", "sss", "iletisim"],
+    },
   },
   "hali-yikama": {
     aile: "temizlik",
+    panelTuru: "hali-takibi",
     kod: "Takip kaydı 03",
     ustEtiket: "BARKODLU HALI KABULÜ",
-    durum: "İADEYE HAZIR",
+    durum: "Adım adım takip",
     adimlar: ["Dokuma kaydı", "Yıkama reçetesi", "Paketli iade"],
     metrikler: [
-      { etiket: "Barkod", deger: "Eşleşti" },
-      { etiket: "Kurutma", deger: "Tamamlandı" },
+      { etiket: "Kabul", deger: "Barkodlu" },
+      { etiket: "İade", deger: "Planlı rota" },
     ],
+    alanlar: [
+      { etiket: "Halı türü", deger: "Makine / yün / hassas" },
+      { etiket: "Durum", deger: "Leke ve hasar kaydı" },
+      { etiket: "Teslimat", deger: "Adresten alım" },
+    ],
+    secimEtiketi: "Takip hattı",
+    secenekler: ["Kabul", "Yıkama", "Kurutma ve iade"],
+    sonuc: { etiket: "Kayıt standardı", deger: "Dokuma, leke, adet ve teslim bilgisi" },
+    icerikSemasi: {
+      heroEtiketi: "Barkodlu kabul ve teslim takibi",
+      heroBasligi: "Halınız kabulden teslime kayıt altında ilerlesin.",
+      heroAciklamasi: "Dokuma türünü, mevcut leke ve hasarları, uygulanacak yıkama hattını ve teslim rotasını tek bir takip akışında görünür kılıyoruz.",
+      anaAksiyon: "Halı alımı planlayın",
+      ikincilAksiyon: "Yıkama sürecini görün",
+      guvenEtiketi: "Kayıtlı kabul",
+      hizmetEtiketi: "Dokumaya göre yıkama",
+      surecEtiketi: "Kabul, yıkama, kurutma, iade",
+      sssEtiketi: "Halı teslimi öncesi",
+      iletisimEtiketi: "Adet ve adres bilgisi",
+      anaSayfaAkisi: ["hero", "surec", "guven", "hizmetler", "galeri", "sss", "iletisim"],
+    },
   },
   ilaclama: {
     aile: "hijyen",
+    panelTuru: "risk-protokolu",
     kod: "Uygulama raporu 04",
     ustEtiket: "RİSK VE UYGULAMA RAPORU",
-    durum: "TAKİP TARİHİ VAR",
+    durum: "Güvenlik öncelikli",
     adimlar: ["Risk keşfi", "Güvenli uygulama", "Takip kontrolü"],
     metrikler: [
-      { etiket: "Risk alanı", deger: "Haritalandı" },
-      { etiket: "Protokol", deger: "Kayıtlı" },
+      { etiket: "Keşif", deger: "Tür ve yoğunluk" },
+      { etiket: "Takip", deger: "Kontrol tarihli" },
     ],
+    alanlar: [
+      { etiket: "Sorun türü", deger: "Haşere / kemirgen" },
+      { etiket: "Alan", deger: "Ev / işyeri / gıda alanı" },
+      { etiket: "Hassas durum", deger: "Çocuk / evcil hayvan" },
+    ],
+    secimEtiketi: "Güvenlik protokolü",
+    secenekler: ["Risk keşfi", "Hazırlık", "Takip"],
+    sonuc: { etiket: "Uygulama öncesi", deger: "Yöntem, bekleme süresi ve dönüş bilgisi" },
+    icerikSemasi: {
+      heroEtiketi: "Risk keşfi ve güvenlik protokolü",
+      heroBasligi: "İlaçlamadan önce riski ve güvenli uygulama planını netleştirin.",
+      heroAciklamasi: "Zararlı türünü, yoğunluğu, hassas alanları ve alana dönüş süresini kayıt altına alarak yöntem ve takip planını açıkça anlatıyoruz.",
+      anaAksiyon: "Risk değerlendirmesi isteyin",
+      ikincilAksiyon: "Uygulama türlerini görün",
+      guvenEtiketi: "İnsan ve alan güvenliği",
+      hizmetEtiketi: "Sorun türüne göre çözümler",
+      surecEtiketi: "Keşif, uygulama ve takip",
+      sssEtiketi: "Güvenli uygulama hakkında",
+      iletisimEtiketi: "Sorunu ve alanı tarif edin",
+      anaSayfaAkisi: ["hero", "guven", "hizmetler", "surec", "sss", "iletisim"],
+    },
   },
   elektrikci: {
     aile: "teknik",
+    panelTuru: "elektrik-teshisi",
     kod: "Servis kaydı 01",
     ustEtiket: "ELEKTRİK SERVİS KAYDI",
-    durum: "KORUMA TESTİ",
+    durum: "Güvenli müdahale",
     adimlar: ["İzolasyon", "Ölçümlü teşhis", "Fonksiyon testi"],
     metrikler: [
-      { etiket: "Hat", deger: "Ölçüldü" },
-      { etiket: "Koruma", deger: "Doğrulandı" },
+      { etiket: "Öncelik", deger: "Risk seviyesine göre" },
+      { etiket: "Teslim", deger: "Test raporlu" },
     ],
+    alanlar: [
+      { etiket: "Belirti", deger: "Sigorta / priz / enerji kesintisi" },
+      { etiket: "Konum", deger: "Daire / işyeri" },
+      { etiket: "Aciliyet", deger: "Aktif risk kontrolü" },
+    ],
+    secimEtiketi: "Servis kaydı",
+    secenekler: ["Güvenliği sağla", "Ölçüm yap", "Test ederek teslim et"],
+    sonuc: { etiket: "Müdahale standardı", deger: "İzolasyon, teşhis ve koruma testi" },
+    icerikSemasi: {
+      heroEtiketi: "Güvenli elektrik servis kaydı",
+      heroBasligi: "Elektrik arızasını tahminle değil, ölçümlü teşhisle çözüme taşıyın.",
+      heroAciklamasi: "Belirtiyi ve risk seviyesini kaydediyor; güvenli izolasyon, ölçüm sonucu ve yapılacak müdahaleyi işlemden önce açıklıyoruz.",
+      anaAksiyon: "Elektrik servis kaydı açın",
+      ikincilAksiyon: "Hizmet kapsamını görün",
+      guvenEtiketi: "Ölçüm ve koruma standardı",
+      hizmetEtiketi: "Arıza türüne göre servis",
+      surecEtiketi: "İzolasyondan fonksiyon testine",
+      sssEtiketi: "Servis çağırmadan önce",
+      iletisimEtiketi: "Belirtiyi ve konumu paylaşın",
+      anaSayfaAkisi: ["hero", "guven", "hizmetler", "surec", "sss", "iletisim"],
+    },
   },
   tesisatci: {
     aile: "teknik",
+    panelTuru: "tesisat-teshisi",
     kod: "Saha kaydı 02",
     ustEtiket: "TESİSAT SERVİS KAYDI",
-    durum: "SIZDIRMAZLIK TESTİ",
+    durum: "Kaynak tespiti",
     adimlar: ["Kaynak tespiti", "Müdahale onayı", "Basınç kontrolü"],
     metrikler: [
-      { etiket: "Kaynak", deger: "Tespit edildi" },
-      { etiket: "Akış", deger: "Test edildi" },
+      { etiket: "Müdahale", deger: "Onay sonrası" },
+      { etiket: "Teslim", deger: "Sızdırmazlık testli" },
     ],
+    alanlar: [
+      { etiket: "Sorun", deger: "Kaçak / tıkanıklık / armatür" },
+      { etiket: "Görünür belirti", deger: "Nem / akış / koku" },
+      { etiket: "Erişim", deger: "Banyo / mutfak / kolon" },
+    ],
+    secimEtiketi: "Teşhis akışı",
+    secenekler: ["Kaynağı bul", "Kapsamı onayla", "Basınçla test et"],
+    sonuc: { etiket: "Doğru başlangıç", deger: "Sorun fotoğrafı ve konum bilgisi" },
+    icerikSemasi: {
+      heroEtiketi: "Kaynak tespiti ve kontrollü müdahale",
+      heroBasligi: "Kaçağın veya tıkanıklığın kaynağını bulup müdahaleyi netleştirin.",
+      heroAciklamasi: "Görünen belirtiyi, olası kaynağı ve erişim koşullarını değerlendirerek yöntem, parça ihtiyacı ve test sürecini açıkça planlıyoruz.",
+      anaAksiyon: "Tesisat servis talebi oluşturun",
+      ikincilAksiyon: "Sorun türlerini görün",
+      guvenEtiketi: "Kaynak ve sızdırmazlık kontrolü",
+      hizmetEtiketi: "Tesisat çözümleri",
+      surecEtiketi: "Tespitten basınç testine",
+      sssEtiketi: "Müdahale öncesi sorular",
+      iletisimEtiketi: "Sorunu fotoğrafla anlatın",
+      anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "sss", "iletisim"],
+    },
   },
   "kombi-servisi": {
     aile: "teknik",
+    panelTuru: "kombi-teshisi",
     kod: "Cihaz kaydı 03",
     ustEtiket: "CİHAZ SERVİS KAYDI",
-    durum: "GÜVENLİK RAPORU",
+    durum: "Cihaz bilgisi gerekli",
     adimlar: ["Cihaz kaydı", "Bakım ve onay", "Yanma testi"],
     metrikler: [
-      { etiket: "Basınç", deger: "Kontrollü" },
-      { etiket: "Yanma", deger: "Doğrulandı" },
+      { etiket: "Bakım", deger: "Ölçümlü" },
+      { etiket: "Teslim", deger: "Güvenlik raporlu" },
     ],
+    alanlar: [
+      { etiket: "Cihaz", deger: "Marka ve model" },
+      { etiket: "Belirti", deger: "Hata kodu / basınç / ısı" },
+      { etiket: "Servis geçmişi", deger: "Son bakım bilgisi" },
+    ],
+    secimEtiketi: "Cihaz kontrolü",
+    secenekler: ["Kaydı aç", "Ölç ve onayla", "Yanmayı test et"],
+    sonuc: { etiket: "Servis sonunda", deger: "İşlem, ölçüm ve güvenlik raporu" },
+    icerikSemasi: {
+      heroEtiketi: "Cihaz kaydı ve güvenlik testi",
+      heroBasligi: "Cihaz bilgisinden güvenlik testine kadar kayıtlı servis alın.",
+      heroAciklamasi: "Marka-model, hata kodu ve basınç bilgisini kaydediyor; bakım, parça onayı, yanma ve sızdırmazlık sonuçlarını anlaşılır biçimde teslim ediyoruz.",
+      anaAksiyon: "Kombi servis kaydı açın",
+      ikincilAksiyon: "Bakım kapsamını görün",
+      guvenEtiketi: "Yanma ve sızdırmazlık güvenliği",
+      hizmetEtiketi: "Cihaza göre servis",
+      surecEtiketi: "Kayıttan güvenlik raporuna",
+      sssEtiketi: "Kombi servisi hakkında",
+      iletisimEtiketi: "Marka, model ve hatayı paylaşın",
+      anaSayfaAkisi: ["hero", "guven", "surec", "hizmetler", "sss", "iletisim"],
+    },
   },
   nakliyat: {
     aile: "lojistik",
+    panelTuru: "tasima-teklifi",
     kod: "Taşıma kaydı 01",
     ustEtiket: "TAŞIMA MANİFESTOSU",
-    durum: "ROTA HAZIR",
+    durum: "Hızlı ön teklif",
     adimlar: ["Ekspertiz", "Kodlu paketleme", "Teslim tutanağı"],
     metrikler: [
-      { etiket: "Envanter", deger: "Kayıtlı" },
-      { etiket: "Rota", deger: "Planlandı" },
+      { etiket: "Ekip", deger: "Hacme göre" },
+      { etiket: "Teslim", deger: "Tutanaklı" },
     ],
+    alanlar: [
+      { etiket: "Çıkış", deger: "Adres, kat ve erişim" },
+      { etiket: "Varış", deger: "Adres, kat ve erişim" },
+      { etiket: "Hacim", deger: "Oda ve özel eşya" },
+    ],
+    secimEtiketi: "Taşıma kapsamı",
+    secenekler: ["Paketleme", "Söküm–kurulum", "Şehirler arası"],
+    sonuc: { etiket: "Net teklif için", deger: "Rota, hacim, erişim ve tarih" },
+    icerikSemasi: {
+      heroEtiketi: "Rota, hacim ve erişim planı",
+      heroBasligi: "Taşınmayı adres, eşya hacmi ve bina erişimiyle birlikte planlayın.",
+      heroAciklamasi: "Çıkış-varış koşullarını, oda ve özel eşya envanterini, paketleme kapsamını ve taşıma tarihini tek bir teklif akışında topluyoruz.",
+      anaAksiyon: "Taşıma ön teklifini alın",
+      ikincilAksiyon: "Hizmet kapsamını görün",
+      guvenEtiketi: "Envanter ve sorumluluk kaydı",
+      hizmetEtiketi: "Taşıma türleri",
+      surecEtiketi: "Ekspertizden teslim tutanağına",
+      sssEtiketi: "Taşınmadan önce",
+      iletisimEtiketi: "Rota ve eşya bilgisini paylaşın",
+      anaSayfaAkisi: ["hero", "guven", "surec", "hizmetler", "sss", "iletisim"],
+    },
+  },
+  transfer: {
+    aile: "ulasim",
+    panelTuru: "transfer-rezervasyonu",
+    kod: "Yolculuk planı 01",
+    ustEtiket: "TRANSFER REZERVASYONU",
+    durum: "Sabit rota planı",
+    adimlar: ["Rotayı girin", "Aracı seçin", "Yolculuğu onaylayın"],
+    metrikler: [
+      { etiket: "Karşılama", deger: "Uçuş takipli" },
+      { etiket: "Fiyat", deger: "Rota bazlı" },
+    ],
+    alanlar: [
+      { etiket: "Alış noktası", deger: "Havalimanı / adres" },
+      { etiket: "Bırakış noktası", deger: "Otel / adres" },
+      { etiket: "Yolcu ve bagaj", deger: "Kapasite seçimi" },
+    ],
+    secimEtiketi: "Araç sınıfı",
+    secenekler: ["Sedan", "VIP van", "Grup aracı"],
+    sonuc: { etiket: "Rezervasyon özeti", deger: "Rota, tarih, saat ve araç" },
+    icerikSemasi: {
+      heroEtiketi: "Rota ve araç seçimi",
+      heroBasligi: "Nereden nereye? Aracınızı ve saatinizi hemen planlayın.",
+      heroAciklamasi: "Alış-bırakış noktasını, uçuş saatini, yolcu ve bagaj sayısını girerek kapasitesi doğru aracı ve karşılama biçimini baştan netleştirin.",
+      anaAksiyon: "Transfer rotası oluşturun",
+      ikincilAksiyon: "Araç seçeneklerini görün",
+      guvenEtiketi: "Sabit fiyat ve karşılama",
+      hizmetEtiketi: "Transfer seçenekleri",
+      surecEtiketi: "Rotadan kapı önü teslime",
+      sssEtiketi: "Yolculuk öncesi",
+      iletisimEtiketi: "Uçuş ve rota bilgisini paylaşın",
+      anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "sss", "iletisim"],
+    },
+  },
+  "arac-kiralama": {
+    aile: "ulasim",
+    panelTuru: "arac-kiralama",
+    kod: "Kiralama planı 02",
+    ustEtiket: "ARAÇ UYGUNLUK ARAMASI",
+    durum: "Tarihe göre uygunluk",
+    adimlar: ["Tarihleri seçin", "Sınıfı karşılaştırın", "Teslimi planlayın"],
+    metrikler: [
+      { etiket: "Teslim", deger: "Nokta ve saat seçimi" },
+      { etiket: "Koşullar", deger: "Açık bilgilendirme" },
+    ],
+    alanlar: [
+      { etiket: "Alış tarihi", deger: "Gün ve saat" },
+      { etiket: "İade tarihi", deger: "Gün ve saat" },
+      { etiket: "Kullanım", deger: "Şehir / uzun yol / iş" },
+    ],
+    secimEtiketi: "Araç sınıfı",
+    secenekler: ["Ekonomi", "Konfor", "SUV / geniş"],
+    sonuc: { etiket: "Karşılaştırma", deger: "Kapasite, koşul ve teslim noktası" },
+    icerikSemasi: {
+      heroEtiketi: "Tarih, konum ve araç sınıfı",
+      heroBasligi: "Tarih ve ihtiyacınıza uygun araç sınıfını kolayca bulun.",
+      heroAciklamasi: "Alış-iade zamanını, yolcu ve bagaj ihtiyacını, kullanım rotasını ve teslim koşullarını karşılaştırarak doğru araç sınıfını seçin.",
+      anaAksiyon: "Uygun araçları listeleyin",
+      ikincilAksiyon: "Filo sınıflarını görün",
+      guvenEtiketi: "Açık kiralama koşulları",
+      hizmetEtiketi: "Araç sınıfları",
+      surecEtiketi: "Rezervasyondan iadeye",
+      sssEtiketi: "Kiralama öncesi",
+      iletisimEtiketi: "Tarih ve kullanım bilgisini paylaşın",
+      anaSayfaAkisi: ["hero", "hizmetler", "guven", "galeri", "surec", "sss", "iletisim"],
+    },
   },
 };
 

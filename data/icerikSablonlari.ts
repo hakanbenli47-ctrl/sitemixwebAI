@@ -5,6 +5,7 @@ import {
   type SektorIcerikProfili,
 } from "@/data/sektorIcerikProfilleri";
 import { sektorDonusumProfiliniGetir } from "@/data/sektorDonusumProfilleri";
+import { sektorOperasyonProfiliniGetir } from "@/data/sektorGorselDili";
 import {
   sektorSunumProfiliniGetir,
   type SayfaRolu,
@@ -342,10 +343,29 @@ function anaSayfaButonlari(proje: ProjeVerisi): HazirButon[] {
   const whatsapp = whatsappBaglantisi(proje.whatsapp);
   const telefon = telefonBaglantisi(proje.telefon);
   const sunum = sektorSunumProfiliniGetir(proje.sektor);
+  const profesyonelSema = sektorOperasyonProfiliniGetir(
+    proje.sektor,
+  )?.icerikSemasi;
+
+  if (profesyonelSema) {
+    return [
+      {
+        metin: profesyonelSema.anaAksiyon,
+        baglanti: aksiyonHedefi(proje),
+      },
+      {
+        metin: profesyonelSema.ikincilAksiyon,
+        baglanti: hizmetHedefi(proje),
+      },
+    ];
+  }
 
   if (whatsapp) {
     butonlar.push({
-      metin: proje.sektor === "temizlik" ? "WhatsApp’tan teklif alın" : "WhatsApp’tan bilgi alın",
+      metin:
+        proje.sektor === "temizlik"
+          ? "WhatsApp’tan teklif alın"
+          : "WhatsApp’tan bilgi alın",
       baglanti: whatsapp,
     });
   } else if (telefon) {
@@ -354,7 +374,10 @@ function anaSayfaButonlari(proje: ProjeVerisi): HazirButon[] {
       baglanti: telefon,
     });
   } else {
-    butonlar.push({ metin: "Bilgi alın", baglanti: iletisimHedefi(proje) });
+    butonlar.push({
+      metin: "Bilgi alın",
+      baglanti: aksiyonHedefi(proje),
+    });
   }
 
   butonlar.push({
@@ -639,14 +662,28 @@ function genelIcerik(
     .join(" ");
   const profil = sektorIcerikProfiliniGetir(proje.sektor, mevcutIcerik);
   const donusum = sektorDonusumProfiliniGetir(proje.sektor);
+  const profesyonelSema = sektorOperasyonProfiliniGetir(
+    proje.sektor,
+  )?.icerikSemasi;
   const hizmetler = sektorHizmetleriniGetir(proje.sektor);
   const yerMetni = bolge ? `${bolge} ve çevresinde` : "hizmet bölgenizde";
 
   if (bolum.tur === "hero" && anaSayfaMi) {
     return {
-      ustBaslik: bolge ? `${proje.sektorAdi} · ${bolge}` : proje.sektorAdi,
-      baslik: donusum.heroBaslik || profil.heroBaslik || ton.anaBaslik,
-      aciklama: heroOzetiniGetir(profil),
+      ustBaslik: profesyonelSema
+        ? bolge
+          ? `${profesyonelSema.heroEtiketi} · ${bolge}`
+          : profesyonelSema.heroEtiketi
+        : bolge
+          ? `${proje.sektorAdi} · ${bolge}`
+          : proje.sektorAdi,
+      baslik:
+        profesyonelSema?.heroBasligi ??
+        donusum.heroBaslik ??
+        profil.heroBaslik ??
+        ton.anaBaslik,
+      aciklama:
+        profesyonelSema?.heroAciklamasi ?? heroOzetiniGetir(profil),
       butonlar: anaSayfaButonlari(proje),
     };
   }
@@ -699,7 +736,9 @@ function genelIcerik(
 
   if (bolum.tur === "metin") {
     return {
-      ustBaslik: anaSayfaMi ? "Çalışma yaklaşımımız" : "Nasıl çalışıyoruz?",
+      ustBaslik: anaSayfaMi
+        ? profesyonelSema?.guvenEtiketi ?? "Çalışma yaklaşımımız"
+        : "Nasıl çalışıyoruz?",
       baslik: donusum.hakkimizdaBaslik || profil.yaklasimBaslik || ton.hakkimizdaBaslik,
       aciklama: anaSayfaMi
         ? ilkCumleyiAl(profil.detayliYaklasim)
@@ -737,7 +776,10 @@ function genelIcerik(
 
     if (surecBolumuMu) {
       return {
-        ustBaslik: bolum.ustBaslik || "Çalışma süreci",
+        ustBaslik:
+          profesyonelSema?.surecEtiketi ||
+          bolum.ustBaslik ||
+          "Çalışma süreci",
         baslik: donusum.surecBaslik,
         aciklama: "",
         listeElemanlari: donusum.surecAdimlari.map((oge, index) => ({
@@ -756,7 +798,9 @@ function genelIcerik(
     }
 
     return {
-      ustBaslik: anaSayfaMi ? "Neden bizi tercih etmelisiniz?" : "Çalışma ilkelerimiz",
+      ustBaslik: anaSayfaMi
+        ? profesyonelSema?.guvenEtiketi ?? "Neden bizi tercih etmelisiniz?"
+        : "Çalışma ilkelerimiz",
       baslik: donusum.guvenBaslik,
       aciklama: "",
       listeElemanlari: donusum.guvenUnsurlari.map((oge) => ({
@@ -789,7 +833,10 @@ function genelIcerik(
 
   if (bolum.tur === "sss") {
     return {
-      ustBaslik: bolum.ustBaslik || "Sık sorulan sorular",
+      ustBaslik:
+        profesyonelSema?.sssEtiketi ||
+        bolum.ustBaslik ||
+        "Sık sorulan sorular",
       baslik: donusum.sssBaslik,
       aciklama: "",
       listeElemanlari: donusum.sorular.map((oge, index) => ({
@@ -805,7 +852,9 @@ function genelIcerik(
 
   if (bolum.tur === "iletisim") {
     return {
-      ustBaslik: anaSayfaMi ? "Bilgi ve planlama" : "İletişim",
+      ustBaslik: anaSayfaMi
+        ? profesyonelSema?.iletisimEtiketi ?? "Bilgi ve planlama"
+        : "İletişim",
       baslik: donusum.iletisimBaslik,
       aciklama: anaSayfaMi
         ? profil.iletisimIstegi
@@ -828,7 +877,9 @@ function genelIcerik(
     const randevuSayfasiMi = sayfaRolu === "aksiyon";
 
     return {
-      ustBaslik: randevuSayfasiMi ? "Talep oluşturun" : "Kısa bilgi bırakın",
+      ustBaslik:
+        profesyonelSema?.iletisimEtiketi ??
+        (randevuSayfasiMi ? "Talep oluşturun" : "Kısa bilgi bırakın"),
       baslik: randevuSayfasiMi
         ? donusum.iletisimBaslik
         : "İhtiyacınızı birkaç bilgiyle anlatın",

@@ -28,7 +28,10 @@ import {
 import styles from "./siteGorunumu.module.css";
 import semaStyles from "./sektorSemalari.module.css";
 import SektorSahnesi from "./SektorSahnesi";
-import { sektorKararNoktalariniGetir } from "@/data/sektorGorselDili";
+import {
+  sektorKararNoktalariniGetir,
+  sektorOperasyonProfiliniGetir,
+} from "@/data/sektorGorselDili";
 import type {
   AnimasyonTuru,
   SiteBolumu,
@@ -36,7 +39,10 @@ import type {
 } from "@/data/sektorSablonlari";
 import { sektorHizmetleriniGetir } from "@/data/sektorSablonlari";
 import { sektorFormProfiliniGetir } from "@/data/sektorFormProfilleri";
-import { temaKarakterleriniGetir } from "@/data/sektorSunumProfilleri";
+import {
+  sektorSunumProfiliniGetir,
+  temaKarakterleriniGetir,
+} from "@/data/sektorSunumProfilleri";
 import {
   sektorTasariminiGetir,
   type SektorTasarimSecenegi,
@@ -732,6 +738,7 @@ function HeroBolumu({
   bilgiler: HeroBilgisi[];
   dahiliBaglantiAc: DahiliBaglantiFonksiyonu;
 }) {
+  const profesyonelProfil = sektorOperasyonProfiliniGetir(sektor);
   const arkaPlanStili = bolum.arkaPlanGorseli
     ? {
         backgroundImage: `linear-gradient(rgba(5, 8, 6, 0.55), rgba(5, 8, 6, 0.55)), url("${bolum.arkaPlanGorseli}")`,
@@ -751,7 +758,10 @@ function HeroBolumu({
       variants={animasyon}
       data-site-alani="hero"
     >
-      <div className={styles.heroDekorasyon}>
+      <div
+        className={styles.heroDekorasyon}
+        data-site-parcasi="hero-dekorasyon"
+      >
         <motion.span
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
@@ -763,7 +773,11 @@ function HeroBolumu({
         />
       </div>
 
-      <div className={styles.heroKunye} aria-hidden="true">
+      <div
+        className={styles.heroKunye}
+        data-site-parcasi="hero-kunye"
+        aria-hidden="true"
+      >
         <span>{firmaAdi}</span>
         <i />
         <strong>{tasarim?.etiket || sektorAdi}</strong>
@@ -817,7 +831,11 @@ function HeroBolumu({
       {!bolum.arkaPlanGorseli && (
         <motion.div
           className={`${styles.heroGorseli} ${
-            bolum.gorsel ? "" : styles.heroSahnesi
+            bolum.gorsel
+              ? ""
+              : profesyonelProfil
+                ? styles.heroKararPaneli
+                : styles.heroSahnesi
           }`}
           data-site-parcasi="hero-gorsel"
           initial={{
@@ -858,15 +876,23 @@ function HeroBolumu({
             />
           )}
 
-          <div className={styles.gorselNumarasi}>
+          <div
+            className={styles.gorselNumarasi}
+            data-site-parcasi="panel-etiketi"
+          >
             <span>01</span>
-            <strong>{bolum.gorsel ? "SEÇİLİ İŞ" : "SEKTÖR SAHNESİ"}</strong>
+            <strong>
+              {bolum.gorsel
+                ? "SEÇİLİ İŞ"
+                : profesyonelProfil?.ustEtiket ?? "SEKTÖR SAHNESİ"}
+            </strong>
           </div>
         </motion.div>
       )}
 
       <motion.div
         className={styles.kaydirmaIsareti}
+        data-site-parcasi="kaydirma-isareti"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{
@@ -2008,6 +2034,13 @@ export default function SiteGorunumu({
     proje.tasarim,
     proje.tema,
   );
+  const profesyonelProfil = sektorOperasyonProfiliniGetir(proje.sektor);
+  const sunumProfili = sektorSunumProfiliniGetir(proje.sektor);
+  const profesyonelHeaderHedefi = profesyonelProfil
+    ? proje.siteTipi === "cok-sayfa" && sunumProfili.aksiyonSayfasi
+      ? `/${sunumProfili.aksiyonSayfasi.slug}`
+      : "#iletisim"
+    : "";
   const etkinTema = tasarim?.tema ?? proje.tema;
   const renkler = temaRenkleri[etkinTema] ?? temaRenkleri.standard;
   const temaKarakterSiniflari = temaKarakterleriniGetir(etkinTema)
@@ -2037,6 +2070,9 @@ export default function SiteGorunumu({
       className={`${styles.site} ${semaStyles.sektorSemasi} ${styles[`tema_${etkinTema}`] ?? ""} ${temaKarakterSiniflari}`}
       style={cssDegiskenleri}
       data-sektor={proje.sektor}
+      data-profesyonel-sema={profesyonelProfil ? "true" : undefined}
+      data-profesyonel-aile={profesyonelProfil?.aile}
+      data-karar-paneli={profesyonelProfil?.panelTuru}
       data-tasarim-aile={tasarim?.aile}
       data-tasarim-duzen={tasarim?.duzen}
       data-kart-stili={tasarim?.kartStili}
@@ -2079,16 +2115,34 @@ export default function SiteGorunumu({
           ))}
         </nav>
 
-        {(whatsappBaglantisi(proje.whatsapp) ||
+        {(profesyonelProfil ||
+          whatsappBaglantisi(proje.whatsapp) ||
           telefonBaglantisi(proje.telefon)) && (
           <a
             className={styles.headerAksiyon}
             href={
+              profesyonelHeaderHedefi ||
               whatsappBaglantisi(proje.whatsapp) ||
               telefonBaglantisi(proje.telefon)
             }
-            target={whatsappBaglantisi(proje.whatsapp) ? "_blank" : undefined}
-            rel={whatsappBaglantisi(proje.whatsapp) ? "noreferrer" : undefined}
+            target={
+              !profesyonelProfil && whatsappBaglantisi(proje.whatsapp)
+                ? "_blank"
+                : undefined
+            }
+            rel={
+              !profesyonelProfil && whatsappBaglantisi(proje.whatsapp)
+                ? "noreferrer"
+                : undefined
+            }
+            onClick={
+              profesyonelProfil
+                ? (event) => {
+                    event.preventDefault();
+                    dahiliBaglantiAc(profesyonelHeaderHedefi, "iletisim");
+                  }
+                : undefined
+            }
           >
             {whatsappBaglantisi(proje.whatsapp) ? (
               <MessageCircle size={17} />
@@ -2096,7 +2150,10 @@ export default function SiteGorunumu({
               <Phone size={17} />
             )}
             <span>
-              {whatsappBaglantisi(proje.whatsapp) ? "Bilgi alın" : "Hemen arayın"}
+              {profesyonelProfil?.icerikSemasi.anaAksiyon ??
+                (whatsappBaglantisi(proje.whatsapp)
+                  ? "Bilgi alın"
+                  : "Hemen arayın")}
             </span>
           </a>
         )}
@@ -2114,7 +2171,7 @@ export default function SiteGorunumu({
         </button>
       </header>
 
-      {aktifSayfa.anaSayfa && (
+      {aktifSayfa.anaSayfa && !profesyonelProfil && (
         <MarkaSeridi
           sektorAdi={proje.sektorAdi}
           hizmetler={markaHizmetleri}

@@ -1,5 +1,21 @@
 "use client";
 
+import {
+  BaggageClaim,
+  CalendarDays,
+  CarFront,
+  Droplets,
+  MapPinned,
+  Scissors,
+  ShieldCheck,
+  Sofa,
+  Sparkles,
+  SprayCan,
+  Truck,
+  Wrench,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import {
   sektorKararNoktalariniGetir,
@@ -29,31 +45,27 @@ interface OperasyonSahnesiProps {
   hareketiAzalt: boolean | null;
 }
 
-function OperasyonAdimlari({ profil }: { profil: SektorOperasyonProfili }) {
-  return (
-    <ol className={styles.operasyonAdimlari}>
-      {profil.adimlar.map((adim, sira) => (
-        <li key={adim}>
-          <span>{String(sira + 1).padStart(2, "0")}</span>
-          <strong>{adim}</strong>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
-function OperasyonMetrikleri({ profil }: { profil: SektorOperasyonProfili }) {
-  return (
-    <dl className={styles.operasyonMetrikleri}>
-      {profil.metrikler.map((metrik) => (
-        <div key={`${metrik.etiket}-${metrik.deger}`}>
-          <dt>{metrik.etiket}</dt>
-          <dd>{metrik.deger}</dd>
-        </div>
-      ))}
-    </dl>
-  );
-}
+const panelIkonlari: Record<
+  SektorOperasyonProfili["panelTuru"],
+  LucideIcon
+> = {
+  "yikama-paketi": Droplets,
+  "yuzey-analizi": CarFront,
+  "kaplama-plani": CarFront,
+  "bakim-randevusu": Sparkles,
+  "sac-randevusu": Scissors,
+  "berber-randevusu": Scissors,
+  "temizlik-kapsami": SprayCan,
+  "kumas-analizi": Sofa,
+  "hali-takibi": ShieldCheck,
+  "risk-protokolu": ShieldCheck,
+  "elektrik-teshisi": Zap,
+  "tesisat-teshisi": Wrench,
+  "kombi-teshisi": Wrench,
+  "tasima-teklifi": Truck,
+  "transfer-rezervasyonu": MapPinned,
+  "arac-kiralama": BaggageClaim,
+};
 
 function OperasyonSahnesi({
   profil,
@@ -61,157 +73,88 @@ function OperasyonSahnesi({
   baslik,
   hareketiAzalt,
 }: OperasyonSahnesiProps) {
-  if (profil.aile === "bakim") {
-    return (
-      <div className={`${styles.operasyonPaneli} ${styles.operasyonBakim}`}>
-        <header>
-          <span>{profil.ustEtiket}</span>
-          <strong>{profil.kod}</strong>
-        </header>
-        <div className={styles.bakimKartlari}>
-          <article>
-            <small>KİŞİYE ÖZEL PLAN</small>
-            <strong>{sektorAdi}</strong>
-            <p>{baslik}</p>
-          </article>
-          <aside>
-            <span>RANDEVU DURUMU</span>
-            <strong>{profil.durum}</strong>
-            <OperasyonMetrikleri profil={profil} />
-          </aside>
-        </div>
-        <OperasyonAdimlari profil={profil} />
-      </div>
-    );
-  }
-
-  if (profil.aile === "temizlik") {
-    return (
-      <div className={`${styles.operasyonPaneli} ${styles.operasyonTemizlik}`}>
-        <header>
-          <span>{profil.ustEtiket}</span>
-          <strong>{profil.kod}</strong>
-        </header>
-        <div className={styles.temizlikMatrisi}>
-          <article>
-            <small>OPERASYON</small>
-            <strong>{sektorAdi}</strong>
-            <p>{baslik}</p>
-          </article>
-          <OperasyonMetrikleri profil={profil} />
-          <div className={styles.temizlikOnayi}>
-            <span>✓</span>
-            <strong>{profil.durum}</strong>
-          </div>
-        </div>
-        <OperasyonAdimlari profil={profil} />
-      </div>
-    );
-  }
-
-  if (profil.aile === "hijyen") {
-    return (
-      <div className={`${styles.operasyonPaneli} ${styles.operasyonHijyen}`}>
-        <header>
-          <span>{profil.ustEtiket}</span>
-          <strong>{profil.kod}</strong>
-        </header>
-        <div className={styles.hijyenRiskAlani}>
-          <article>
-            <small>RİSK SINIFI / KONTROLLÜ</small>
-            <strong>{sektorAdi}</strong>
-            <p>{baslik}</p>
-          </article>
-          <div className={styles.hijyenDurumu}>
-            <span>PROTOKOL</span>
-            <strong>{profil.durum}</strong>
-          </div>
-        </div>
-        <OperasyonAdimlari profil={profil} />
-        <OperasyonMetrikleri profil={profil} />
-      </div>
-    );
-  }
-
-  if (profil.aile === "teknik") {
-    return (
-      <div className={`${styles.operasyonPaneli} ${styles.operasyonTeknik}`}>
-        <header>
-          <span>{profil.ustEtiket}</span>
-          <strong>{profil.kod}</strong>
-        </header>
-        <div className={styles.teknikEkrani}>
-          <article>
-            <small>SERVİS / ÖLÇÜM / TEST</small>
-            <strong>{sektorAdi}</strong>
-            <p>{baslik}</p>
-          </article>
-          <motion.i
-            animate={hareketiAzalt ? undefined : { scaleX: [0.18, 1, 0.18] }}
-            transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <div className={styles.teknikDurumu}>
-            <span>SERVİS DURUMU</span>
-            <strong>{profil.durum}</strong>
-          </div>
-        </div>
-        <OperasyonMetrikleri profil={profil} />
-        <OperasyonAdimlari profil={profil} />
-      </div>
-    );
-  }
-
-  if (profil.aile === "lojistik") {
-    return (
-      <div className={`${styles.operasyonPaneli} ${styles.operasyonLojistik}`}>
-        <header>
-          <span>{profil.ustEtiket}</span>
-          <strong>{profil.kod}</strong>
-        </header>
-        <div className={styles.lojistikManifesto}>
-          <article>
-            <small>ÇIKIŞ / ROTA / VARIŞ</small>
-            <strong>{sektorAdi}</strong>
-            <p>{baslik}</p>
-          </article>
-          <div className={styles.rotaCizgisi} aria-hidden="true">
-            <span />
-            <motion.i
-              animate={hareketiAzalt ? undefined : { x: [0, 120, 0] }}
-              transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <span />
-          </div>
-          <div className={styles.lojistikDurumu}>
-            <span>OPERASYON</span>
-            <strong>{profil.durum}</strong>
-          </div>
-        </div>
-        <OperasyonAdimlari profil={profil} />
-        <OperasyonMetrikleri profil={profil} />
-      </div>
-    );
-  }
+  const PanelIkonu = panelIkonlari[profil.panelTuru] ?? CalendarDays;
 
   return (
-    <div className={`${styles.operasyonPaneli} ${styles.operasyonOtomotiv}`}>
-      <header>
-        <span>{profil.ustEtiket}</span>
-        <strong>{profil.kod}</strong>
+    <div
+      className={styles.profesyonelPanel}
+      data-panel-turu={profil.panelTuru}
+      data-panel-aile={profil.aile}
+    >
+      <header className={styles.panelUstBilgi}>
+        <span className={styles.panelKimligi}>
+          <i aria-hidden="true">
+            <PanelIkonu size={18} strokeWidth={1.8} />
+          </i>
+          <span>
+            <small>{profil.ustEtiket}</small>
+            <strong>{profil.kod}</strong>
+          </span>
+        </span>
+        <span className={styles.panelDurumu}>
+          <motion.i
+            aria-hidden="true"
+            animate={hareketiAzalt ? undefined : { opacity: [0.35, 1, 0.35] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+          />
+          {profil.durum}
+        </span>
       </header>
-      <div className={styles.otomotivIsEmri}>
-        <article>
-          <small>ARAÇ / YÜZEY / UYGULAMA</small>
-          <strong>{sektorAdi}</strong>
-          <p>{baslik}</p>
-        </article>
-        <div className={styles.otomotivDurumu}>
-          <span>İŞ EMRİ DURUMU</span>
-          <strong>{profil.durum}</strong>
-        </div>
-        <OperasyonMetrikleri profil={profil} />
+
+      <div className={styles.panelBaslik}>
+        <small>{sektorAdi}</small>
+        <strong>{baslik}</strong>
       </div>
-      <OperasyonAdimlari profil={profil} />
+
+      <dl className={styles.kararAlanlari}>
+        {profil.alanlar.map((alan, sira) => (
+          <div key={`${alan.etiket}-${alan.deger}`}>
+            <dt>
+              <span>{String(sira + 1).padStart(2, "0")}</span>
+              {alan.etiket}
+            </dt>
+            <dd>{alan.deger}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <div className={styles.secimAlani}>
+        <small>{profil.secimEtiketi}</small>
+        <div>
+          {profil.secenekler.map((secenek, sira) => (
+            <span key={secenek} data-secili={sira === 0 ? "true" : "false"}>
+              {secenek}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className={styles.panelSonucu}>
+        <div>
+          <small>{profil.sonuc.etiket}</small>
+          <strong>{profil.sonuc.deger}</strong>
+        </div>
+        <CalendarDays size={20} strokeWidth={1.8} aria-hidden="true" />
+      </div>
+
+      <footer className={styles.panelAltBilgi}>
+        <ol>
+          {profil.adimlar.map((adim, sira) => (
+            <li key={adim}>
+              <span>{String(sira + 1).padStart(2, "0")}</span>
+              <strong>{adim}</strong>
+            </li>
+          ))}
+        </ol>
+        <dl>
+          {profil.metrikler.map((metrik) => (
+            <div key={`${metrik.etiket}-${metrik.deger}`}>
+              <dt>{metrik.etiket}</dt>
+              <dd>{metrik.deger}</dd>
+            </div>
+          ))}
+        </dl>
+      </footer>
     </div>
   );
 }

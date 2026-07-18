@@ -356,7 +356,7 @@ for (const sektor of sektorler.sektorler) {
     }
 
     if (
-      secenek.medyaStratejisi !== "gorselsiz-sahne" ||
+      secenek.medyaStratejisi !== "metin-odakli" ||
       secenek.gorselLimiti !== gorselDilleri.SECILI_IS_GORSEL_LIMITI
     ) {
       sorunlar.push(`${sektor.id}: görselsiz medya stratejisi uygulanmadı`);
@@ -435,7 +435,7 @@ for (const sektor of sektorler.sektorler) {
     if (
       profesyonelAkis
         ? anaSayfaBolumleri.length !== profesyonelAkis.length
-        : anaSayfaBolumleri.length < 7 || anaSayfaBolumleri.length > 9
+        : anaSayfaBolumleri.length < 6 || anaSayfaBolumleri.length > 8
     ) {
       sorunlar.push(`${sektor.id}/${siteTipi}: ana sayfa bölüm sayısı dengesiz`);
     }
@@ -455,7 +455,6 @@ for (const sektor of sektorler.sektorler) {
         hizmetler: "hizmetler",
         surec: "neden-biz",
         hikaye: "metin",
-        galeri: "galeri",
         sss: "sss",
         iletisim: "iletisim",
       };
@@ -552,19 +551,22 @@ for (const sektor of sektorler.sektorler) {
       }
     }
 
-    const galeriBekleniyor = profesyonelAkis
-      ? sunum.galeriKullan && profesyonelAkis.includes("galeri")
-      : sunum.galeriKullan;
-
-    if (galeriBekleniyor !== anaSayfaTurleri.has("galeri")) {
-      sorunlar.push(`${sektor.id}/${siteTipi}: galeri tercihi uygulanmadı`);
+    if (
+      anaSayfaTurleri.has("galeri") ||
+      sonuc.sayfalar.some(
+        (sayfa) =>
+          sayfa.rol === "galeri" ||
+          sayfa.bolumler.some((bolum) => bolum.tur === "galeri"),
+      )
+    ) {
+      sorunlar.push(`${sektor.id}/${siteTipi}: görselsiz yapıda galeri üretildi`);
     }
 
     if (siteTipi === "tek-sayfa" && sonuc.sayfalar.length !== 1) {
       sorunlar.push(`${sektor.id}: tek sayfa yapısı hatalı`);
     }
 
-    if (siteTipi === "cok-sayfa" && sonuc.sayfalar.length < 5) {
+    if (siteTipi === "cok-sayfa" && sonuc.sayfalar.length < 4) {
       sorunlar.push(`${sektor.id}: çok sayfa yapısı yetersiz`);
     }
 
@@ -749,12 +751,8 @@ const siteCss = fs.readFileSync(
   path.join(kok, "components/site/siteGorunumu.module.css"),
   "utf8",
 );
-const sektorSemaCss = fs.readFileSync(
-  path.join(kok, "components/site/sektorSemalari.module.css"),
-  "utf8",
-);
-const sektorSahneCss = fs.readFileSync(
-  path.join(kok, "components/site/sektorSahnesi.module.css"),
+const metinTemaCss = fs.readFileSync(
+  path.join(kok, "components/site/metinTemalari.module.css"),
   "utf8",
 );
 const temaSecimCss = fs.readFileSync(
@@ -790,31 +788,43 @@ function kontrastOrani(birinci, ikinci) {
   return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
 }
 
+for (const [aile, metin, zemin, vurgu] of [
+  ["varsayılan", "#171a18", "#f7f6f2", "#225f49"],
+  ["otomotiv", "#191b1d", "#f4f3f0", "#8a4308"],
+  ["bakım", "#34272d", "#faf6f3", "#8b3658"],
+  ["temizlik", "#15251f", "#f3f8f5", "#0b6b50"],
+  ["hijyen", "#24231e", "#f7f5ed", "#705b00"],
+  ["teknik", "#152235", "#f2f5f8", "#165a9f"],
+  ["lojistik", "#16231a", "#f2f5f1", "#1b693e"],
+  ["ulaşım", "#152831", "#f2f6f7", "#146976"],
+]) {
+  if (kontrastOrani(metin, zemin) < 7) {
+    sorunlar.push(`${aile}: ana metin kontrastı 7 altında`);
+  }
+
+  if (kontrastOrani(vurgu, zemin) < 4.5) {
+    sorunlar.push(`${aile}: vurgu kontrastı 4.5 altında`);
+  }
+
+  if (kontrastOrani("#ffffff", vurgu) < 4.5) {
+    sorunlar.push(`${aile}: vurgu düğmesi kontrastı 4.5 altında`);
+  }
+}
+
 const siteBileseni = fs.readFileSync(
   path.join(kok, "components/site/SiteGorunumu.tsx"),
   "utf8",
 );
-const sektorSahnesi = fs.readFileSync(
-  path.join(kok, "components/site/SektorSahnesi.tsx"),
-  "utf8",
-);
-
-if (!siteBileseni.includes("SektorSahnesi") || !sektorSahnesi.includes("motion")) {
-  sorunlar.push("tipografik sektör sahnesi site görünümüne bağlanmadı");
-}
-
-if (sektorSahnesi.includes("kisaltma") || !sektorSahnesi.includes("{sektorAdi}")) {
-  sorunlar.push("sektör sahnesinde kısaltma kaldı veya tam sektör adı gösterilmiyor");
-}
 
 if (
-  !sektorSahnesi.includes("sektorKararNoktalariniGetir") ||
-  !sektorSahnesi.includes("sektorOperasyonProfiliniGetir") ||
-  !sektorSahnesi.includes("OperasyonSahnesi") ||
-  !sektorSahnesi.includes("data-duzen={duzen}") ||
-  !siteBileseni.includes("sektorKararNoktalariniGetir")
+  siteBileseni.includes("SektorSahnesi") ||
+  /<(?:img|Image)\b/.test(siteBileseni) ||
+  siteBileseni.includes('data-site-parcasi="hero-gorsel"') ||
+  siteBileseni.includes('data-site-parcasi="galeri"') ||
+  !siteBileseni.includes('bolum.tur === "galeri"') ||
+  !siteBileseni.includes("metinTemalari.module.css")
 ) {
-  sorunlar.push("sektörel karar mimarisi sahne ve hero alanına bağlanmadı");
+  sorunlar.push("site görünümünde görsel, galeri veya sahne yer tutucusu kaldı");
 }
 
 if (/initial="gizli"[\s\S]{0,120}whileInView=/.test(siteBileseni)) {
@@ -851,12 +861,9 @@ for (const gerekliSinif of [
   ".varyasyon_adimlar",
   ".sssOgesi",
   ".formYerlesimi",
-  ".markaSeridi",
   ".heroBilgiListesi",
-  ".bolumFiligran",
   '[data-bolum-turu="hizmetler"]',
   '[data-bolum-turu="istatistik"]',
-  '[data-bolum-turu="galeri"]',
   '[data-bolum-turu="sss"]',
   "@media (max-width: 650px)",
   "@media (prefers-reduced-motion: reduce)",
@@ -873,18 +880,32 @@ for (const gerekliSinif of [
   }
 }
 
-for (const operasyonSinifi of [
-  ".operasyonOtomotiv",
-  ".operasyonBakim",
-  ".operasyonTemizlik",
-  ".operasyonHijyen",
-  ".operasyonTeknik",
-  ".operasyonLojistik",
-  "@container (max-width: 460px)",
+for (const metinTemaKurali of [
+  ".sadeSite",
+  ".heroSadeceMetin",
+  ".metinSadeceMetin",
+  'data-profesyonel-aile="otomotiv"',
+  'data-profesyonel-aile="bakim"',
+  'data-profesyonel-aile="temizlik"',
+  'data-profesyonel-aile="hijyen"',
+  'data-profesyonel-aile="teknik"',
+  'data-profesyonel-aile="lojistik"',
+  'data-profesyonel-aile="ulasim"',
+  'data-site-alani="hero"',
+  'data-site-parcasi="hero-metin"',
+  'data-site-parcasi="hero-bilgi"',
+  'data-site-parcasi="liste"',
+  'data-site-parcasi="kart"',
+  "@media (max-width: 650px)",
+  "@media (prefers-reduced-motion: reduce)",
 ]) {
-  if (!sektorSahneCss.includes(operasyonSinifi)) {
-    sorunlar.push(`köklü operasyon sahnesi CSS'i eksik: ${operasyonSinifi}`);
+  if (!metinTemaCss.includes(metinTemaKurali)) {
+    sorunlar.push(`görselsiz metin teması eksik: ${metinTemaKurali}`);
   }
+}
+
+if (/url\(|(?:linear|radial)-gradient\(/.test(metinTemaCss)) {
+  sorunlar.push("metin temasında görsel veya dekoratif gradyan kaldı");
 }
 
 for (const semantikRenk of [
@@ -915,81 +936,14 @@ for (const guvenliYerlesimKurali of [
   }
 }
 
-if (!sektorSemaCss.includes("@media (max-width: 1240px)")) {
-  sorunlar.push("dar masaüstü için güvenli sektör kırılımı eksik");
-}
-
-for (const responsiveGuvenlikKurali of [
-  "@media (min-width: 1241px)",
-  'data-site-parcasi="hikaye"',
-  "overflow-wrap: normal",
-  "word-break: normal",
-]) {
-  if (!sektorSemaCss.includes(responsiveGuvenlikKurali)) {
-    sorunlar.push(`sektör şeması responsive güvenlik kuralı eksik: ${responsiveGuvenlikKurali}`);
-  }
-}
-
-for (const ortakResponsiveKural of [
-  ".varyasyon_vitrin .galeri figure:first-child",
-  ".varyasyon_iki_kolon .liste",
-  'data-bolum-turu="sss"',
-]) {
-  if (!siteCss.includes(ortakResponsiveKural)) {
-    sorunlar.push(`ortak responsive yerleşim kuralı eksik: ${ortakResponsiveKural}`);
-  }
-}
-
-for (const sahneGuvenlikKurali of [
-  "container-type: inline-size",
-  "grid-template-columns: minmax(0, 1.15fr)",
-  ".sektorAdi",
-  "max-width: 56%",
-  "text-overflow: ellipsis",
-]) {
-  if (!sektorSahneCss.includes(sahneGuvenlikKurali)) {
-    sorunlar.push(`sektör sahnesi taşma kuralı eksik: ${sahneGuvenlikKurali}`);
-  }
-}
-
-for (const tasarimDuzeni of [
-  "teknik",
-  "sinematik",
-  "servis",
-  "editorial",
-  "klinik",
-  "katalog",
-  "rezervasyon",
-  "portfoy",
-  "egitim",
-  "zanaat",
-]) {
-  if (!sektorSahneCss.includes(`[data-duzen="${tasarimDuzeni}"]`)) {
-    sorunlar.push(`${tasarimDuzeni}: tasarıma özel sektör sahnesi bulunamadı`);
-  }
-}
-
-if (!sektorSemaCss.includes("section[data-bolum-sira]")) {
-  sorunlar.push("bölüm görünürlüğü için güvenli CSS kuralı eksik");
-}
-
-for (const sektor of sektorler.sektorler) {
-  if (!sektorSemaCss.includes(`[data-sektor="${sektor.id}"]`)) {
-    sorunlar.push(`${sektor.id}: sektöre özel sayfa şeması bulunamadı`);
-  }
-}
-
 for (const semaParcasi of [
   "data-site-alani=\"hero\"",
   "data-site-parcasi=\"hero-metin\"",
-  "data-site-parcasi=\"hero-gorsel\"",
   "data-site-parcasi=\"liste\"",
   "data-site-parcasi=\"kart\"",
-  "data-site-parcasi=\"galeri\"",
-  "data-site-parcasi=\"bolum-sahnesi\"",
-  "data-site-parcasi=\"sektor-sahnesi\"",
+  "data-site-parcasi=\"bolum-icerigi\"",
 ]) {
-  if (!siteBileseni.includes(semaParcasi) && !sektorSahnesi.includes(semaParcasi)) {
+  if (!siteBileseni.includes(semaParcasi)) {
     sorunlar.push(`sektör şeması bağlantısı eksik: ${semaParcasi}`);
   }
 }

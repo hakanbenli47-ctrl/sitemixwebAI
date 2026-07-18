@@ -108,13 +108,17 @@ for (const dosyaYolu of kaynakYollari) {
   }
 }
 
-const sahneKaynagi = fs.readFileSync(
-  path.join(kok, "components/site/SektorSahnesi.tsx"),
+const siteKaynagi = fs.readFileSync(
+  path.join(kok, "components/site/SiteGorunumu.tsx"),
   "utf8",
 );
 
-if (sahneKaynagi.includes("kisaltma") || !sahneKaynagi.includes("{sektorAdi}")) {
-  sorunlar.push("Sektör sahnesinde kısaltma kaldı veya tam sektör adı gösterilmiyor.");
+if (
+  siteKaynagi.includes("SektorSahnesi") ||
+  /<(?:img|Image)\b/.test(siteKaynagi) ||
+  !siteKaynagi.includes("metinTemalari.module.css")
+) {
+  sorunlar.push("Yayın görünümünde görsel alanı kaldı veya metin teması eksik.");
 }
 
 console.log(`Yayın kaynağı: ${kaynakYollari.length}`);

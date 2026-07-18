@@ -62,7 +62,7 @@ export type TasarimDuzeni =
 export type KartStili = "keskin" | "yumusak" | "cerceveli" | "katmanli";
 export type IcerikYogunlugu = "ferah" | "dengeli" | "kompakt";
 export type GorselOrani = "panorama" | "portre" | "kare" | "karisik";
-export type MedyaStratejisi = "gorselsiz-sahne";
+export type MedyaStratejisi = "metin-odakli";
 
 export type AnaSayfaBolumu =
   | "hero"
@@ -220,17 +220,17 @@ const aileKurgulari: Record<TasarimAilesi, [AileSecenegi, AileSecenegi, AileSece
 };
 
 const akislar = {
-  otomotiv: ["hero", "guven", "hizmetler", "surec", "galeri", "hikaye", "sss", "iletisim"],
-  proje: ["hero", "galeri", "hikaye", "hizmetler", "surec", "guven", "sss", "iletisim"],
-  hizmet: ["hero", "hizmetler", "guven", "surec", "galeri", "hikaye", "sss", "iletisim"],
+  otomotiv: ["hero", "guven", "hizmetler", "surec", "hikaye", "sss", "iletisim"],
+  proje: ["hero", "hikaye", "hizmetler", "surec", "guven", "sss", "iletisim"],
+  hizmet: ["hero", "hizmetler", "guven", "surec", "hikaye", "sss", "iletisim"],
   acil: ["hero", "guven", "hizmetler", "surec", "sss", "hikaye", "iletisim"],
-  bakim: ["hero", "hizmetler", "surec", "guven", "galeri", "hikaye", "sss", "iletisim"],
+  bakim: ["hero", "hizmetler", "surec", "guven", "hikaye", "sss", "iletisim"],
   hijyen: ["hero", "guven", "surec", "hizmetler", "sss", "hikaye", "iletisim"],
   teknik: ["hero", "guven", "hizmetler", "surec", "sss", "hikaye", "iletisim"],
-  lojistik: ["hero", "guven", "surec", "hizmetler", "galeri", "sss", "hikaye", "iletisim"],
-  saglik: ["hero", "guven", "hizmetler", "hikaye", "surec", "galeri", "sss", "iletisim"],
-  katalog: ["hero", "hizmetler", "galeri", "guven", "hikaye", "surec", "sss", "iletisim"],
-  rezervasyon: ["hero", "hizmetler", "guven", "surec", "galeri", "sss", "hikaye", "iletisim"],
+  lojistik: ["hero", "guven", "surec", "hizmetler", "sss", "hikaye", "iletisim"],
+  saglik: ["hero", "guven", "hizmetler", "hikaye", "surec", "sss", "iletisim"],
+  katalog: ["hero", "hizmetler", "guven", "hikaye", "surec", "sss", "iletisim"],
+  rezervasyon: ["hero", "hizmetler", "guven", "surec", "sss", "hikaye", "iletisim"],
 } satisfies Record<string, AnaSayfaBolumu[]>;
 
 const sektorKimlikleri: Record<string, SektorKimligi> = {
@@ -242,8 +242,8 @@ const sektorKimlikleri: Record<string, SektorKimligi> = {
   tadilat: { aile: "proje-portfoyu", odak: "Keşif, iş kalemleri, uygulama sırası ve teslim disiplini", temalar: ["copper", "marble", "mono"], adlar: ["Dönüşüm Stüdyosu", "Önce Sonra", "Uygulama Planı"], anaSayfaAkisi: akislar.proje },
   dekorasyon: { aile: "proje-portfoyu", odak: "Mekân dili, malzeme seçimi ve tamamlanmış uygulamalar", temalar: ["terra", "marble", "artisan"], adlar: ["Mekân Hikâyesi", "Dekor Portföyü", "Malzeme Planı"], anaSayfaAkisi: akislar.proje },
   temizlik: { aile: "temizlik-servisi", odak: "Alan keşfi, yüzey matrisi, ekip görev planı ve kontrol listeli hijyen teslimi", temalar: ["hygiene", "lagoon", "aurora"], adlar: ["Hijyen Operasyon Planı", "Doğrulanabilir Sonuç", "Periyodik Hizmet Sistemi"], anaSayfaAkisi: akislar.hizmet },
-  "koltuk-yikama": { aile: "temizlik-servisi", odak: "Kumaş etiketi ve renk testi, leke protokolü, kontrollü ekstraksiyon ve nem takibi", temalar: ["hygiene", "lagoon", "skyline"], adlar: ["Kumaş Kabul Protokolü", "Leke ve Sonuç Stüdyosu", "Kuruma Takip Planı"], anaSayfaAkisi: ["hero", "guven", "hizmetler", "surec", "galeri", "sss", "hikaye", "iletisim"] },
-  "hali-yikama": { aile: "temizlik-servisi", odak: "Barkodlu kabul, dokuma sınıflandırması, yıkama reçetesi, kontrollü kurutma ve iade", temalar: ["hygiene", "aurora", "sand"], adlar: ["Halı Kabul Sistemi", "Yıkama ve Kurutma Hattı", "Kayıtlı Teslim Planı"], anaSayfaAkisi: ["hero", "guven", "surec", "hizmetler", "galeri", "sss", "hikaye", "iletisim"] },
+  "koltuk-yikama": { aile: "temizlik-servisi", odak: "Kumaş etiketi ve renk testi, leke protokolü, kontrollü ekstraksiyon ve nem takibi", temalar: ["hygiene", "lagoon", "skyline"], adlar: ["Kumaş Kabul Protokolü", "Leke ve Sonuç Stüdyosu", "Kuruma Takip Planı"], anaSayfaAkisi: ["hero", "guven", "hizmetler", "surec", "sss", "hikaye", "iletisim"] },
+  "hali-yikama": { aile: "temizlik-servisi", odak: "Barkodlu kabul, dokuma sınıflandırması, yıkama reçetesi, kontrollü kurutma ve iade", temalar: ["hygiene", "aurora", "sand"], adlar: ["Halı Kabul Sistemi", "Yıkama ve Kurutma Hattı", "Kayıtlı Teslim Planı"], anaSayfaAkisi: ["hero", "guven", "surec", "hizmetler", "sss", "hikaye", "iletisim"] },
   ilaclama: { aile: "hijyen-kontrol", odak: "Risk keşfi, güvenli ürün-yöntem seçimi, uygulama raporu ve planlı takip", temalar: ["signal", "hygiene", "copper"], adlar: ["Risk Keşif Protokolü", "Uygulama Güvenliği", "Takip ve Raporlama"], anaSayfaAkisi: akislar.hijyen },
   "guzellik-salonu": { aile: "butik-bakim", odak: "Ön görüşme, hijyen protokolü, kişiye uygun bakım ve uygulama sonrası takip", temalar: ["pearl", "ruby", "ivory"], adlar: ["Bakım Danışmanlığı", "Uzmanlık Editörü", "Uygulama Protokolü"], anaSayfaAkisi: akislar.bakim },
   kuafor: { aile: "butik-bakim", odak: "Saç geçmişi analizi, teknik renk-kesim reçetesi, stil sonucu ve evde bakım planı", temalar: ["pearl", "studio", "ivory"], adlar: ["Saç Danışmanlığı", "Stil ve Renk Editörü", "Teknik Uygulama Menüsü"], anaSayfaAkisi: akislar.bakim },
@@ -255,10 +255,10 @@ const sektorKimlikleri: Record<string, SektorKimligi> = {
   veteriner: { aile: "klinik-guven", odak: "Hayvan sağlığı hizmetleri, klinik ortamı ve ulaşılabilir destek", temalar: ["sage", "clinic", "terra"], adlar: ["Dost Kliniği", "Bakım Rehberi", "Kliniğimiz"], anaSayfaAkisi: akislar.saglik },
   emlak: { aile: "emlak-portfoyu", odak: "İlan seçkisi, bölge uzmanlığı ve doğru portföy talebi", temalar: ["skyline", "ivory", "royal"], adlar: ["Seçili Portföy", "Emlak Danışmanı", "İlan Kataloğu"], anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "hikaye", "sss", "iletisim"] },
   mimarlik: { aile: "proje-portfoyu", odak: "Mimari yaklaşım, proje bağlamı, süreç ve seçili yapılar", temalar: ["mono", "marble", "ivory"], adlar: ["Mimari Editör", "Proje Arşivi", "Tasarım Süreci"], anaSayfaAkisi: akislar.proje },
-  fotografci: { aile: "yaratici-portfoy", odak: "Çekim dili, seçili işler, teslim yaklaşımı ve brief", temalar: ["studio", "mono", "noir"], adlar: ["Seçili Kareler", "Görsel Hikâye", "Çekim Türleri"], anaSayfaAkisi: ["hero", "galeri", "hizmetler", "hikaye", "guven", "surec", "sss", "iletisim"] },
-  "dugun-salonu": { aile: "etkinlik-sahnesi", odak: "Salon atmosferi, davet paketleri, kapasite ve tarih uygunluğu", temalar: ["noir", "ivory", "studio"], adlar: ["Davet Sahnesi", "Salon Seçkisi", "Tarih Planı"], anaSayfaAkisi: ["hero", "galeri", "hizmetler", "guven", "surec", "hikaye", "sss", "iletisim"] },
-  "spor-salonu": { aile: "spor-enerjisi", odak: "Antrenman programları, salon olanakları, hedef ve üyelik", temalar: ["obsidian", "neon", "copper"], adlar: ["Performans Alanı", "Hareket Sahnesi", "Program Seçimi"], anaSayfaAkisi: ["hero", "hizmetler", "galeri", "guven", "surec", "hikaye", "sss", "iletisim"] },
-  anaokulu: { aile: "okul-yasami", odak: "Gelişim programı, güvenli okul ortamı, günlük yaşam ve veli görüşmesi", temalar: ["terra", "aurora", "sage"], adlar: ["Neşeli Okul", "Gelişim Yolculuğu", "Okulu Tanıyın"], anaSayfaAkisi: ["hero", "galeri", "guven", "hizmetler", "hikaye", "surec", "sss", "iletisim"] },
+  fotografci: { aile: "yaratici-portfoy", odak: "Çekim dili, seçili işler, teslim yaklaşımı ve brief", temalar: ["studio", "mono", "noir"], adlar: ["Seçili Kareler", "İş Hikâyesi", "Çekim Türleri"], anaSayfaAkisi: ["hero", "hizmetler", "hikaye", "guven", "surec", "sss", "iletisim"] },
+  "dugun-salonu": { aile: "etkinlik-sahnesi", odak: "Salon atmosferi, davet paketleri, kapasite ve tarih uygunluğu", temalar: ["noir", "ivory", "studio"], adlar: ["Davet Planı", "Salon Seçkisi", "Tarih Planı"], anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "hikaye", "sss", "iletisim"] },
+  "spor-salonu": { aile: "spor-enerjisi", odak: "Antrenman programları, salon olanakları, hedef ve üyelik", temalar: ["obsidian", "neon", "copper"], adlar: ["Performans Alanı", "Program Akışı", "Program Seçimi"], anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "hikaye", "sss", "iletisim"] },
+  anaokulu: { aile: "okul-yasami", odak: "Gelişim programı, güvenli okul ortamı, günlük yaşam ve veli görüşmesi", temalar: ["terra", "aurora", "sage"], adlar: ["Neşeli Okul", "Gelişim Yolculuğu", "Okulu Tanıyın"], anaSayfaAkisi: ["hero", "guven", "hizmetler", "hikaye", "surec", "sss", "iletisim"] },
   "ozel-egitim-kursu": { aile: "akademik-program", odak: "Program içeriği, seviye, eğitim yöntemi ve kayıt danışmanlığı", temalar: ["aurora", "royal", "skyline"], adlar: ["Eğitim Rehberi", "Program Kataloğu", "Seviye Görüşmesi"], anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "hikaye", "sss", "iletisim"] },
   matbaa: { aile: "urun-katalogu", odak: "Baskı türü, malzeme, adet, termin ve örnek işler", temalar: ["mono", "copper", "studio"], adlar: ["Baskı Kataloğu", "Seçili İşler", "Hızlı Teklif"], anaSayfaAkisi: akislar.katalog },
   cicekci: { aile: "urun-katalogu", odak: "Aranjman türü, gönderim amacı, tazelik ve teslim zamanı", temalar: ["sage", "terra", "ruby"], adlar: ["Çiçek Seçkisi", "Butik Aranjman", "Aynı Gün Sipariş"], anaSayfaAkisi: akislar.katalog },
@@ -292,18 +292,18 @@ function profilOlustur(sektor: string, kimlik: SektorKimligi): SektorTasarimProf
       id: `${sektor}-tasarim-${index + 1}`,
       ad: kimlik.adlar[index],
       etiket: secenek.etiket,
-      aciklama: `${kimlik.odak}. ${secenek.aciklama} Görsel gerektirmeden sektörel tipografi, geometrik sahneler ve dengeli hareketle eksiksiz çalışır.`,
+      aciklama: `${kimlik.odak}. ${secenek.aciklama} Fotoğraf, galeri veya görsel yer tutucusu kullanmadan güçlü tipografi ve düzenli içerik akışıyla çalışır.`,
       tema: kimlik.temalar[index],
       aile: kimlik.aile,
       duzen: secenek.duzen,
       kartStili: secenek.kartStili,
       yogunluk: secenek.yogunluk,
       gorselOrani: secenek.gorselOrani,
-      medyaStratejisi: "gorselsiz-sahne",
+      medyaStratejisi: "metin-odakli",
       gorselLimiti: 4,
       ozellikler: [
         kimlik.odak,
-        "Görselsiz kullanıma hazır",
+        "Yalnızca metin ve içerik hiyerarşisi",
         "Sektörel tipografi ve dengeli hareket",
         ...secenek.ozellikler,
       ],

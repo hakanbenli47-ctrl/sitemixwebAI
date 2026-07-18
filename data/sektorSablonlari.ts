@@ -14,7 +14,7 @@ import {
   whatsappBaglantisi,
 } from "@/lib/iletisim";
 
-export const GUNCEL_SABLON_SURUMU = 7;
+export const GUNCEL_SABLON_SURUMU = 8;
 
 export type BolumTuru =
   | "hero"
@@ -362,19 +362,9 @@ function anaSayfaBolumleri(
   const anaSayfaSirasi = [
     ...(profesyonelSema?.anaSayfaAkisi ??
       sektorAnaSayfaAkisiniGetir(bilgi.sektor)),
-  ];
-
-  if (
-    !profesyonelSema &&
-    sunum.galeriKullan &&
-    !anaSayfaSirasi.includes("galeri")
-  ) {
-    const sssSirasi = anaSayfaSirasi.indexOf("sss");
-    anaSayfaSirasi.splice(sssSirasi === -1 ? anaSayfaSirasi.length : sssSirasi, 0, "galeri");
-  }
+  ].filter((anahtar) => anahtar !== "galeri");
 
   return anaSayfaSirasi
-    .filter((anahtar) => anahtar !== "galeri" || sunum.galeriKullan)
     .map((anahtar, index) => ({
       ...bolumler[anahtar],
       sira: index,
@@ -545,16 +535,9 @@ function standartSayfalar(
     ]),
   };
 
-  const sayfaSirasi = [...sunum.sayfaSirasi];
-
-  if (sunum.galeriKullan && !sayfaSirasi.includes("galeri")) {
-    const hakkimizdaSirasi = sayfaSirasi.indexOf("hakkimizda");
-    sayfaSirasi.splice(
-      hakkimizdaSirasi === -1 ? sayfaSirasi.length : hakkimizdaSirasi,
-      0,
-      "galeri",
-    );
-  }
+  const sayfaSirasi = [...sunum.sayfaSirasi].filter(
+    (rol) => rol !== "galeri",
+  );
 
   return sayfaSirasi
     .map((rol) => sayfalar[rol])

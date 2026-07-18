@@ -11,7 +11,7 @@ siteleri hazırlayan Next.js tabanlı stüdyo.
 3. İsteğe bağlı OpenAI yapılandırması varsa metinler, mevcut sektör profilini
    ve kullanıcının verdiği gerçek bilgileri koruyarak yeniden yazılır.
 4. Site; fotoğraf gerektirmeden, 36 sektörün her biri için tanımlanmış sektörel
-   tipografi, bilgi şeritleri, geometrik sahneler, renk ve mikro etkileşimlerle tamamlanır.
+   tipografi, içerik hiyerarşisi, güvenli renkler ve ölçülü mikro etkileşimlerle tamamlanır.
    Yalnızca gerçek tamamlanmış işleri göstermek için her seçili işler alanına en
    fazla dört isteğe bağlı görsel eklenebilir; sahte ekip veya stok işletme
    görseli oluşturulmaz.

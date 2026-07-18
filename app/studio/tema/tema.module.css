@@ -197,14 +197,12 @@
 
 .temaOnizleme {
   position: relative;
-  min-height: 255px;
+  min-height: 330px;
   overflow: hidden;
   border: 1px solid var(--tema-cizgi);
-  background:
-    radial-gradient(circle at 88% 12%, color-mix(in srgb, var(--tema-vurgu) 18%, transparent), transparent 24%),
-    linear-gradient(135deg, var(--tema-arka), var(--tema-ikinci));
+  background: var(--tema-arka);
   color: var(--tema-yazi);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.08);
+  box-shadow: none;
 }
 
 .ornekMenu {
@@ -232,7 +230,9 @@
 }
 
 .ornekHero {
-  padding: 36px 22px;
+  display: grid;
+  gap: 9px;
+  padding: 28px 22px 24px;
 }
 
 .ornekHero small {
@@ -241,6 +241,66 @@
   font-weight: 900;
   letter-spacing: 0.13em;
   text-transform: uppercase;
+}
+
+.ornekHero > strong {
+  margin-top: 12px;
+  color: var(--tema-soluk);
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ornekHero h4 {
+  max-width: 12ch;
+  margin: 0;
+  color: var(--tema-yazi);
+  font-size: clamp(30px, 3.3vw, 44px);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.ornekHero p {
+  max-width: 52ch;
+  margin: 4px 0 0;
+  color: var(--tema-soluk);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.ornekAksiyon {
+  width: fit-content;
+  min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 0 11px;
+  background: var(--tema-vurgu);
+  color: var(--tema-buton-yazi);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.ornekIcerikSatiri {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--tema-cizgi);
+}
+
+.ornekIcerikSatiri span {
+  padding: 13px 12px;
+  border-right: 1px solid var(--tema-cizgi);
+  color: var(--tema-soluk);
+  font-size: 8px;
+  font-weight: 750;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.ornekIcerikSatiri span:last-child {
+  border-right: 0;
 }
 
 .ornekBaslik {
@@ -494,13 +554,13 @@
   width: fit-content;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
   margin-top: 13px;
-  padding: 7px 9px;
-  border: 1px solid color-mix(in srgb, var(--tema-vurgu) 34%, transparent);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--tema-vurgu) 8%, transparent);
-  color: var(--tema-vurgu);
+  padding: 7px 0 0;
+  border: 0;
+  border-top: 1px solid rgba(17, 23, 19, 0.15);
+  border-radius: 0;
+  background: transparent;
+  color: #3f4942;
   font-size: 9px;
   font-weight: 850;
   letter-spacing: 0.06em;

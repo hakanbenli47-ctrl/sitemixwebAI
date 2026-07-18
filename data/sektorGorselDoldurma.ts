@@ -1,12 +1,28 @@
 import type { ProjeVerisi } from "@/types/proje";
 
 /**
- * Yeni sunum sistemi boş görsel alanlarını sektörel tipografi sahneleriyle tamamlar.
- * Kullanıcının daha önce eklediği gerçek iş görsellerine dokunulmaz.
+ * Yayın verisini tamamen metin tabanlı sunuma dönüştürür.
+ * Galeri sayfaları ve bölümleri kaldırılır; eski kayıtlardaki görseller temizlenir.
  */
 export function gorselsizSunumuHazirla(proje: ProjeVerisi): ProjeVerisi {
   return {
     ...proje,
+    sayfalar: proje.sayfalar
+      .filter((sayfa) => sayfa.rol !== "galeri")
+      .map((sayfa) => ({
+        ...sayfa,
+        bolumler: sayfa.bolumler
+          .filter((bolum) => bolum.tur !== "galeri")
+          .map((bolum) => ({
+            ...bolum,
+            gorsel: "",
+            arkaPlanGorseli: "",
+            listeElemanlari: bolum.listeElemanlari.map((eleman) => ({
+              ...eleman,
+              gorsel: "",
+            })),
+          })),
+      })),
     otomatikGorsellerOlusturulduMu: false,
     gorselsizSunumHazirlandiMi: true,
     guncellenmeTarihi: new Date().toISOString(),

@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
+import { gorselsizSunumuHazirla } from "@/data/sektorGorselDoldurma";
 import type { ProjeVerisi } from "@/types/proje";
 
 export const runtime = "nodejs";
@@ -281,28 +282,13 @@ async function kaynakDosyalariOku() {
         ),
         "utf8",
       ),
-    "components/site/sektorSemalari.module.css": () =>
+    "components/site/metinTemalari.module.css": () =>
       readFile(
         path.join(
           kokDizin,
           "components",
           "site",
-          "sektorSemalari.module.css",
-        ),
-        "utf8",
-      ),
-    "components/site/SektorSahnesi.tsx": () =>
-      readFile(
-        path.join(kokDizin, "components", "site", "SektorSahnesi.tsx"),
-        "utf8",
-      ),
-    "components/site/sektorSahnesi.module.css": () =>
-      readFile(
-        path.join(
-          kokDizin,
-          "components",
-          "site",
-          "sektorSahnesi.module.css",
+          "metinTemalari.module.css",
         ),
         "utf8",
       ),
@@ -492,7 +478,10 @@ async function aktarilacakDosyalariOlustur(
   repoAdi: string,
 ) {
   const kaynaklar = await kaynakDosyalariOku();
-  const yerelGorselSonucu = await gorselleriYerellestir(proje, repoAdi);
+  const yerelGorselSonucu = await gorselleriYerellestir(
+    gorselsizSunumuHazirla(proje),
+    repoAdi,
+  );
   const yayinProjesi = yerelGorselSonucu.proje;
   const siteUrl = siteAdresiniOlustur(yayinProjesi, repoAdi);
   const seoBasligi = seoBasligiOlustur(yayinProjesi);

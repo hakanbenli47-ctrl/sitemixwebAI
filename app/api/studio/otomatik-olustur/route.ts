@@ -435,7 +435,7 @@ export async function POST(request: Request) {
     uyarilar,
     mesaj:
       uyarilar.length > 0
-        ? "Site hazırlandı; sektör metinleri ve tipografik sahne sistemi kullanıldı."
-        : "Sektöre ve konuma özel içerikler, tema ve tipografik sahne sistemi hazırlandı.",
+        ? "Site hazırlandı; sektör metinleri ve metin odaklı içerik sistemi kullanıldı."
+        : "Sektöre ve konuma özel içerikler, tema ve metin odaklı içerik sistemi hazırlandı.",
   });
 }

@@ -646,18 +646,6 @@
   min-height: inherit;
 }
 
-.heroKararPaneli {
-  min-height: min(70vh, 720px);
-}
-
-.heroKararPaneli::before {
-  display: none;
-}
-
-.heroKararPaneli > [data-site-parcasi="sektor-sahnesi"] {
-  min-height: inherit;
-}
-
 .gorselNumarasi {
   position: absolute;
   z-index: 3;
@@ -3127,10 +3115,6 @@
 
   .heroSahnesi {
     min-height: 420px;
-  }
-
-  .heroKararPaneli {
-    min-height: 620px;
   }
 
   .gorselNumarasi {

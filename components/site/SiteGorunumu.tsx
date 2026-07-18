@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import {
   ArrowRight,
   ExternalLink,
@@ -26,8 +25,7 @@ import {
   useState,
 } from "react";
 import styles from "./siteGorunumu.module.css";
-import semaStyles from "./sektorSemalari.module.css";
-import SektorSahnesi from "./SektorSahnesi";
+import metinStyles from "./metinTemalari.module.css";
 import {
   sektorKararNoktalariniGetir,
   sektorOperasyonProfiliniGetir,
@@ -45,7 +43,6 @@ import {
 } from "@/data/sektorSunumProfilleri";
 import {
   sektorTasariminiGetir,
-  type SektorTasarimSecenegi,
 } from "@/data/sektorTasarimlari";
 import {
   epostaGecerliMi,
@@ -688,101 +685,30 @@ interface HeroBilgisi {
   deger: string;
 }
 
-function MarkaSeridi({
-  sektorAdi,
-  hizmetler,
-}: {
-  sektorAdi: string;
-  hizmetler: string[];
-}) {
-  const ogeler = [sektorAdi, ...hizmetler].filter(Boolean);
-
-  if (ogeler.length === 0) {
-    return null;
-  }
-
-  return (
-    <div
-      className={styles.markaSeridi}
-      data-site-alani="hizmet-seridi"
-      aria-label="Öne çıkan hizmetler"
-    >
-      <div className={styles.markaSeridiAkisi}>
-        {[...ogeler, ...ogeler].map((oge, index) => (
-          <span key={`${oge}-${index}`} aria-hidden={index >= ogeler.length}>
-            <i />
-            {oge}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function HeroBolumu({
   bolum,
   tema,
-  firmaAdi,
-  sektor,
-  sektorAdi,
-  tasarim,
   bilgiler,
   dahiliBaglantiAc,
 }: {
   bolum: SiteBolumu;
   tema: string;
-  firmaAdi: string;
-  sektor: string;
-  sektorAdi: string;
-  tasarim?: SektorTasarimSecenegi;
   bilgiler: HeroBilgisi[];
   dahiliBaglantiAc: DahiliBaglantiFonksiyonu;
 }) {
-  const profesyonelProfil = sektorOperasyonProfiliniGetir(sektor);
-  const arkaPlanStili = bolum.arkaPlanGorseli
-    ? {
-        backgroundImage: `linear-gradient(rgba(5, 8, 6, 0.55), rgba(5, 8, 6, 0.55)), url("${bolum.arkaPlanGorseli}")`,
-      }
-    : undefined;
   const animasyon = bolumAnimasyonlari[bolum.animasyon] ?? bolumGecisi;
 
   return (
     <motion.section
       id={`bolum-${bolum.id}`}
-      className={`${styles.heroBolumu} ${
-        bolum.arkaPlanGorseli ? styles.gorselliHero : ""
-      } ${styles[`hero_${tema}`] ?? ""} ${varyasyonSinifi(bolum.varyasyon)}`}
-      style={arkaPlanStili}
+      className={`${styles.heroBolumu} ${metinStyles.heroSadeceMetin} ${
+        styles[`hero_${tema}`] ?? ""
+      } ${varyasyonSinifi(bolum.varyasyon)}`}
       initial="gizli"
       animate="gorunur"
       variants={animasyon}
       data-site-alani="hero"
     >
-      <div
-        className={styles.heroDekorasyon}
-        data-site-parcasi="hero-dekorasyon"
-      >
-        <motion.span
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{
-            duration: 1.2,
-            delay: 0.4,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-        />
-      </div>
-
-      <div
-        className={styles.heroKunye}
-        data-site-parcasi="hero-kunye"
-        aria-hidden="true"
-      >
-        <span>{firmaAdi}</span>
-        <i />
-        <strong>{tasarim?.etiket || sektorAdi}</strong>
-      </div>
-
       <motion.div
         className={styles.heroMetni}
         data-site-parcasi="hero-metin"
@@ -827,113 +753,20 @@ function HeroBolumu({
           </motion.ul>
         )}
       </motion.div>
-
-      {!bolum.arkaPlanGorseli && (
-        <motion.div
-          className={`${styles.heroGorseli} ${
-            bolum.gorsel
-              ? ""
-              : profesyonelProfil
-                ? styles.heroKararPaneli
-                : styles.heroSahnesi
-          }`}
-          data-site-parcasi="hero-gorsel"
-          initial={{
-            opacity: 0,
-            scale: 0.94,
-            x: 55,
-          }}
-          animate={{
-            opacity: 1,
-            scale: 1,
-            x: 0,
-          }}
-          transition={{
-            duration: 1,
-            delay: 0.25,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-        >
-          {bolum.gorsel ? (
-            <motion.img
-              src={bolum.gorsel}
-              alt={bolum.baslik}
-              whileHover={{
-                scale: 1.035,
-              }}
-              transition={{
-                duration: 0.7,
-              }}
-            />
-          ) : (
-            <SektorSahnesi
-              sektor={sektor}
-              sektorAdi={sektorAdi}
-              aile={tasarim?.aile}
-              duzen={tasarim?.duzen}
-              baslik={bolum.ustBaslik || sektorAdi}
-              varyant="hero"
-            />
-          )}
-
-          <div
-            className={styles.gorselNumarasi}
-            data-site-parcasi="panel-etiketi"
-          >
-            <span>01</span>
-            <strong>
-              {bolum.gorsel
-                ? "SEÇİLİ İŞ"
-                : profesyonelProfil?.ustEtiket ?? "SEKTÖR SAHNESİ"}
-            </strong>
-          </div>
-        </motion.div>
-      )}
-
-      <motion.div
-        className={styles.kaydirmaIsareti}
-        data-site-parcasi="kaydirma-isareti"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{
-          delay: 1.1,
-          duration: 0.6,
-        }}
-      >
-        <span />
-        Aşağı kaydır
-      </motion.div>
     </motion.section>
   );
 }
 
 function MetinBolumu({
   bolum,
-  sektor,
-  sektorAdi,
-  aile,
-  duzen,
   dahiliBaglantiAc,
 }: {
   bolum: SiteBolumu;
-  sektor: string;
-  sektorAdi: string;
-  aile?: string;
-  duzen?: string;
   dahiliBaglantiAc: DahiliBaglantiFonksiyonu;
 }) {
-  const yerlesimSinifi =
-    bolum.varyasyon === "sol-gorsel"
-      ? styles.solGorsel
-      : bolum.varyasyon === "sag-gorsel"
-        ? styles.sagGorsel
-        : styles.tekKolonMetin;
-
   return (
     <div
-      className={`${styles.metinYerlesimi} ${yerlesimSinifi} ${
-        bolum.gorsel ? "" : styles.sahneliMetin
-      }`}
+      className={`${styles.metinYerlesimi} ${styles.tekKolonMetin} ${metinStyles.metinSadeceMetin}`}
       data-site-parcasi="hikaye"
     >
       <motion.div
@@ -957,56 +790,6 @@ function MetinBolumu({
 
         <Butonlar bolum={bolum} dahiliBaglantiAc={dahiliBaglantiAc} />
       </motion.div>
-
-      {bolum.gorsel ? (
-        <motion.div
-          className={styles.metinGorseli}
-          data-site-parcasi="hikaye-gorsel"
-          initial={false}
-          whileInView={{
-            opacity: 1,
-            scale: 1,
-            y: 0,
-          }}
-          viewport={{
-            once: true,
-            amount: 0.25,
-          }}
-          transition={{
-            duration: 0.9,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-        >
-          <motion.img
-            src={bolum.gorsel}
-            alt={bolum.baslik}
-            whileHover={{
-              scale: 1.035,
-            }}
-            transition={{
-              duration: 0.65,
-            }}
-          />
-        </motion.div>
-      ) : (
-        <motion.div
-          className={`${styles.metinGorseli} ${styles.metinSahnesi}`}
-          data-site-parcasi="hikaye-gorsel"
-          initial={false}
-          whileInView={{ opacity: 1, scale: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.25 }}
-          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <SektorSahnesi
-            sektor={sektor}
-            sektorAdi={sektorAdi}
-            aile={aile}
-            duzen={duzen}
-            baslik={bolum.ustBaslik || bolum.baslik}
-            varyant="panel"
-          />
-        </motion.div>
-      )}
     </div>
   );
 }
@@ -1019,7 +802,7 @@ function ListeBolumu({
   dahiliBaglantiAc: DahiliBaglantiFonksiyonu;
 }) {
   const elemanlar = bolum.listeElemanlari.filter(
-    (eleman) => eleman.baslik.trim() || eleman.aciklama.trim() || eleman.gorsel,
+    (eleman) => eleman.baslik.trim() || eleman.aciklama.trim(),
   );
 
   if (elemanlar.length === 0) {
@@ -1070,9 +853,7 @@ function ListeBolumu({
 
         return (
           <motion.article
-            className={`${styles.listeSatiri} ${
-              eleman.gorsel ? "" : styles.gorselsizListeSatiri
-            }`}
+            className={`${styles.listeSatiri} ${styles.gorselsizListeSatiri}`}
             data-site-parcasi="kart"
             key={eleman.id}
             variants={listeElemaniGecisi}
@@ -1106,27 +887,6 @@ function ListeBolumu({
               )}
             </div>
 
-            {eleman.gorsel && (
-              <motion.div
-                className={styles.listeGorsel}
-                data-site-parcasi="kart-gorsel"
-                whileHover={{
-                  scale: 1.025,
-                }}
-                transition={{
-                  duration: 0.4,
-                }}
-              >
-                <Image
-                  src={eleman.gorsel}
-                  alt={eleman.baslik}
-                  width={1200}
-                  height={800}
-                  unoptimized
-                />
-              </motion.div>
-            )}
-
             <motion.span
               className={styles.satirOku}
               whileHover={{
@@ -1138,110 +898,6 @@ function ListeBolumu({
           </motion.article>
         );
       })}
-    </motion.div>
-  );
-}
-
-function GaleriBolumu({
-  bolum,
-  sektor,
-  sektorAdi,
-  aile,
-  duzen,
-}: {
-  bolum: SiteBolumu;
-  sektor: string;
-  sektorAdi: string;
-  aile?: string;
-  duzen?: string;
-}) {
-  const elemanlar = bolum.listeElemanlari
-    .filter(
-      (eleman) =>
-        eleman.gorsel || eleman.baslik.trim() || eleman.aciklama.trim(),
-    )
-    .slice(0, 6);
-
-  if (elemanlar.length === 0 && !bolum.gorsel) {
-    return null;
-  }
-
-  return (
-    <motion.div
-      className={styles.galeri}
-      data-site-parcasi="galeri"
-      variants={listeKapsayici}
-      initial={false}
-      whileInView="gorunur"
-      viewport={{
-        once: true,
-        amount: 0.12,
-      }}
-    >
-      {bolum.gorsel && (
-        <motion.figure
-          className={styles.buyukGaleriGorseli}
-          data-site-parcasi="galeri-karti"
-          variants={listeElemaniGecisi}
-        >
-          <div className={styles.galeriGorselSarma}>
-            <motion.img
-              src={bolum.gorsel}
-              alt={bolum.baslik}
-              whileHover={{
-                scale: 1.04,
-              }}
-              transition={{
-                duration: 0.75,
-              }}
-            />
-          </div>
-        </motion.figure>
-      )}
-
-      {elemanlar.map((eleman, index) => (
-        <motion.figure
-          key={eleman.id}
-          variants={listeElemaniGecisi}
-          data-site-parcasi="galeri-karti"
-        >
-          <div className={styles.galeriGorselSarma}>
-            {eleman.gorsel ? (
-              <motion.img
-                src={eleman.gorsel}
-                alt={eleman.baslik}
-                whileHover={{
-                  scale: 1.055,
-                }}
-                transition={{
-                  duration: 0.65,
-                }}
-              />
-            ) : (
-              <SektorSahnesi
-                sektor={sektor}
-                sektorAdi={sektorAdi}
-                aile={aile}
-                duzen={duzen}
-                baslik={eleman.baslik}
-                varyant="kart"
-                index={index}
-                className={styles.galeriSahnesi}
-              />
-            )}
-
-            <span className={styles.galeriSirasi}>{bolumNumarasi(index)}</span>
-          </div>
-
-          {(eleman.baslik.trim() || eleman.aciklama.trim()) && (
-            <figcaption>
-              {eleman.baslik.trim() && <strong>{eleman.baslik}</strong>}
-
-              {eleman.aciklama.trim() && <span>{eleman.aciklama}</span>}
-            </figcaption>
-          )}
-        </motion.figure>
-      ))}
     </motion.div>
   );
 }
@@ -1617,17 +1273,19 @@ function BolumRender({
   proje,
   index,
   anaSayfaMi,
-  tasarim,
   dahiliBaglantiAc,
 }: {
   bolum: SiteBolumu;
   proje: ProjeVerisi;
   index: number;
   anaSayfaMi: boolean;
-  tasarim?: SektorTasarimSecenegi;
   dahiliBaglantiAc: DahiliBaglantiFonksiyonu;
 }) {
   if (!bolum.aktif) {
+    return null;
+  }
+
+  if (bolum.tur === "galeri") {
     return null;
   }
 
@@ -1641,10 +1299,6 @@ function BolumRender({
       <HeroBolumu
         bolum={bolum}
         tema={proje.tema}
-        firmaAdi={proje.firmaAdi}
-        sektor={proje.sektor}
-        sektorAdi={proje.sektorAdi}
-        tasarim={tasarim}
         bilgiler={heroBilgileri}
         dahiliBaglantiAc={dahiliBaglantiAc}
       />
@@ -1684,30 +1338,8 @@ function BolumRender({
         <i />
       </div>
 
-      <span className={styles.bolumFiligran} aria-hidden="true">
-        {bolumNumarasi(index)}
-      </span>
-
-      <div className={styles.bolumIcerikSahnesi} data-site-parcasi="bolum-sahnesi">
-        {bolum.tur === "galeri" ? (
-          <>
-            <AnimasyonluBaslik
-              ustBaslik={bolum.ustBaslik}
-              baslik={bolum.baslik}
-              aciklama={bolum.aciklama}
-            />
-
-            <GaleriBolumu
-              bolum={bolum}
-              sektor={proje.sektor}
-              sektorAdi={proje.sektorAdi}
-              aile={tasarim?.aile}
-              duzen={tasarim?.duzen}
-            />
-
-            <Butonlar bolum={bolum} dahiliBaglantiAc={dahiliBaglantiAc} />
-          </>
-        ) : bolum.tur === "iletisim" ? (
+      <div className={styles.bolumIcerikSahnesi} data-site-parcasi="bolum-icerigi">
+        {bolum.tur === "iletisim" ? (
           <IletisimBolumu bolum={bolum} proje={proje} />
         ) : bolum.tur === "harita" ? (
           <HaritaBolumu bolum={bolum} proje={proje} />
@@ -1731,10 +1363,6 @@ function BolumRender({
         ) : (
           <MetinBolumu
             bolum={bolum}
-            sektor={proje.sektor}
-            sektorAdi={proje.sektorAdi}
-            aile={tasarim?.aile}
-            duzen={tasarim?.duzen}
             dahiliBaglantiAc={dahiliBaglantiAc}
           />
         )}
@@ -2053,8 +1681,6 @@ export default function SiteGorunumu({
   const aktifBolumler = [...aktifSayfa.bolumler]
     .filter((bolum) => bolum.aktif)
     .sort((a, b) => a.sira - b.sira);
-  const markaHizmetleri = sektorHizmetleriniGetir(proje.sektor).slice(0, 4);
-
   const cssDegiskenleri = {
     "--site-arka-plan": renkler.arkaPlan,
     "--site-ikinci-arka-plan": renkler.ikinciArkaPlan,
@@ -2067,12 +1693,12 @@ export default function SiteGorunumu({
 
   return (
     <main
-      className={`${styles.site} ${semaStyles.sektorSemasi} ${styles[`tema_${etkinTema}`] ?? ""} ${temaKarakterSiniflari}`}
+      className={`${styles.site} ${metinStyles.sadeSite} ${styles[`tema_${etkinTema}`] ?? ""} ${temaKarakterSiniflari}`}
       style={cssDegiskenleri}
+      data-metin-temasi="true"
       data-sektor={proje.sektor}
       data-profesyonel-sema={profesyonelProfil ? "true" : undefined}
       data-profesyonel-aile={profesyonelProfil?.aile}
-      data-karar-paneli={profesyonelProfil?.panelTuru}
       data-tasarim-aile={tasarim?.aile}
       data-tasarim-duzen={tasarim?.duzen}
       data-kart-stili={tasarim?.kartStili}
@@ -2170,13 +1796,6 @@ export default function SiteGorunumu({
           <Menu size={24} />
         </button>
       </header>
-
-      {aktifSayfa.anaSayfa && !profesyonelProfil && (
-        <MarkaSeridi
-          sektorAdi={proje.sektorAdi}
-          hizmetler={markaHizmetleri}
-        />
-      )}
 
       <AnimatePresence>
         {mobilMenuAcik && (
@@ -2282,7 +1901,6 @@ export default function SiteGorunumu({
                 proje={proje}
                 index={index}
                 anaSayfaMi={aktifSayfa.anaSayfa}
-                tasarim={tasarim}
                 dahiliBaglantiAc={dahiliBaglantiAc}
               />
             ))

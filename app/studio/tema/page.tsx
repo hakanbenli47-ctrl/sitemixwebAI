@@ -9,7 +9,6 @@ import {
   LayoutTemplate,
   Monitor,
   Palette,
-  Sparkles,
   Smartphone,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -20,7 +19,6 @@ import {
   type TemaKimligi,
 } from "@/data/sektorTasarimlari";
 import { sektorKararNoktalariniGetir } from "@/data/sektorGorselDili";
-import SektorSahnesi from "@/components/site/SektorSahnesi";
 import styles from "./tema.module.css";
 
 interface Tema {
@@ -701,22 +699,28 @@ export default function TemaSecimSayfasi() {
                 >
                   <div
                     className={styles.temaOnizleme}
-                    data-duzen={tasarim.duzen}
-                    data-kart-stili={tasarim.kartStili}
                   >
                     <div className={styles.ornekMenu}>
                       <strong>{proje.firmaAdi}</strong>
                       <span />
                     </div>
 
-                    <SektorSahnesi
-                      sektor={proje.sektor}
-                      sektorAdi={proje.sektorAdi}
-                      aile={tasarim.aile}
-                      duzen={tasarim.duzen}
-                      baslik={tasarim.ad}
-                      varyant="tema"
-                    />
+                    <div className={styles.ornekHero}>
+                      <small>{tasarim.etiket}</small>
+                      <strong>{proje.sektorAdi}</strong>
+                      <h4>{tasarim.ad}</h4>
+                      <p>{tasarim.aciklama}</p>
+                      <span className={styles.ornekAksiyon}>
+                        Bilgi alın
+                        <ArrowRight size={13} />
+                      </span>
+                    </div>
+
+                    <div className={styles.ornekIcerikSatiri}>
+                      <span>Hizmetler</span>
+                      <span>Güven</span>
+                      <span>İletişim</span>
+                    </div>
                   </div>
 
                   <div className={styles.temaBilgisi}>
@@ -747,8 +751,7 @@ export default function TemaSecimSayfasi() {
                   </ul>
 
                   <span className={styles.gorselsizRozet}>
-                    <Sparkles size={13} />
-                    Görselsiz profesyonel düzen
+                    Sadece içerik ve tipografi
                   </span>
 
                   <small className={styles.onerilen}>
@@ -798,7 +801,7 @@ export default function TemaSecimSayfasi() {
                   </div>
                   <div>
                     <small>Medya yaklaşımı</small>
-                    <strong>Tipografik sahne sistemi</strong>
+                    <strong>Metin odaklı içerik sistemi</strong>
                   </div>
                   <div>
                     <small>İçerik yoğunluğu</small>
@@ -878,10 +881,8 @@ export default function TemaSecimSayfasi() {
                   </div>
 
                   <div>
-                    <Sparkles size={18} />
-                    <span>
-                      Her iş alanında en fazla {aktifTasarim.gorselLimiti} görsel
-                    </span>
+                    <Palette size={18} />
+                    <span>Görselsiz, yüksek kontrastlı içerik düzeni</span>
                   </div>
                 </div>
               </>

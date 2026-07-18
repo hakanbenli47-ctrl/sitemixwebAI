@@ -1716,6 +1716,11 @@ export default function SiteGorunumu({
       data-gorsel-orani={tasarim?.gorselOrani}
       data-medya-stratejisi={tasarim?.medyaStratejisi}
       data-hareket-stili={sektorSahneDili.hareket}
+      data-studyo-genislik={proje.stilAyarlari?.genislik ?? "dengeli"}
+      data-studyo-bosluk={proje.stilAyarlari?.bosluk ?? "dengeli"}
+      data-studyo-kose={proje.stilAyarlari?.kose ?? "yumusak"}
+      data-studyo-tipografi={proje.stilAyarlari?.tipografi ?? "modern"}
+      data-studyo-hareket={proje.stilAyarlari?.hareket ?? "dengeli"}
       data-gorsel-limiti={tasarim?.gorselLimiti}
       data-ana-sayfa={aktifSayfa.anaSayfa ? "true" : "false"}
     >

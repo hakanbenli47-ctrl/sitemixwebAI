@@ -14,7 +14,7 @@ export default function AnaSayfa() {
           <span>SITEMIX</span>
           <small>STUDIO</small>
         </Link>
-        <div className="surum">36 sektöre özel yeni nesil stüdyo</div>
+        <div className="surum">10 güçlü hizmet sektörüne özel stüdyo</div>
       </header>
 
       <section className="hero">
@@ -29,9 +29,9 @@ export default function AnaSayfa() {
         </h1>
 
         <p>
-          Firma bilgilerini ve sektörünü belirle. Sitemix Studio; tipografi,
-          renk, sektörel tipografi ve hareketli bilgi sahneleriyle
-          görsele ihtiyaç duymadan bağımsız bir web sitesi oluştursun.
+          Firma bilgilerini, sektörünü ve sunduğun hizmetleri seç. Hazır içerik
+          paketleri, bağımsız sayfalar ve görsel düzenleyiciyle kod yazmadan
+          profesyonel bir web sitesi kur.
         </p>
 
         <div className="heroButonlar">
@@ -58,10 +58,10 @@ export default function AnaSayfa() {
           </div>
 
           <div className="ozellikMetni">
-            <h2>Sayfa ve bölüm yönetimi</h2>
+            <h2>Görsel çok sayfalı stüdyo</h2>
             <p>
-              İstediğin sayfayı oluştur, bölümleri ekle ve aşağı doğru
-              sıralayarak site yapısını belirle.
+              Sayfaları, bölümleri ve metinleri canlı önizleme üzerinde yönet;
+              hazır blokları ekle ve istediğin sıraya taşı.
             </p>
           </div>
         </div>
@@ -74,8 +74,8 @@ export default function AnaSayfa() {
           <div className="ozellikMetni">
             <h2>Sektöre özel tasarım dili</h2>
             <p>
-              36 sektör için ayrı tipografik sahneler, hareket karakterleri ve
-              tema düzenleriyle görsel olmadan da güçlü siteler oluştur.
+              Kuaförden nakliyata, tesisatçıdan VIP transfere odaklanan on iş
+              kolu için ayrı içerik, renk, tipografi ve hareket dili kullan.
             </p>
           </div>
         </div>

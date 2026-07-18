@@ -44,8 +44,15 @@ export default function SiteOnizlemeSayfasi() {
   const [aktarimDurumu, setAktarimDurumu] =
     useState<AktarimDurumu | null>(null);
 
+  const [gomulu, setGomulu] = useState(false);
+  const [baslangicSlug, setBaslangicSlug] = useState("");
+
   useEffect(() => {
     const yuklemeZamanlayicisi = window.setTimeout(() => {
+      const arama = new URLSearchParams(window.location.search);
+      setGomulu(arama.get("gomulu") === "1");
+      setBaslangicSlug(arama.get("sayfa") ?? "");
+
       const kayit = localStorage.getItem(
         "sitemix-aktif-proje",
       );
@@ -170,10 +177,10 @@ export default function SiteOnizlemeSayfasi() {
 
   return (
     <>
-      <div className={styles.studioCubugu}>
-        <Link href="/studio/icerik">
+      {!gomulu && <div className={styles.studioCubugu}>
+        <Link href="/studio/duzenle">
           <ArrowLeft size={17} />
-          İçerik düzenlemeye dön
+          Görsel stüdyoya dön
         </Link>
 
         <span>CANLI ÖNİZLEME</span>
@@ -209,9 +216,9 @@ export default function SiteOnizlemeSayfasi() {
             </span>
           </button>
         </div>
-      </div>
+      </div>}
 
-      {aktarimDurumu && (
+      {!gomulu && aktarimDurumu && (
         <div
           className={`${styles.aktarimBildirimi} ${
             aktarimDurumu.tur === "basarili"
@@ -245,7 +252,7 @@ export default function SiteOnizlemeSayfasi() {
         </div>
       )}
 
-      <SiteGorunumu proje={proje} />
+      <SiteGorunumu proje={proje} baslangicSlug={baslangicSlug} />
     </>
   );
 }

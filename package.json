@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test:sektorler": "node scripts/sektor-yapi-denetimi.cjs",
-    "test:yayin": "node scripts/github-aktarim-denetimi.cjs"
+    "test:yayin": "node scripts/github-aktarim-denetimi.cjs",
+    "test:vercel-paket": "node scripts/vercel-paket-denetimi.cjs"
   },
   "dependencies": {
     "lucide-react": "^1.17.0",

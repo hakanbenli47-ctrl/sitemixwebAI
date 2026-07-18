@@ -504,6 +504,134 @@ select {
   right: 26px;
 }
 
+.hizmetSecenekleri {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.hizmetSecenegi {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--cizgi);
+  background: rgba(255, 255, 255, 0.34);
+  color: var(--soluk-yazi);
+  font-size: 12px;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+  transition: 180ms ease;
+}
+
+.hizmetSecenegi svg {
+  flex: 0 0 auto;
+  opacity: 0.35;
+}
+
+.hizmetSecenegi:hover,
+.hizmetSecenegi.aktif {
+  border-color: var(--yazi);
+  background: var(--yazi);
+  color: var(--beyaz);
+}
+
+.hizmetSecenegi.aktif svg {
+  opacity: 1;
+}
+
+.cokSayfaliBilgi {
+  display: grid;
+  gap: 14px;
+  padding: 24px;
+  border: 1px solid var(--cizgi);
+  border-left: 4px solid var(--vurgu);
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.cokSayfaliBilgi > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cokSayfaliBilgi span {
+  font-size: 19px;
+  font-weight: 750;
+}
+
+.cokSayfaliBilgi p {
+  margin: 0;
+  color: var(--soluk-yazi);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.icerikPaketiSecenekleri {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.icerikPaketiSecenegi {
+  position: relative;
+  min-height: 170px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 20px;
+  border: 1px solid var(--cizgi);
+  background: rgba(255, 255, 255, 0.32);
+  color: var(--yazi);
+  text-align: left;
+  cursor: pointer;
+  transition: 180ms ease;
+}
+
+.icerikPaketiSecenegi:hover {
+  transform: translateY(-3px);
+  border-color: var(--yazi);
+}
+
+.icerikPaketiSecenegi.aktif {
+  border-color: var(--yazi);
+  background: var(--yazi);
+  color: var(--beyaz);
+}
+
+.icerikPaketiSecenegi small {
+  margin-bottom: 22px;
+  color: inherit;
+  opacity: 0.58;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.icerikPaketiSecenegi span {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 17px;
+  font-weight: 760;
+}
+
+.icerikPaketiSecenegi p {
+  margin: 0;
+  color: inherit;
+  opacity: 0.66;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.icerikPaketiSecenegi svg {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+}
+
 .slugAlani {
   display: flex;
   align-items: center;
@@ -1352,7 +1480,9 @@ select {
   }
 
   .ikiliAlan,
-  .siteTipiSecenekleri {
+  .siteTipiSecenekleri,
+  .icerikPaketiSecenekleri,
+  .hizmetSecenekleri {
     grid-template-columns: 1fr;
   }
 

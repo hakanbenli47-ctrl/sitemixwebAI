@@ -26,6 +26,7 @@ import {
   projeyeOzelTopluIcerikOlustur,
 } from "@/data/icerikSablonlari";
 import { gorselsizSunumuHazirla } from "@/data/sektorGorselDoldurma";
+import { hazirIcerikPaketiniUygula } from "@/data/studyoPaketleri";
 import type {
   ButonVerisi,
   ListeElemani,
@@ -554,10 +555,15 @@ export default function KolayIcerikDuzenleyici() {
 
       try {
         const hamProje = JSON.parse(kayit) as ProjeVerisi;
-        const guncelSablonluProje = gorselsizSunumuHazirla(
+        const sablonluProje =
           hamProje.sablonSurumu === GUNCEL_SABLON_SURUMU
             ? hamProje
-            : projeyeOzelIcerigiUygula(hamProje),
+            : hazirIcerikPaketiniUygula(
+                projeyeOzelIcerigiUygula(hamProje),
+                hamProje.icerikPaketi,
+              );
+        const guncelSablonluProje = gorselsizSunumuHazirla(
+          sablonluProje,
         );
         const duzenlenmisProje = projeyiDuzenle(guncelSablonluProje);
 
@@ -1138,9 +1144,9 @@ export default function KolayIcerikDuzenleyici() {
   return (
     <main className={styles.sayfa}>
       <header className={styles.ustAlan}>
-        <Link href="/studio/tema" className={styles.geri}>
+        <Link href="/studio/duzenle" className={styles.geri}>
           <ArrowLeft size={18} />
-          Tema
+          Görsel stüdyo
         </Link>
 
         <Link href="/" className={styles.logo}>
@@ -1162,13 +1168,13 @@ export default function KolayIcerikDuzenleyici() {
 
       <section className={styles.baslikAlani}>
         <div>
-          <span>OTOMATİK İÇERİKLER</span>
+          <span>HAZIR İÇERİK PAKETİ</span>
           <h1>{proje.firmaAdi}</h1>
 
           <p>
-            Girişte verdiğin işletme bilgileri, seçtiğin sektör ve site yapısı
-            kullanılarak içerikler hazırlandı. Aşağıdan kontrol edip bütün
-            bölümlere tek seferde uygulayabilirsin.
+            İşletme bilgilerin, seçtiğin hizmetler ve insan eliyle hazırlanmış
+            sektör metinleri kullanıldı. Aşağıdan tüm sayfaları birlikte
+            kontrol edebilir veya tek tek düzenleyebilirsin.
           </p>
         </div>
 
@@ -1227,7 +1233,10 @@ export default function KolayIcerikDuzenleyici() {
             type="button"
             onClick={() => {
               const guncelProje = gorselsizSunumuHazirla(
-                projeyeOzelIcerigiUygula(proje),
+                hazirIcerikPaketiniUygula(
+                  projeyeOzelIcerigiUygula(proje),
+                  proje.icerikPaketi,
+                ),
               );
               const ilkSayfa = guncelProje.sayfalar[0];
 
@@ -1246,7 +1255,7 @@ export default function KolayIcerikDuzenleyici() {
               );
             }}
           >
-            İşletmeye özel içeriği yenile
+            Hazır sektör içeriğini yeniden kur
           </button>
         </div>
 

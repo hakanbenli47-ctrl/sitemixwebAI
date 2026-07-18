@@ -18,9 +18,16 @@ import { projeyeOzelIcerigiUygula } from "@/data/icerikSablonlari";
 import { sektorler } from "@/data/sektorler";
 import {
   GUNCEL_SABLON_SURUMU,
+  sektorHizmetleriniGetir,
   sektorSayfalariOlustur,
 } from "@/data/sektorSablonlari";
 import { sektorVarsayilanTemasiniGetir } from "@/data/sektorSunumProfilleri";
+import {
+  hazirIcerikPaketiniUygula,
+  icerikPaketleri,
+  sektorVarsayilanIcerikPaketiniGetir,
+  sektorVarsayilanStiliniGetir,
+} from "@/data/studyoPaketleri";
 import {
   epostaGecerliMi,
   iletisimKanaliVarMi,
@@ -28,14 +35,13 @@ import {
   whatsappNumarasiniDuzenle,
 } from "@/lib/iletisim";
 import type { ProjeVerisi } from "@/types/proje";
-
-type SiteTipi = "tek-sayfa" | "cok-sayfa";
+import type { IcerikPaketiKimligi } from "@/types/proje";
 
 interface ProjeFormu {
   firmaAdi: string;
   sektor: string;
-  ozelSektor: string;
-  siteTipi: SiteTipi;
+  icerikPaketi: IcerikPaketiKimligi;
+  secilenHizmetler: string[];
   telefon: string;
   whatsapp: string;
   eposta: string;
@@ -56,8 +62,8 @@ interface OtomatikOlusturmaCevabi {
 const baslangicFormu: ProjeFormu = {
   firmaAdi: "",
   sektor: "",
-  ozelSektor: "",
-  siteTipi: "cok-sayfa",
+  icerikPaketi: "guven",
+  secilenHizmetler: [],
   telefon: "",
   whatsapp: "",
   eposta: "",
@@ -106,10 +112,11 @@ export default function YeniProjeSayfasi() {
     return sektorler.find((sektor) => sektor.id === form.sektor);
   }, [form.sektor]);
 
-  const gorunenSektor =
-    form.sektor === "ozel"
-      ? form.ozelSektor.trim()
-      : secilenSektor?.ad ?? "";
+  const gorunenSektor = secilenSektor?.ad ?? "";
+
+  const sektorHizmetleri = useMemo(() => {
+    return form.sektor ? sektorHizmetleriniGetir(form.sektor) : [];
+  }, [form.sektor]);
 
   const gorunenKonum = [form.ilce.trim(), form.sehir.trim()]
     .filter(Boolean)
@@ -137,6 +144,30 @@ export default function YeniProjeSayfasi() {
     setHata("");
   }
 
+  function sektorGuncelle(sektor: string) {
+    setForm((eskiForm) => ({
+      ...eskiForm,
+      sektor,
+      icerikPaketi: sektorVarsayilanIcerikPaketiniGetir(sektor),
+      secilenHizmetler: sektor ? sektorHizmetleriniGetir(sektor) : [],
+    }));
+
+    setHata("");
+  }
+
+  function hizmetSeciminiDegistir(hizmet: string) {
+    setForm((eskiForm) => {
+      const seciliMi = eskiForm.secilenHizmetler.includes(hizmet);
+      const secilenHizmetler = seciliMi
+        ? eskiForm.secilenHizmetler.filter((aday) => aday !== hizmet)
+        : [...eskiForm.secilenHizmetler, hizmet];
+
+      return { ...eskiForm, secilenHizmetler };
+    });
+
+    setHata("");
+  }
+
   async function devamEt() {
     if (kaydediliyor) {
       return;
@@ -152,8 +183,8 @@ export default function YeniProjeSayfasi() {
       return;
     }
 
-    if (form.sektor === "ozel" && !form.ozelSektor.trim()) {
-      setHata("Özel sektörün adını yazmalısın.");
+    if (form.secilenHizmetler.length === 0) {
+      setHata("Site içeriği için en az bir hizmet seçmelisin.");
       return;
     }
 
@@ -190,13 +221,10 @@ export default function YeniProjeSayfasi() {
     setKaydediliyor(true);
     setHata("");
 
-    const sektorAdi =
-      form.sektor === "ozel"
-        ? form.ozelSektor.trim()
-        : secilenSektor?.ad ?? "";
+    const sektorAdi = secilenSektor?.ad ?? "";
 
     try {
-      let sayfalar = sektorSayfalariOlustur({
+      const sayfalar = sektorSayfalariOlustur({
         firmaAdi: form.firmaAdi.trim(),
         sektor: form.sektor,
         sektorAdi,
@@ -207,11 +235,8 @@ export default function YeniProjeSayfasi() {
         sehir: form.sehir.trim(),
         ilce: form.ilce.trim(),
         hizmetBolgesi: form.hizmetBolgesi.trim(),
+        hizmetler: form.secilenHizmetler,
       });
-
-      if (form.siteTipi === "tek-sayfa") {
-        sayfalar = sayfalar.length > 0 ? [sayfalar[0]] : [];
-      }
 
       const tarih = new Date().toISOString();
 
@@ -220,7 +245,7 @@ export default function YeniProjeSayfasi() {
         firmaAdi: form.firmaAdi.trim(),
         sektor: form.sektor,
         sektorAdi,
-        siteTipi: form.siteTipi,
+        siteTipi: "cok-sayfa",
         telefon: form.telefon.trim(),
         whatsapp: form.whatsapp.trim(),
         eposta: form.eposta.trim(),
@@ -230,6 +255,9 @@ export default function YeniProjeSayfasi() {
         hizmetBolgesi: form.hizmetBolgesi.trim(),
         slug: form.slug.trim(),
         tema: sektorVarsayilanTemasiniGetir(form.sektor),
+        icerikPaketi: form.icerikPaketi,
+        secilenHizmetler: form.secilenHizmetler,
+        stilAyarlari: sektorVarsayilanStiliniGetir(form.sektor),
         sayfalar,
         sablonSurumu: GUNCEL_SABLON_SURUMU,
         seoBaslik: `${form.firmaAdi.trim()} | ${sektorAdi}`,
@@ -244,7 +272,10 @@ export default function YeniProjeSayfasi() {
         guncellenmeTarihi: tarih,
       };
 
-      const icerikliProje = projeyeOzelIcerigiUygula(temelProje);
+      const icerikliProje = hazirIcerikPaketiniUygula(
+        projeyeOzelIcerigiUygula(temelProje),
+        form.icerikPaketi,
+      );
       let kaydedilecekProje = icerikliProje;
 
       try {
@@ -263,7 +294,7 @@ export default function YeniProjeSayfasi() {
 
         if (!cevap.ok || !veri.basarili || !veri.proje) {
           throw new Error(
-            veri.mesaj || "Otomatik içerik ve tasarım sahnesi hazırlanamadı.",
+            veri.mesaj || "Hazır içerik ve tasarım sahnesi hazırlanamadı.",
           );
         }
 
@@ -278,14 +309,14 @@ export default function YeniProjeSayfasi() {
           localStorage.removeItem("sitemix-son-uyarilar");
         }
       } catch (otomatikHata) {
-        console.error("Otomatik hazırlama tamamlanamadı:", otomatikHata);
+        console.error("Hazır içerik paketi tamamlanamadı:", otomatikHata);
 
         localStorage.setItem(
           "sitemix-son-uyarilar",
           JSON.stringify([
             otomatikHata instanceof Error
               ? otomatikHata.message
-              : "Otomatik hazırlama tamamlanamadı; hazır sektör şablonu kullanıldı.",
+              : "Hazır içerik paketi tamamlanamadı; sektör şablonu kullanıldı.",
           ]),
         );
       }
@@ -295,7 +326,7 @@ export default function YeniProjeSayfasi() {
         JSON.stringify(kaydedilecekProje),
       );
 
-      router.push("/studio/tema");
+      router.push("/studio/duzenle");
     } catch (error) {
       console.error("Proje oluşturulamadı:", error);
       setKaydediliyor(false);
@@ -338,8 +369,8 @@ export default function YeniProjeSayfasi() {
         </div>
 
         <p>
-          Sektör, şehir ve ilçe bilgilerine göre sayfalar, içerikler ve
-          sektöre özel sayfa düzenleri ve profesyonel içerik akışları otomatik hazırlanacak.
+          Sektörü ve hizmetleri seç; hazır metin kütüphanesi çok sayfalı siteyi
+          doldursun. Tasarımı sonraki ekranda kod yazmadan özgürce düzenle.
         </p>
       </section>
 
@@ -376,7 +407,7 @@ export default function YeniProjeSayfasi() {
                 id="sektor"
                 value={form.sektor}
                 onChange={(event) =>
-                  alanGuncelle("sektor", event.target.value)
+                  sektorGuncelle(event.target.value)
                 }
               >
                 <option value="">Sektör seç</option>
@@ -389,63 +420,78 @@ export default function YeniProjeSayfasi() {
               </select>
             </div>
 
-            {form.sektor === "ozel" && (
+            {form.sektor && (
               <div className="alanGrubu">
-                <label htmlFor="ozelSektor">Sektör adı</label>
+                <label>Sunulan hizmetler</label>
 
-                <input
-                  id="ozelSektor"
-                  type="text"
-                  value={form.ozelSektor}
-                  onChange={(event) =>
-                    alanGuncelle("ozelSektor", event.target.value)
-                  }
-                  placeholder="Sektörün adını yaz"
-                />
+                <div className="hizmetSecenekleri">
+                  {sektorHizmetleri.map((hizmet) => {
+                    const seciliMi = form.secilenHizmetler.includes(hizmet);
+
+                    return (
+                      <button
+                        type="button"
+                        key={hizmet}
+                        className={
+                          seciliMi
+                            ? "hizmetSecenegi aktif"
+                            : "hizmetSecenegi"
+                        }
+                        onClick={() => hizmetSeciminiDegistir(hizmet)}
+                        aria-pressed={seciliMi}
+                      >
+                        <Check size={15} />
+                        {hizmet}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             )}
 
             <div className="alanGrubu">
               <label>Site yapısı</label>
 
-              <div className="siteTipiSecenekleri">
-                <button
-                  type="button"
-                  className={
-                    form.siteTipi === "tek-sayfa"
-                      ? "siteTipiSecenegi aktif"
-                      : "siteTipiSecenegi"
-                  }
-                  onClick={() =>
-                    alanGuncelle("siteTipi", "tek-sayfa")
-                  }
-                >
-                  <span>Tek sayfalı</span>
-                  <small>Tüm bölümler ana sayfada hazırlanır</small>
+              <div className="cokSayfaliBilgi">
+                <div>
+                  <Globe2 size={22} />
+                  <span>Çok sayfalı site</span>
+                </div>
+                <p>
+                  Ana sayfa, hizmetler, hakkımızda, talep/randevu ve iletişim
+                  sayfaları sektör paketinden hazır gelir.
+                </p>
+              </div>
+            </div>
 
-                  {form.siteTipi === "tek-sayfa" && (
-                    <Check size={18} className="secimIsareti" />
-                  )}
-                </button>
+            <div className="alanGrubu">
+              <label>Hazır içerik yaklaşımı</label>
 
-                <button
-                  type="button"
-                  className={
-                    form.siteTipi === "cok-sayfa"
-                      ? "siteTipiSecenegi aktif"
-                      : "siteTipiSecenegi"
-                  }
-                  onClick={() =>
-                    alanGuncelle("siteTipi", "cok-sayfa")
-                  }
-                >
-                  <span>Çok sayfalı</span>
-                  <small>Sektöre uygun sayfalar otomatik oluşturulur</small>
+              <div className="icerikPaketiSecenekleri">
+                {icerikPaketleri.map((paket) => {
+                  const aktifMi = form.icerikPaketi === paket.id;
 
-                  {form.siteTipi === "cok-sayfa" && (
-                    <Check size={18} className="secimIsareti" />
-                  )}
-                </button>
+                  return (
+                    <button
+                      type="button"
+                      key={paket.id}
+                      className={
+                        aktifMi
+                          ? "icerikPaketiSecenegi aktif"
+                          : "icerikPaketiSecenegi"
+                      }
+                      onClick={() =>
+                        alanGuncelle("icerikPaketi", paket.id)
+                      }
+                      aria-pressed={aktifMi}
+                    >
+                      <small>{paket.etiket}</small>
+                      <span>{paket.ad}</span>
+                      <p>{paket.aciklama}</p>
+                      {aktifMi && <Check size={17} />}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -623,7 +669,7 @@ export default function YeniProjeSayfasi() {
           <div className="ozetSabitleyici">
             <div className="ozetBasligi">
               <span>CANLI ÖZET</span>
-              <p>Otomatik hazırlanacak</p>
+              <p>Hazır sektör paketinden</p>
             </div>
 
             <div className="firmaOnizleme">
@@ -642,21 +688,21 @@ export default function YeniProjeSayfasi() {
             <div className="ozetSatirlari">
               <div className="ozetSatiri">
                 <span>Site yapısı</span>
+                <strong>Çok sayfalı</strong>
+              </div>
+
+              <div className="ozetSatiri">
+                <span>Seçili hizmet</span>
+                <strong>{form.secilenHizmetler.length}</strong>
+              </div>
+
+              <div className="ozetSatiri">
+                <span>İçerik yaklaşımı</span>
                 <strong>
-                  {form.siteTipi === "tek-sayfa"
-                    ? "Tek sayfalı"
-                    : "Çok sayfalı"}
+                  {icerikPaketleri.find(
+                    (paket) => paket.id === form.icerikPaketi,
+                  )?.ad ?? "Güven ve süreç"}
                 </strong>
-              </div>
-
-              <div className="ozetSatiri">
-                <span>İçerikler</span>
-                <strong>Sektör ve konuma özel</strong>
-              </div>
-
-              <div className="ozetSatiri">
-                <span>Tasarım sistemi</span>
-                <strong>Sektöre özel ve yüksek kontrastlı</strong>
               </div>
 
               <div className="ozetSatiri">
@@ -680,7 +726,7 @@ export default function YeniProjeSayfasi() {
                 </>
               ) : (
                 <>
-                  <span>Siteyi otomatik hazırla</span>
+                  <span>Çok sayfalı siteyi hazırla</span>
                   <ArrowRight size={19} />
                 </>
               )}

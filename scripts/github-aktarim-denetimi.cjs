@@ -96,10 +96,26 @@ for (const guvence of [
   "...kaynaklar",
   'node: ">=20.9.0"',
   "root: process.cwd()",
+  "yayinProjesiniNormalizeEt",
+  "guvenliIsoTarihiOlustur",
+  "export const dynamicParams = false",
+  "const sayfaYollari =",
+  '\"app/sitemap.ts\": sitemapTs',
+  '\"app/robots.ts\": robotsTs',
+  '\"vercel.json\": vercelJson',
 ]) {
   if (!routeKaynagi.includes(guvence)) {
     sorunlar.push(`GitHub/Vercel aktarım güvencesi eksik: ${guvence}`);
   }
+}
+
+const icerikRotasi = fs.readFileSync(
+  path.join(kok, "app/api/studio/otomatik-olustur/route.ts"),
+  "utf8",
+);
+
+if (/OPENAI|api\.openai\.com|from ["']openai["']/i.test(icerikRotasi)) {
+  sorunlar.push("Hazır içerik rotasında yapay zekâ bağımlılığı kaldı.");
 }
 
 for (const dosyaYolu of kaynakYollari) {

@@ -973,6 +973,7 @@ export function projeyeOzelIcerigiUygula(proje: ProjeVerisi): ProjeVerisi {
       sehir: proje.sehir,
       ilce: proje.ilce,
       hizmetBolgesi: proje.hizmetBolgesi,
+      hizmetler: proje.secilenHizmetler,
     });
 
     if (proje.siteTipi === "tek-sayfa") {

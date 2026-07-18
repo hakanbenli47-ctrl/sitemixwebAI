@@ -14,7 +14,7 @@ import {
   whatsappBaglantisi,
 } from "@/lib/iletisim";
 
-export const GUNCEL_SABLON_SURUMU = 8;
+export const GUNCEL_SABLON_SURUMU = 9;
 
 export type BolumTuru =
   | "hero"
@@ -95,6 +95,7 @@ export interface SablonBilgileri {
   sehir?: string;
   ilce?: string;
   hizmetBolgesi?: string;
+  hizmetler?: string[];
 }
 
 function idOlustur() {
@@ -562,6 +563,14 @@ function otelSayfalari(bilgi: SablonBilgileri): SiteSayfasi[] {
 }
 
 export function sektorSayfalariOlustur(bilgi: SablonBilgileri): SiteSayfasi[] {
+  const seciliHizmetler = (bilgi.hizmetler ?? [])
+    .map((hizmet) => hizmet.trim())
+    .filter(Boolean);
+
+  if (seciliHizmetler.length > 0) {
+    return standartSayfalar(bilgi, seciliHizmetler);
+  }
+
   if (["restoran", "kafe", "pastane", "catering"].includes(bilgi.sektor)) {
     return restoranSayfalari(bilgi);
   }

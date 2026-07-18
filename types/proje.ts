@@ -1,5 +1,15 @@
 import type { SiteSayfasi } from "@/data/sektorSablonlari";
 
+export type IcerikPaketiKimligi = "hizli" | "guven" | "vitrin";
+
+export interface SiteStilAyarlari {
+  genislik: "dar" | "dengeli" | "genis";
+  bosluk: "kompakt" | "dengeli" | "ferah";
+  kose: "keskin" | "yumusak" | "yuvarlak";
+  tipografi: "modern" | "kurumsal" | "editorial";
+  hareket: "sakin" | "dengeli" | "canli";
+}
+
 export interface ProjeVerisi {
   id: string;
   firmaAdi: string;
@@ -16,6 +26,9 @@ export interface ProjeVerisi {
   slug: string;
   tema: string;
   tasarim?: string;
+  icerikPaketi?: IcerikPaketiKimligi;
+  secilenHizmetler?: string[];
+  stilAyarlari?: SiteStilAyarlari;
   sayfalar: SiteSayfasi[];
   sablonSurumu?: number;
 

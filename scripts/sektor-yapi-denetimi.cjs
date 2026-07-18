@@ -86,16 +86,21 @@ const icerikler = tsModulunuYukle(
     "@/lib/iletisim": iletisim,
   },
 );
+const studyoPaketleri = tsModulunuYukle(
+  path.join(kok, "data/studyoPaketleri.ts"),
+);
 
 const beklenenSektorler = [
-  "oto-yikama", "oto-detaylandirma", "arac-kaplama", "cam-balkon", "tente",
-  "tadilat", "dekorasyon", "temizlik", "koltuk-yikama", "hali-yikama",
-  "ilaclama", "guzellik-salonu", "kuafor", "berber", "diyetisyen",
-  "psikolog", "fizyoterapist", "dis-klinigi", "veteriner", "emlak",
-  "mimarlik", "fotografci", "dugun-salonu", "spor-salonu", "anaokulu",
-  "ozel-egitim-kursu", "matbaa", "cicekci", "pastane", "mobilya",
-  "elektrikci", "tesisatci", "kombi-servisi", "nakliyat", "transfer",
+  "kuafor",
+  "nakliyat",
+  "tesisatci",
+  "elektrikci",
+  "oto-yikama",
+  "hali-yikama",
+  "temizlik",
   "arac-kiralama",
+  "transfer",
+  "mobilya",
 ];
 
 const temaKimlikleri = new Set([
@@ -170,7 +175,7 @@ if (
   JSON.stringify(sektorler.sektorler.map((sektor) => sektor.id)) !==
   JSON.stringify(beklenenSektorler)
 ) {
-  sorunlar.push("Sektör listesi İşletme Bulucu sırası ve kapsamıyla eşleşmiyor");
+  sorunlar.push("Sektör listesi Sitemix'in odak kapsamı ve sırasıyla eşleşmiyor");
 }
 
 for (const sektor of sektorler.sektorler) {
@@ -433,6 +438,42 @@ for (const sektor of sektorler.sektorler) {
     );
 
     const profesyonelAkis = operasyonProfili?.icerikSemasi?.anaSayfaAkisi;
+
+    if (siteTipi === "cok-sayfa") {
+      const paketBasliklari = new Set();
+
+      for (const paketId of ["hizli", "guven", "vitrin"]) {
+        const paketliProje = studyoPaketleri.hazirIcerikPaketiniUygula(
+          sonuc,
+          paketId,
+        );
+        const paketHero = paketliProje.sayfalar
+          .find((sayfa) => sayfa.anaSayfa)
+          ?.bolumler.find((bolum) => bolum.tur === "hero");
+
+        if (paketliProje.icerikPaketi !== paketId || !paketHero?.baslik.trim()) {
+          sorunlar.push(`${sektor.id}: ${paketId} içerik paketi uygulanmadı`);
+        }
+
+        paketBasliklari.add(paketHero?.baslik.trim());
+      }
+
+      if (paketBasliklari.size !== 3) {
+        sorunlar.push(`${sektor.id}: hazır içerik paketleri birbirinden ayrışmıyor`);
+      }
+
+      const stil = studyoPaketleri.sektorVarsayilanStiliniGetir(sektor.id);
+
+      if (
+        !stil?.genislik ||
+        !stil?.bosluk ||
+        !stil?.kose ||
+        !stil?.tipografi ||
+        !stil?.hareket
+      ) {
+        sorunlar.push(`${sektor.id}: görsel stüdyo varsayılanları eksik`);
+      }
+    }
 
     if (
       profesyonelAkis

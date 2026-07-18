@@ -63,8 +63,8 @@ function bekle(ms: number) {
   });
 }
 
-function turkceSlugOlustur(metin: unknown) {
-  const slug = String(metin ?? "")
+function slugParcasiOlustur(metin: unknown) {
+  return String(metin ?? "")
     .toLocaleLowerCase("tr-TR")
     .replace(/ğ/g, "g")
     .replace(/ü/g, "u")
@@ -77,8 +77,82 @@ function turkceSlugOlustur(metin: unknown) {
     .replace(/[\s_]+/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
+}
+
+function turkceSlugOlustur(metin: unknown) {
+  const slug = slugParcasiOlustur(metin);
 
   return slug || `sitemix-site-${Date.now()}`;
+}
+
+function guvenliIsoTarihiOlustur(deger: unknown) {
+  const tarih = new Date(String(deger ?? ""));
+
+  return Number.isNaN(tarih.getTime())
+    ? new Date().toISOString()
+    : tarih.toISOString();
+}
+
+function yayinProjesiniNormalizeEt(proje: ProjeVerisi): ProjeVerisi {
+  const kopya = JSON.parse(JSON.stringify(proje)) as ProjeVerisi;
+  const siraliSayfalar = [...kopya.sayfalar].sort((a, b) => {
+    if (a.anaSayfa !== b.anaSayfa) {
+      return a.anaSayfa ? -1 : 1;
+    }
+
+    return a.sira - b.sira;
+  });
+  const anaSayfa =
+    siraliSayfalar.find((sayfa) => sayfa.anaSayfa) ??
+    siraliSayfalar.find((sayfa) => !sayfa.slug.trim()) ??
+    siraliSayfalar[0];
+  const kullanilanSluglar = new Set<string>();
+
+  kopya.sayfalar = siraliSayfalar.map((sayfa, index) => {
+    const anaSayfaMi = sayfa.id === anaSayfa?.id;
+    let slug = "";
+
+    if (!anaSayfaMi) {
+      const temelSlug =
+        slugParcasiOlustur(sayfa.slug) ||
+        slugParcasiOlustur(sayfa.ad) ||
+        `sayfa-${index + 1}`;
+      let adaySlug = temelSlug;
+      let tekrar = 2;
+
+      while (kullanilanSluglar.has(adaySlug)) {
+        adaySlug = `${temelSlug}-${tekrar}`;
+        tekrar += 1;
+      }
+
+      slug = adaySlug;
+      kullanilanSluglar.add(slug);
+    }
+
+    return {
+      ...sayfa,
+      ad: sayfa.ad.trim() || (anaSayfaMi ? "Ana Sayfa" : `Sayfa ${index + 1}`),
+      menuBasligi:
+        sayfa.menuBasligi.trim() ||
+        sayfa.ad.trim() ||
+        (anaSayfaMi ? "Ana Sayfa" : `Sayfa ${index + 1}`),
+      slug,
+      anaSayfa: anaSayfaMi,
+      sira: index,
+      bolumler: [...sayfa.bolumler]
+        .sort((a, b) => a.sira - b.sira)
+        .map((bolum, bolumIndex) => ({
+          ...bolum,
+          sira: bolumIndex,
+        })),
+    };
+  });
+  kopya.siteTipi = "cok-sayfa";
+  kopya.guncellenmeTarihi = guvenliIsoTarihiOlustur(
+    kopya.guncellenmeTarihi,
+  );
+
+  return kopya;
 }
 
 function adresiTemizle(deger?: string) {
@@ -473,7 +547,7 @@ async function gorselleriYerellestir(
   };
 }
 
-async function aktarilacakDosyalariOlustur(
+export async function aktarilacakDosyalariOlustur(
   proje: ProjeVerisi,
   repoAdi: string,
 ) {
@@ -482,11 +556,19 @@ async function aktarilacakDosyalariOlustur(
     gorselsizSunumuHazirla(proje),
     repoAdi,
   );
-  const yayinProjesi = yerelGorselSonucu.proje;
+  const yayinProjesi = yayinProjesiniNormalizeEt(
+    yerelGorselSonucu.proje,
+  );
   const siteUrl = siteAdresiniOlustur(yayinProjesi, repoAdi);
   const seoBasligi = seoBasligiOlustur(yayinProjesi);
   const seoAciklama = projeAciklamasiOlustur(yayinProjesi);
   const seoKelimeleri = seoKelimeleriOlustur(yayinProjesi);
+  const sitemapYollari = yayinProjesi.sayfalar.map((sayfa) =>
+    sayfa.anaSayfa ? "" : sayfa.slug,
+  );
+  const sitemapTarihi = guvenliIsoTarihiOlustur(
+    yayinProjesi.guncellenmeTarihi,
+  );
 
   const guvenliProjeJson = JSON.stringify(yayinProjesi, null, 2).replace(
     /</g,
@@ -593,6 +675,8 @@ interface DinamikSayfaProps {
   }>;
 }
 
+export const dynamicParams = false;
+
 function sayfayiBul(slug: string) {
   return proje.sayfalar.find(
     (sayfa) => !sayfa.anaSayfa && sayfa.slug === slug,
@@ -660,20 +744,16 @@ export default async function DinamikSayfa({
 `;
 
   const sitemapTs = `import type { MetadataRoute } from "next";
-import { proje } from "@/data/proje";
-
 const siteUrl = ${JSON.stringify(siteUrl)};
+const sayfaYollari = ${JSON.stringify(sitemapYollari)} as const;
+const sonGuncelleme = new Date(${JSON.stringify(sitemapTarihi)});
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return proje.sayfalar
-    .filter((sayfa) => sayfa.anaSayfa || sayfa.slug.trim())
-    .map((sayfa) => ({
-      url: sayfa.anaSayfa
-        ? siteUrl
-        : siteUrl + "/" + sayfa.slug,
-      lastModified: new Date(proje.guncellenmeTarihi),
-      changeFrequency: sayfa.anaSayfa ? "weekly" : "monthly",
-      priority: sayfa.anaSayfa ? 1 : 0.8,
+  return sayfaYollari.map((sayfaYolu) => ({
+      url: sayfaYolu ? siteUrl + "/" + sayfaYolu : siteUrl,
+      lastModified: sonGuncelleme,
+      changeFrequency: sayfaYolu ? "monthly" : "weekly",
+      priority: sayfaYolu ? 0.8 : 1,
     }));
 }
 `;
@@ -778,6 +858,16 @@ const nextConfig: NextConfig = {
 export default nextConfig;
 `;
 
+  const vercelJson = JSON.stringify(
+    {
+      framework: "nextjs",
+      buildCommand: "npm run build",
+      installCommand: "npm install",
+    },
+    null,
+    2,
+  );
+
   const gitignore = `.next
 node_modules
 .env
@@ -813,6 +903,7 @@ npm run dev
     "tsconfig.json": tsconfig,
     "next-env.d.ts": nextEnv,
     "next.config.ts": nextConfig,
+    "vercel.json": vercelJson,
     ".gitignore": gitignore,
     "README.md": readme,
 
@@ -970,7 +1061,8 @@ export async function POST(request: Request) {
     !proje ||
     !proje.id ||
     !proje.firmaAdi?.trim() ||
-    !Array.isArray(proje.sayfalar)
+    !Array.isArray(proje.sayfalar) ||
+    proje.sayfalar.length === 0
   ) {
     return NextResponse.json(
       {

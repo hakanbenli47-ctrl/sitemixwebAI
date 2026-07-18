@@ -3779,3 +3779,122 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+/* Sitemix Composer: kullanıcı tarafından seçilen serbest tasarım kontrolleri. */
+.site[data-studyo-genislik="dar"] {
+  --studyo-yatay-bosluk: clamp(34px, 10vw, 170px);
+}
+
+.site[data-studyo-genislik="dengeli"] {
+  --studyo-yatay-bosluk: clamp(24px, 6vw, 100px);
+}
+
+.site[data-studyo-genislik="genis"] {
+  --studyo-yatay-bosluk: clamp(20px, 3.4vw, 62px);
+}
+
+.site[data-studyo-genislik] :is(.siteHeader, .heroBolumu, .standartBolum, .footer) {
+  padding-right: var(--studyo-yatay-bosluk);
+  padding-left: var(--studyo-yatay-bosluk);
+}
+
+.site[data-studyo-bosluk="kompakt"] .heroBolumu {
+  min-height: min(76svh, 760px);
+  padding-top: clamp(70px, 7vw, 110px);
+  padding-bottom: clamp(70px, 7vw, 110px);
+}
+
+.site[data-studyo-bosluk="kompakt"] .standartBolum {
+  padding-top: clamp(66px, 6.5vw, 105px);
+  padding-bottom: clamp(66px, 6.5vw, 105px);
+}
+
+.site[data-studyo-bosluk="ferah"] .heroBolumu {
+  padding-top: clamp(120px, 12vw, 205px);
+  padding-bottom: clamp(120px, 12vw, 205px);
+}
+
+.site[data-studyo-bosluk="ferah"] .standartBolum {
+  padding-top: clamp(125px, 11vw, 210px);
+  padding-bottom: clamp(125px, 11vw, 210px);
+}
+
+.site[data-studyo-kose="keskin"]
+  :is(.listeSatiri, .talepFormu, .haritaYerTutucu, .butonlar a, .headerAksiyon, .kucukBaslik, .iletisimListesi > a) {
+  border-radius: 0 !important;
+}
+
+.site[data-studyo-kose="yumusak"]
+  :is(.listeSatiri, .talepFormu, .haritaYerTutucu, .butonlar a, .headerAksiyon, .kucukBaslik, .iletisimListesi > a) {
+  border-radius: 18px !important;
+}
+
+.site[data-studyo-kose="yuvarlak"]
+  :is(.listeSatiri, .talepFormu, .haritaYerTutucu, .butonlar a, .headerAksiyon, .kucukBaslik, .iletisimListesi > a) {
+  border-radius: 34px !important;
+}
+
+.site[data-studyo-kose="yuvarlak"] :is(.butonlar a, .headerAksiyon, .kucukBaslik) {
+  border-radius: 999px !important;
+}
+
+.site[data-studyo-tipografi="modern"] {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.site[data-studyo-tipografi="kurumsal"] {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.site[data-studyo-tipografi="kurumsal"] :is(h1, h2, h3, .firmaLogo span) {
+  letter-spacing: -0.045em;
+}
+
+.site[data-studyo-tipografi="editorial"] :is(h1, h2, h3, .footerFirma h2) {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  letter-spacing: -0.06em;
+}
+
+.site[data-studyo-hareket="sakin"]
+  :is(.listeSatiri, .butonlar a, .headerAksiyon, .iletisimListesi > a, .talepFormu button):hover {
+  transform: translateY(-1px);
+}
+
+.site[data-studyo-hareket="sakin"] .listeSatiri::before,
+.site[data-studyo-hareket="sakin"] .butonlar a::before,
+.site[data-studyo-hareket="sakin"] .headerAksiyon::before,
+.site[data-studyo-hareket="sakin"] .talepFormu button::before {
+  display: none;
+}
+
+.site[data-studyo-hareket="canli"] .listeSatiri {
+  transition:
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 420ms ease,
+    border-color 300ms ease;
+}
+
+.site[data-studyo-hareket="canli"] .listeSatiri:hover {
+  z-index: 3;
+  box-shadow: 0 24px 70px color-mix(in srgb, var(--site-vurgu) 18%, transparent);
+  transform: translateY(-8px);
+}
+
+@media (max-width: 650px) {
+  .site[data-studyo-genislik] {
+    --studyo-yatay-bosluk: 18px;
+  }
+
+  .site[data-studyo-bosluk="ferah"] :is(.heroBolumu, .standartBolum),
+  .site[data-studyo-bosluk="kompakt"] :is(.heroBolumu, .standartBolum) {
+    min-height: auto;
+    padding-top: clamp(70px, 20vw, 105px);
+    padding-bottom: clamp(70px, 20vw, 105px);
+  }
+
+  .site[data-studyo-kose="yuvarlak"]
+    :is(.listeSatiri, .talepFormu, .haritaYerTutucu, .iletisimListesi > a) {
+    border-radius: 24px !important;
+  }
+}

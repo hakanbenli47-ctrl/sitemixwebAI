@@ -27,7 +27,7 @@ import {
 } from "react";
 import styles from "./siteGorunumu.module.css";
 import semaStyles from "./sektorSemalari.module.css";
-import SektorMotifi from "./SektorMotifi";
+import SektorSahnesi from "./SektorSahnesi";
 import type {
   AnimasyonTuru,
   SiteBolumu,
@@ -766,7 +766,7 @@ function HeroBolumu({
       {!bolum.arkaPlanGorseli && (
         <motion.div
           className={`${styles.heroGorseli} ${
-            bolum.gorsel ? "" : styles.heroMotifi
+            bolum.gorsel ? "" : styles.heroSahnesi
           }`}
           data-site-parcasi="hero-gorsel"
           initial={{
@@ -797,7 +797,13 @@ function HeroBolumu({
               }}
             />
           ) : (
-            <SektorMotifi sektor={sektor} varyant="hero" />
+            <SektorSahnesi
+              sektor={sektor}
+              sektorAdi={sektorAdi}
+              aile={tasarim?.aile}
+              baslik={bolum.ustBaslik || sektorAdi}
+              varyant="hero"
+            />
           )}
 
           <div className={styles.gorselNumarasi}>
@@ -826,10 +832,14 @@ function HeroBolumu({
 function MetinBolumu({
   bolum,
   sektor,
+  sektorAdi,
+  aile,
   dahiliBaglantiAc,
 }: {
   bolum: SiteBolumu;
   sektor: string;
+  sektorAdi: string;
+  aile?: string;
   dahiliBaglantiAc: DahiliBaglantiFonksiyonu;
 }) {
   const yerlesimSinifi =
@@ -842,7 +852,7 @@ function MetinBolumu({
   return (
     <div
       className={`${styles.metinYerlesimi} ${yerlesimSinifi} ${
-        bolum.gorsel ? "" : styles.ikonluMetin
+        bolum.gorsel ? "" : styles.sahneliMetin
       }`}
       data-site-parcasi="hikaye"
     >
@@ -900,14 +910,20 @@ function MetinBolumu({
         </motion.div>
       ) : (
         <motion.div
-          className={`${styles.metinGorseli} ${styles.metinMotifi}`}
+          className={`${styles.metinGorseli} ${styles.metinSahnesi}`}
           data-site-parcasi="hikaye-gorsel"
           initial={false}
           whileInView={{ opacity: 1, scale: 1, y: 0 }}
           viewport={{ once: true, amount: 0.25 }}
           transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
         >
-          <SektorMotifi sektor={sektor} varyant="panel" />
+          <SektorSahnesi
+            sektor={sektor}
+            sektorAdi={sektorAdi}
+            aile={aile}
+            baslik={bolum.ustBaslik || bolum.baslik}
+            varyant="panel"
+          />
         </motion.div>
       )}
     </div>
@@ -916,11 +932,9 @@ function MetinBolumu({
 
 function ListeBolumu({
   bolum,
-  sektor,
   dahiliBaglantiAc,
 }: {
   bolum: SiteBolumu;
-  sektor: string;
   dahiliBaglantiAc: DahiliBaglantiFonksiyonu;
 }) {
   const elemanlar = bolum.listeElemanlari.filter(
@@ -976,23 +990,13 @@ function ListeBolumu({
         return (
           <motion.article
             className={`${styles.listeSatiri} ${
-              eleman.gorsel ? "" : styles.ikonluListeSatiri
+              eleman.gorsel ? "" : styles.gorselsizListeSatiri
             }`}
             data-site-parcasi="kart"
             key={eleman.id}
             variants={listeElemaniGecisi}
           >
             <span className={styles.listeNumara}>{bolumNumarasi(index)}</span>
-
-            {!eleman.gorsel && (
-              <SektorMotifi
-                sektor={sektor}
-                varyant="mini"
-                index={index}
-                etiketGoster={false}
-                className={styles.listeIkon}
-              />
-            )}
 
             <div className={styles.listeIcerik} data-site-parcasi="kart-metin">
               {eleman.baslik.trim() && <h3>{eleman.baslik}</h3>}
@@ -1057,7 +1061,17 @@ function ListeBolumu({
   );
 }
 
-function GaleriBolumu({ bolum, sektor }: { bolum: SiteBolumu; sektor: string }) {
+function GaleriBolumu({
+  bolum,
+  sektor,
+  sektorAdi,
+  aile,
+}: {
+  bolum: SiteBolumu;
+  sektor: string;
+  sektorAdi: string;
+  aile?: string;
+}) {
   const elemanlar = bolum.listeElemanlari
     .filter(
       (eleman) =>
@@ -1121,12 +1135,14 @@ function GaleriBolumu({ bolum, sektor }: { bolum: SiteBolumu; sektor: string }) 
                 }}
               />
             ) : (
-              <SektorMotifi
+              <SektorSahnesi
                 sektor={sektor}
+                sektorAdi={sektorAdi}
+                aile={aile}
+                baslik={eleman.baslik}
                 varyant="kart"
                 index={index}
-                etiketGoster={false}
-                className={styles.galeriMotifi}
+                className={styles.galeriSahnesi}
               />
             )}
 
@@ -1620,7 +1636,12 @@ function BolumRender({
               aciklama={bolum.aciklama}
             />
 
-            <GaleriBolumu bolum={bolum} sektor={proje.sektor} />
+            <GaleriBolumu
+              bolum={bolum}
+              sektor={proje.sektor}
+              sektorAdi={proje.sektorAdi}
+              aile={tasarim?.aile}
+            />
 
             <Butonlar bolum={bolum} dahiliBaglantiAc={dahiliBaglantiAc} />
           </>
@@ -1640,7 +1661,6 @@ function BolumRender({
 
             <ListeBolumu
               bolum={bolum}
-              sektor={proje.sektor}
               dahiliBaglantiAc={dahiliBaglantiAc}
             />
 
@@ -1650,6 +1670,8 @@ function BolumRender({
           <MetinBolumu
             bolum={bolum}
             sektor={proje.sektor}
+            sektorAdi={proje.sektorAdi}
+            aile={tasarim?.aile}
             dahiliBaglantiAc={dahiliBaglantiAc}
           />
         )}

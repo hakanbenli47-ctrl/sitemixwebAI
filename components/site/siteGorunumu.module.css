@@ -21,6 +21,8 @@
   --site-kutu-yazi: var(--site-yazi);
   --site-kutu-soluk: var(--site-soluk-yazi);
   --site-kutu-cizgi: var(--site-cizgi);
+  --site-aciklama-yazi: color-mix(in srgb, var(--site-yazi) 82%, var(--site-arka-plan));
+  --site-panel-aciklama-yazi: color-mix(in srgb, var(--site-panel-yazi) 82%, var(--site-ikinci-arka-plan));
 
   min-height: 100vh;
   overflow: clip;
@@ -432,14 +434,28 @@
   line-height: 0.9;
   letter-spacing: -0.075em;
   overflow-wrap: anywhere;
+  background: linear-gradient(
+    118deg,
+    var(--site-yazi) 0%,
+    var(--site-yazi) 66%,
+    color-mix(in srgb, var(--site-vurgu) 78%, var(--site-yazi)) 112%
+  );
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 18px 60px color-mix(in srgb, var(--site-vurgu) 10%, transparent);
+  text-wrap: balance;
 }
 
 .heroMetni p {
   max-width: 640px;
   margin: 0;
-  color: var(--site-soluk-yazi);
-  font-size: clamp(16px, 1.35vw, 20px);
-  line-height: 1.65;
+  padding-left: 20px;
+  border-left: 2px solid var(--site-vurgu);
+  color: var(--site-aciklama-yazi);
+  font-size: clamp(17px, 1.45vw, 21px);
+  font-weight: 500;
+  line-height: 1.72;
+  text-wrap: pretty;
 }
 
 .heroBilgiListesi {
@@ -526,9 +542,21 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
+.gorselliHero .heroMetni h1 {
+  background: none;
+  color: #ffffff;
+  text-shadow: 0 16px 55px rgba(0, 0, 0, 0.3);
+}
+
 .gorselliHero .kucukBaslik {
   border-color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
+}
+
+.gorselliHero .kucukBaslik::before {
+  background: #ffffff;
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.14);
 }
 
 .gorselliHero .heroBilgiListesi li > span {
@@ -612,11 +640,11 @@
   object-fit: cover;
 }
 
-.heroMotifi {
+.heroSahnesi {
   min-height: min(68vh, 690px);
 }
 
-.heroMotifi > [data-site-parcasi="sektor-motifi"] {
+.heroSahnesi > [data-site-parcasi="sektor-sahnesi"] {
   min-height: inherit;
 }
 
@@ -645,15 +673,39 @@
 }
 
 .kucukBaslik {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
   width: fit-content;
-  padding-top: 12px;
-  border-top: 2px solid var(--site-vurgu);
+  min-height: 30px;
+  padding: 7px 11px;
+  border: 1px solid color-mix(in srgb, var(--site-vurgu) 34%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--site-vurgu) 9%, transparent);
   color: var(--site-vurgu);
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.17em;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.13em;
+  line-height: 1;
   text-transform: uppercase;
+}
+
+.kucukBaslik::before {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--site-vurgu);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--site-vurgu) 12%, transparent);
+  content: "";
+}
+
+.heroMetni > .kucukBaslik {
+  margin-bottom: 24px;
+}
+
+.heroMetni > .kucukBaslik + h1 {
+  margin-top: 0;
 }
 
 .kaydirmaIsareti {
@@ -781,8 +833,10 @@
 
 .standartBolum[data-bolum-turu="hizmetler"] .bolumBasligi p,
 .standartBolum[data-bolum-turu="urunler"] .bolumBasligi p {
-  padding: 0 0 8px 28px;
-  border-left: 1px solid var(--site-vurgu);
+  padding: 18px 20px;
+  border: 1px solid color-mix(in srgb, var(--site-vurgu) 25%, var(--site-cizgi));
+  border-left: 3px solid var(--site-vurgu);
+  background: color-mix(in srgb, var(--site-vurgu) 6%, transparent);
 }
 
 .standartBolum[data-bolum-turu="hizmetler"] .listeSatiri,
@@ -1003,18 +1057,43 @@
 }
 
 .bolumBasligi {
+  position: relative;
   max-width: 940px;
   margin-bottom: clamp(50px, 6vw, 90px);
+}
+
+.bolumBasligi > .kucukBaslik,
+.metinIcerigi > .kucukBaslik,
+.iletisimYerlesimi > .kucukBaslik,
+.haritaAlani > .kucukBaslik {
+  margin-bottom: 20px;
 }
 
 .bolumBasligi h2,
 .metinIcerigi h2,
 .iletisimYerlesimi h2,
 .haritaAlani h2 {
-  margin: 30px 0 24px;
+  margin: 0 0 24px;
   font-size: clamp(42px, 5.3vw, 82px);
   line-height: 0.96;
   letter-spacing: -0.065em;
+  text-shadow: 0 16px 50px color-mix(in srgb, var(--site-vurgu) 9%, transparent);
+  text-wrap: balance;
+}
+
+.bolumBasligi h2 {
+  position: relative;
+  width: fit-content;
+}
+
+.bolumBasligi h2::after {
+  width: clamp(72px, 9vw, 142px);
+  height: 4px;
+  display: block;
+  margin-top: 20px;
+  background: linear-gradient(90deg, var(--site-vurgu), color-mix(in srgb, var(--site-vurgu) 8%, transparent));
+  content: "";
+  transform-origin: left;
 }
 
 .bolumBasligi p,
@@ -1023,9 +1102,21 @@
 .haritaAlani p {
   max-width: 680px;
   margin: 0;
-  color: var(--site-soluk-yazi);
-  font-size: 16px;
-  line-height: 1.72;
+  color: var(--site-aciklama-yazi);
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.78;
+  text-wrap: pretty;
+}
+
+.bolumBasligi > p {
+  padding: 4px 0 4px 20px;
+  border-left: 2px solid color-mix(in srgb, var(--site-vurgu) 72%, transparent);
+}
+
+.alternatifBolum .bolumBasligi p,
+.alternatifBolum .metinIcerigi p {
+  color: var(--site-panel-aciklama-yazi);
 }
 
 .metinYerlesimi {
@@ -1038,15 +1129,15 @@
   grid-template-columns: minmax(0, 980px);
 }
 
-.metinYerlesimi.ikonluMetin {
+.metinYerlesimi.sahneliMetin {
   grid-template-columns: minmax(340px, 0.9fr) minmax(0, 1.1fr);
 }
 
-.metinYerlesimi.ikonluMetin.tekKolonMetin .metinIcerigi {
+.metinYerlesimi.sahneliMetin.tekKolonMetin .metinIcerigi {
   order: 1;
 }
 
-.metinYerlesimi.ikonluMetin.tekKolonMetin .metinGorseli {
+.metinYerlesimi.sahneliMetin.tekKolonMetin .metinGorseli {
   order: 2;
 }
 
@@ -1099,11 +1190,11 @@
   object-fit: cover;
 }
 
-.metinMotifi {
+.metinSahnesi {
   min-height: 520px;
 }
 
-.metinMotifi > [data-site-parcasi="sektor-motifi"] {
+.metinSahnesi > [data-site-parcasi="sektor-sahnesi"] {
   min-height: inherit;
 }
 
@@ -1201,13 +1292,8 @@
   border-bottom: 1px solid var(--site-cizgi);
 }
 
-.listeSatiri.ikonluListeSatiri {
-  grid-template-columns: 70px 58px minmax(0, 1fr) 36px;
-}
-
-.listeIkon {
-  position: relative;
-  z-index: 2;
+.listeSatiri.gorselsizListeSatiri {
+  grid-template-columns: 70px minmax(0, 1fr) 36px;
 }
 
 .listeSatiri::before {
@@ -1246,14 +1332,27 @@
   line-height: 1.02;
   letter-spacing: -0.05em;
   color: inherit;
+  text-wrap: balance;
+  transition:
+    color 260ms ease,
+    letter-spacing 320ms ease,
+    transform 320ms ease;
+}
+
+.listeSatiri:hover .listeIcerik h3 {
+  color: var(--site-vurgu);
+  letter-spacing: -0.035em;
+  transform: translateX(4px);
 }
 
 .listeIcerik p {
   max-width: 680px;
   margin: 17px 0 0;
-  color: var(--site-kutu-soluk);
-  font-size: 15px;
-  line-height: 1.7;
+  color: color-mix(in srgb, var(--site-kutu-yazi) 78%, var(--site-kutu-zemin));
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.75;
+  text-wrap: pretty;
 }
 
 .listeIcerik a {
@@ -1322,7 +1421,7 @@
   contain: paint;
 }
 
-.galeriMotifi {
+.galeriSahnesi {
   min-height: 410px;
 }
 
@@ -2656,7 +2755,7 @@
   .tema_visual .heroBolumu,
   .metinYerlesimi.solGorsel,
   .metinYerlesimi.sagGorsel,
-  .metinYerlesimi.ikonluMetin,
+  .metinYerlesimi.sahneliMetin,
   .iletisimYerlesimi,
   .haritaAlani,
   .heroBolumu.varyasyon_editoryal,
@@ -2676,10 +2775,6 @@
 
   .listeSatiri {
     grid-template-columns: 50px minmax(0, 1fr) 36px;
-  }
-
-  .listeSatiri.ikonluListeSatiri {
-    grid-template-columns: 50px 58px minmax(0, 1fr) 36px;
   }
 
   .listeGorsel {
@@ -2812,7 +2907,7 @@
     max-height: 68svh;
   }
 
-  .heroMotifi {
+  .heroSahnesi {
     min-height: 420px;
   }
 
@@ -2922,7 +3017,7 @@
   .metinIcerigi h2,
   .iletisimYerlesimi h2,
   .haritaAlani h2 {
-    margin-top: 24px;
+    margin-top: 0;
     font-size: clamp(38px, 12vw, 58px);
     line-height: 0.96;
   }
@@ -2938,7 +3033,7 @@
     min-height: 300px;
   }
 
-  .metinMotifi {
+  .metinSahnesi {
     min-height: 340px;
   }
 
@@ -2970,8 +3065,8 @@
     padding: 25px 0;
   }
 
-  .listeSatiri.ikonluListeSatiri {
-    grid-template-columns: 34px 58px minmax(0, 1fr);
+  .listeSatiri.gorselsizListeSatiri {
+    grid-template-columns: 34px minmax(0, 1fr);
   }
 
   .listeGorsel {

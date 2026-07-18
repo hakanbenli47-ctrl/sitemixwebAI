@@ -10,8 +10,8 @@ siteleri hazırlayan Next.js tabanlı stüdyo.
    hizmet anlatımları; sayfa rolleri, bölüm sırası ve tema önerileri hazırlanır.
 3. İsteğe bağlı OpenAI yapılandırması varsa metinler, mevcut sektör profilini
    ve kullanıcının verdiği gerçek bilgileri koruyarak yeniden yazılır.
-4. Site; fotoğraf gerektirmeden, 36 sektörün her biri için tanımlanmış hareketli
-   ikonlar, tipografi, renk, ızgara ve mikro etkileşimlerle tamamlanır.
+4. Site; fotoğraf gerektirmeden, 36 sektörün her biri için tanımlanmış sektörel
+   tipografi, bilgi şeritleri, geometrik sahneler, renk ve mikro etkileşimlerle tamamlanır.
    Yalnızca gerçek tamamlanmış işleri göstermek için her seçili işler alanına en
    fazla dört isteğe bağlı görsel eklenebilir; sahte ekip veya stok işletme
    görseli oluşturulmaz.
@@ -31,11 +31,11 @@ npm run build
 ```
 
 Sektör denetimi 36 sektörün tek ve çok sayfalı yapılarını; sayfa rolleri,
-sluglar, bağlantılar, form profilleri, hareketli ikon dilleri, başlık uzunlukları,
+sluglar, bağlantılar, form profilleri, tipografik sahne dilleri, başlık uzunlukları,
 sektörler arası içerik özgünlüğü, sayfa içi tekrarlar ve şablon sürümünü kontrol
 eder.
 
 ## Ortam değişkenleri
 
-İkon sistemi ve isteğe bağlı yerel iş görselleri için API anahtarı gerekmez. `.env.local.example` içinde GitHub
+Sahne sistemi ve isteğe bağlı yerel iş görselleri için API anahtarı gerekmez. `.env.local.example` içinde GitHub
 aktarımı ve isteğe bağlı OpenAI içerik ayarları bulunur.

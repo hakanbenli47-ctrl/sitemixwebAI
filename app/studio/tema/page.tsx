@@ -19,7 +19,7 @@ import {
   type SektorTasarimSecenegi,
   type TemaKimligi,
 } from "@/data/sektorTasarimlari";
-import SektorMotifi from "@/components/site/SektorMotifi";
+import SektorSahnesi from "@/components/site/SektorSahnesi";
 import styles from "./tema.module.css";
 
 interface Tema {
@@ -624,10 +624,12 @@ export default function TemaSecimSayfasi() {
                       <span />
                     </div>
 
-                    <SektorMotifi
+                    <SektorSahnesi
                       sektor={proje.sektor}
+                      sektorAdi={proje.sektorAdi}
+                      aile={tasarim.aile}
+                      baslik={tasarim.ad}
                       varyant="tema"
-                      etiketGoster
                     />
                   </div>
 
@@ -648,13 +650,13 @@ export default function TemaSecimSayfasi() {
 
                   <div className={styles.karakterSatiri}>
                     <strong>
-                      {tasarim.duzen} · {tasarim.yogunluk} · hareketli ikon
+                      {tasarim.duzen} · {tasarim.yogunluk} · tipografik sahne
                     </strong>
                   </div>
 
                   <span className={styles.gorselsizRozet}>
                     <Sparkles size={13} />
-                    Görselsiz kullanıma hazır
+                    Görselsiz profesyonel düzen
                   </span>
 
                   <small className={styles.onerilen}>
@@ -704,7 +706,7 @@ export default function TemaSecimSayfasi() {
                   </div>
                   <div>
                     <small>Medya yaklaşımı</small>
-                    <strong>Görselsiz ikon sistemi</strong>
+                    <strong>Tipografik sahne sistemi</strong>
                   </div>
                   <div>
                     <small>İçerik yoğunluğu</small>

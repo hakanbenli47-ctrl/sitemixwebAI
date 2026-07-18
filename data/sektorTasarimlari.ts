@@ -55,7 +55,7 @@ export type TasarimDuzeni =
 export type KartStili = "keskin" | "yumusak" | "cerceveli" | "katmanli";
 export type IcerikYogunlugu = "ferah" | "dengeli" | "kompakt";
 export type GorselOrani = "panorama" | "portre" | "kare" | "karisik";
-export type MedyaStratejisi = "gorselsiz-ikon";
+export type MedyaStratejisi = "gorselsiz-sahne";
 
 export type AnaSayfaBolumu =
   | "hero"
@@ -112,32 +112,32 @@ interface SektorKimligi {
 const aileKurgulari: Record<TasarimAilesi, [AileSecenegi, AileSecenegi, AileSecenegi]> = {
   "otomotiv-atolye": [
     { etiket: "Performans atölyesi", aciklama: "Teknik işçiliği, paketleri ve sonuçları yüksek kontrastlı atölye düzeninde sunar.", duzen: "teknik", kartStili: "keskin", yogunluk: "kompakt", gorselOrani: "panorama", ozellikler: ["Numaralı servis panelleri", "Güçlü teklif ve randevu geçişi"] },
-    { etiket: "Sinematik showroom", aciklama: "Araç hizmetlerini hareketli katmanlar, güçlü tipografi ve teknik simgelerle showroom ritminde sunar.", duzen: "sinematik", kartStili: "katmanli", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Hareketli araç ve yüzey simgeleri", "Sonuç odaklı iş seçkisi"] },
+    { etiket: "Sinematik showroom", aciklama: "Araç hizmetlerini hareketli katmanlar, güçlü tipografi ve teknik bilgi çizgileriyle showroom ritminde sunar.", duzen: "sinematik", kartStili: "katmanli", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Hareketli araç ve yüzey sahnesi", "Sonuç odaklı iş seçkisi"] },
     { etiket: "Bakım kataloğu", aciklama: "Hizmetleri kolay karşılaştırılan kartlara ayırır ve karar vermeyi hızlandırır.", duzen: "katalog", kartStili: "cerceveli", yogunluk: "dengeli", gorselOrani: "karisik", ozellikler: ["Karşılaştırılabilir hizmet kartları", "Mobilde hızlı paket tarama"] },
   ],
   "yapi-sistemleri": [
-    { etiket: "Mimari keşif", aciklama: "Sistem seçimi, ölçü ve keşif çağrısını çizgisel mimari motiflerle dengeli bir düzende birleştirir.", duzen: "editorial", kartStili: "cerceveli", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Ölçü ve keşif vurgusu", "Mimari ikon ve ızgara dili"] },
-    { etiket: "Sistem vitrini", aciklama: "Ürün tiplerini hareketli sistem simgeleri ve kısa teknik faydalarla vitrin mantığında gösterir.", duzen: "portfoy", kartStili: "katmanli", yogunluk: "dengeli", gorselOrani: "karisik", ozellikler: ["Sistem bazlı proje seçkisi", "Malzeme ve kullanım detayı"] },
+    { etiket: "Mimari keşif", aciklama: "Sistem seçimi, ölçü ve keşif çağrısını çizgisel mimari motiflerle dengeli bir düzende birleştirir.", duzen: "editorial", kartStili: "cerceveli", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Ölçü ve keşif vurgusu", "Mimari tipografi ve ızgara dili"] },
+    { etiket: "Sistem vitrini", aciklama: "Ürün tiplerini hareketli bilgi panelleri ve kısa teknik faydalarla vitrin mantığında gösterir.", duzen: "portfoy", kartStili: "katmanli", yogunluk: "dengeli", gorselOrani: "karisik", ozellikler: ["Sistem bazlı proje seçkisi", "Malzeme ve kullanım detayı"] },
     { etiket: "Teknik çözüm", aciklama: "Dayanım, ölçülendirme ve montaj sürecini düzenli teknik panellerle açıklar.", duzen: "teknik", kartStili: "keskin", yogunluk: "kompakt", gorselOrani: "kare", ozellikler: ["Teknik karar kartları", "Adım adım montaj akışı"] },
   ],
   "proje-portfoyu": [
-    { etiket: "Editoryal stüdyo", aciklama: "Proje hikâyesini geniş boşluklar, güçlü tipografi ve hareketli uygulama simgeleriyle anlatır.", duzen: "editorial", kartStili: "cerceveli", yogunluk: "ferah", gorselOrani: "karisik", ozellikler: ["Proje hikâyesi önceliği", "Asimetrik içerik ritmi"] },
+    { etiket: "Editoryal stüdyo", aciklama: "Proje hikâyesini geniş boşluklar, güçlü tipografi ve hareketli uygulama katmanlarıyla anlatır.", duzen: "editorial", kartStili: "cerceveli", yogunluk: "ferah", gorselOrani: "karisik", ozellikler: ["Proje hikâyesi önceliği", "Asimetrik içerik ritmi"] },
     { etiket: "Proje arşivi", aciklama: "Tamamlanan işleri kategori, sonuç ve teslim mantığıyla güçlü bir portföye dönüştürür.", duzen: "portfoy", kartStili: "katmanli", yogunluk: "dengeli", gorselOrani: "panorama", ozellikler: ["İkon destekli proje ızgarası", "Süreç ve sonuç eşleşmesi"] },
     { etiket: "Uygulama planı", aciklama: "Hizmet kapsamını, iş sırasını ve teslim yaklaşımını teknik bir düzende netleştirir.", duzen: "teknik", kartStili: "keskin", yogunluk: "kompakt", gorselOrani: "kare", ozellikler: ["Kapsam bazlı hizmet düzeni", "Planlama ve teslim akışı"] },
   ],
   "temizlik-servisi": [
     { etiket: "Net hizmet akışı", aciklama: "Hizmet kapsamını, güven unsurlarını ve teklif adımını ilk bakışta anlaşılır kılar.", duzen: "servis", kartStili: "yumusak", yogunluk: "dengeli", gorselOrani: "karisik", ozellikler: ["Kapsamı açık hizmet kartları", "Sessiz teklif yönlendirmesi"] },
-    { etiket: "Sonuç vitrini", aciklama: "Temizlik sonucunu ve uygulama ayrıntılarını akışkan simgeler ve önce-sonra ritmiyle öne çıkarır.", duzen: "sinematik", kartStili: "katmanli", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Sonuç odaklı hareketli akış", "Ekipman ve yöntem anlatımı"] },
+    { etiket: "Sonuç vitrini", aciklama: "Temizlik sonucunu ve uygulama ayrıntılarını akışkan katmanlar ve önce-sonra ritmiyle öne çıkarır.", duzen: "sinematik", kartStili: "katmanli", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Sonuç odaklı hareketli akış", "Ekipman ve yöntem anlatımı"] },
     { etiket: "Kurumsal plan", aciklama: "Düzenli hizmet, alan türü ve çalışma sıklığını kurumsal alıcıların kolay tarayacağı yapıda sunar.", duzen: "katalog", kartStili: "cerceveli", yogunluk: "kompakt", gorselOrani: "kare", ozellikler: ["Alan türüne göre hizmet seçimi", "Periyodik çalışma vurgusu"] },
   ],
   "acil-saha-servisi": [
     { etiket: "Hızlı servis", aciklama: "Sorun, hizmet bölgesi ve iletişim yolunu gecikmeden gösteren dönüşüm odaklı yapı kurar.", duzen: "servis", kartStili: "keskin", yogunluk: "kompakt", gorselOrani: "karisik", ozellikler: ["Tek dokunuşla servis talebi", "Hizmet bölgesi görünürlüğü"] },
     { etiket: "Teknik güven", aciklama: "Arıza türlerini, müdahale biçimini ve güvenlik adımlarını teknik bir sunumla açıklar.", duzen: "teknik", kartStili: "cerceveli", yogunluk: "dengeli", gorselOrani: "kare", ozellikler: ["Sorun türüne göre yönlendirme", "Güvenlik ve kontrol adımları"] },
-    { etiket: "Yerinde çözüm", aciklama: "Saha, konum ve müdahale bilgisini hareketli teknik simgelerle dengeler; kullanıcıyı kısa talep formuna taşır.", duzen: "rezervasyon", kartStili: "yumusak", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Konum ve uygunluk akışı", "Kısa talep formu önceliği"] },
+    { etiket: "Yerinde çözüm", aciklama: "Saha, konum ve müdahale bilgisini hareketli teknik panellerle dengeler; kullanıcıyı kısa talep formuna taşır.", duzen: "rezervasyon", kartStili: "yumusak", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Konum ve uygunluk akışı", "Kısa talep formu önceliği"] },
   ],
   "butik-bakim": [
     { etiket: "Butik randevu", aciklama: "Uygulamaları zarif bir hizmet menüsüyle sunar ve randevuya doğal biçimde yönlendirir.", duzen: "rezervasyon", kartStili: "yumusak", yogunluk: "ferah", gorselOrani: "portre", ozellikler: ["Randevu odaklı hizmet seçimi", "Mobilde rahat uygulama tarama"] },
-    { etiket: "Stil galerisi", aciklama: "Stil sonuçlarını editoryal kartlar ve zarif hareketli simgelerle öne alarak uzmanlık algısını güçlendirir.", duzen: "portfoy", kartStili: "katmanli", yogunluk: "dengeli", gorselOrani: "portre", ozellikler: ["Model ve uygulama seçkisi", "Stilden hizmete geçiş"] },
+    { etiket: "Stil galerisi", aciklama: "Stil sonuçlarını editoryal kartlar ve zarif hareketli katmanlarla öne alarak uzmanlık algısını güçlendirir.", duzen: "portfoy", kartStili: "katmanli", yogunluk: "dengeli", gorselOrani: "portre", ozellikler: ["Model ve uygulama seçkisi", "Stilden hizmete geçiş"] },
     { etiket: "Bakım menüsü", aciklama: "Hizmetleri sade, kıyaslanabilir ve açıklayıcı kartlarla düzenler.", duzen: "katalog", kartStili: "cerceveli", yogunluk: "kompakt", gorselOrani: "kare", ozellikler: ["Net bakım kategorileri", "Fayda ve süreç açıklamaları"] },
   ],
   "saglik-danismanlik": [
@@ -148,10 +148,10 @@ const aileKurgulari: Record<TasarimAilesi, [AileSecenegi, AileSecenegi, AileSece
   "klinik-guven": [
     { etiket: "Klinik güven", aciklama: "Hizmetleri, uzman yaklaşımını ve randevu bilgisini hijyenik ve ölçülü bir düzende sunar.", duzen: "klinik", kartStili: "yumusak", yogunluk: "ferah", gorselOrani: "karisik", ozellikler: ["Tedavi ve uzmanlık ayrımı", "Güven veren randevu paneli"] },
     { etiket: "Tedavi rehberi", aciklama: "Hizmetleri anlaşılır kategorilere ayırır; karar öncesi soruları açıkça yanıtlar.", duzen: "katalog", kartStili: "cerceveli", yogunluk: "dengeli", gorselOrani: "kare", ozellikler: ["Hizmet bazlı bilgi kartları", "Süreç ve hazırlık açıklamaları"] },
-    { etiket: "Merkez vitrini", aciklama: "Klinik ortamını ve uygulama alanlarını ölçülü sağlık simgeleriyle destekleyen güven odaklı sunum kurar.", duzen: "editorial", kartStili: "katmanli", yogunluk: "dengeli", gorselOrani: "panorama", ozellikler: ["Merkez ve ekipman görünürlüğü", "Uzmanlık hikâyesi"] },
+    { etiket: "Merkez vitrini", aciklama: "Klinik ortamını ve uygulama alanlarını ölçülü bilgi panelleriyle destekleyen güven odaklı sunum kurar.", duzen: "editorial", kartStili: "katmanli", yogunluk: "dengeli", gorselOrani: "panorama", ozellikler: ["Merkez ve ekipman görünürlüğü", "Uzmanlık hikâyesi"] },
   ],
   "emlak-portfoyu": [
-    { etiket: "Portföy vitrini", aciklama: "İlanları konum, tip ve değer simgeleriyle desteklenen okunaklı bilgi bloklarında sunar.", duzen: "portfoy", kartStili: "katmanli", yogunluk: "dengeli", gorselOrani: "panorama", ozellikler: ["İlan odaklı geniş kartlar", "Portföy talebine hızlı geçiş"] },
+    { etiket: "Portföy vitrini", aciklama: "İlanları konum, tip ve değer verileriyle desteklenen okunaklı bilgi bloklarında sunar.", duzen: "portfoy", kartStili: "katmanli", yogunluk: "dengeli", gorselOrani: "panorama", ozellikler: ["İlan odaklı geniş kartlar", "Portföy talebine hızlı geçiş"] },
     { etiket: "Danışmanlık ofisi", aciklama: "Bölge uzmanlığı, süreç ve danışmanlık değerini kurumsal bir editoryal yapıda anlatır.", duzen: "editorial", kartStili: "cerceveli", yogunluk: "ferah", gorselOrani: "karisik", ozellikler: ["Bölge ve danışmanlık vurgusu", "Alım-satım süreci açıklaması"] },
     { etiket: "İlan kataloğu", aciklama: "Portföy tiplerini karşılaştırılabilir kartlarla sıralar ve mobil taramayı hızlandırır.", duzen: "katalog", kartStili: "keskin", yogunluk: "kompakt", gorselOrani: "kare", ozellikler: ["Kategori hissi veren ilan düzeni", "Kısa bilgi ve hızlı talep"] },
   ],
@@ -167,7 +167,7 @@ const aileKurgulari: Record<TasarimAilesi, [AileSecenegi, AileSecenegi, AileSece
   ],
   "spor-enerjisi": [
     { etiket: "Performans kulübü", aciklama: "Antrenman, ekipman ve salon enerjisini yüksek kontrastlı dinamik bir yapıda sunar.", duzen: "teknik", kartStili: "keskin", yogunluk: "kompakt", gorselOrani: "panorama", ozellikler: ["Program ve hedef odaklı kartlar", "Güçlü üyelik çağrısı"] },
-    { etiket: "Hareket vitrini", aciklama: "Ders ve antrenman enerjisini nabızlı hareketler, program blokları ve performans simgeleriyle öne çıkarır.", duzen: "sinematik", kartStili: "katmanli", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Hareket odaklı seçki", "Salon atmosferi"] },
+    { etiket: "Hareket vitrini", aciklama: "Ders ve antrenman enerjisini nabızlı hareketler, program blokları ve performans verileriyle öne çıkarır.", duzen: "sinematik", kartStili: "katmanli", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Hareket odaklı seçki", "Salon atmosferi"] },
     { etiket: "Program seçimi", aciklama: "Dersleri ve üyelik seçeneklerini mobilde kolay kıyaslanabilir hale getirir.", duzen: "katalog", kartStili: "cerceveli", yogunluk: "dengeli", gorselOrani: "kare", ozellikler: ["Ders ve program ayrımı", "Hedefe göre yönlendirme"] },
   ],
   "okul-yasami": [
@@ -181,7 +181,7 @@ const aileKurgulari: Record<TasarimAilesi, [AileSecenegi, AileSecenegi, AileSece
     { etiket: "Seviye görüşmesi", aciklama: "Program bilgisini seviye belirleme ve danışmanlık çağrısıyla birleştirir.", duzen: "rezervasyon", kartStili: "yumusak", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Seviye değerlendirme adımı", "Danışmanlık odaklı kayıt yolu"] },
   ],
   "urun-katalogu": [
-    { etiket: "Ürün vitrini", aciklama: "Ürünleri kategori simgeleri, kısa seçim bilgileri ve kolay talep akışıyla düzenli biçimde sunar.", duzen: "katalog", kartStili: "cerceveli", yogunluk: "dengeli", gorselOrani: "kare", ozellikler: ["Ürün kategorisi hissi", "Mobilde kolay ürün tarama"] },
+    { etiket: "Ürün vitrini", aciklama: "Ürünleri kategori blokları, kısa seçim bilgileri ve kolay talep akışıyla düzenli biçimde sunar.", duzen: "katalog", kartStili: "cerceveli", yogunluk: "dengeli", gorselOrani: "kare", ozellikler: ["Ürün kategorisi hissi", "Mobilde kolay ürün tarama"] },
     { etiket: "Butik koleksiyon", aciklama: "Ürünlerin işçiliğini ve duygusunu editoryal, seçkin bir görünümle öne çıkarır.", duzen: "editorial", kartStili: "katmanli", yogunluk: "ferah", gorselOrani: "portre", ozellikler: ["Koleksiyon odaklı sunum", "Ürün hikâyesi ve ayrıntı"] },
     { etiket: "Hızlı sipariş", aciklama: "Ürün seçimini teslim, adet veya tarih bilgisiyle kısa bir sipariş yoluna bağlar.", duzen: "rezervasyon", kartStili: "yumusak", yogunluk: "kompakt", gorselOrani: "karisik", ozellikler: ["Teslim ve sipariş bilgisi", "WhatsApp'a doğal yönlendirme"] },
   ],
@@ -197,7 +197,7 @@ const aileKurgulari: Record<TasarimAilesi, [AileSecenegi, AileSecenegi, AileSece
   ],
   "seyahat-rezervasyonu": [
     { etiket: "Kolay rezervasyon", aciklama: "Araç veya transfer seçimini tarih, rota ve iletişim bilgisiyle hızlıca birleştirir.", duzen: "rezervasyon", kartStili: "yumusak", yogunluk: "kompakt", gorselOrani: "karisik", ozellikler: ["Tarih ve rota odaklı akış", "Mobilde hızlı rezervasyon"] },
-    { etiket: "Filo vitrini", aciklama: "Araç seçeneklerini sınıf, kapasite ve rota simgeleriyle profesyonel bir filoya dönüştürür.", duzen: "portfoy", kartStili: "katmanli", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Araç sınıfı ve kapasite", "İkon destekli filo sunumu"] },
+    { etiket: "Filo vitrini", aciklama: "Araç seçeneklerini sınıf, kapasite ve rota verileriyle profesyonel bir filoya dönüştürür.", duzen: "portfoy", kartStili: "katmanli", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Araç sınıfı ve kapasite", "Veri destekli filo sunumu"] },
     { etiket: "Seçenek kataloğu", aciklama: "Hizmet ya da araç türlerini kolay karşılaştırılan kartlarla listeler.", duzen: "katalog", kartStili: "cerceveli", yogunluk: "dengeli", gorselOrani: "kare", ozellikler: ["Karşılaştırılabilir seçenekler", "Kapsam ve uygunluk bilgisi"] },
   ],
 };
@@ -272,19 +272,19 @@ function profilOlustur(sektor: string, kimlik: SektorKimligi): SektorTasarimProf
       id: `${sektor}-tasarim-${index + 1}`,
       ad: kimlik.adlar[index],
       etiket: secenek.etiket,
-      aciklama: `${kimlik.odak}. ${secenek.aciklama} Görsel gerektirmeden hareketli sektör simgeleriyle eksiksiz çalışır.`,
+      aciklama: `${kimlik.odak}. ${secenek.aciklama} Görsel gerektirmeden sektörel tipografi, geometrik sahneler ve dengeli hareketle eksiksiz çalışır.`,
       tema: kimlik.temalar[index],
       aile: kimlik.aile,
       duzen: secenek.duzen,
       kartStili: secenek.kartStili,
       yogunluk: secenek.yogunluk,
       gorselOrani: secenek.gorselOrani,
-      medyaStratejisi: "gorselsiz-ikon",
+      medyaStratejisi: "gorselsiz-sahne",
       gorselLimiti: 4,
       ozellikler: [
         kimlik.odak,
         "Görselsiz kullanıma hazır",
-        "Hareketli sektör simgeleri",
+        "Sektörel tipografi ve dengeli hareket",
         ...secenek.ozellikler,
       ],
     })),

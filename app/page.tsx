@@ -30,7 +30,7 @@ export default function AnaSayfa() {
 
         <p>
           Firma bilgilerini ve sektörünü belirle. Sitemix Studio; tipografi,
-          renk, hareketli sektör simgeleri ve profesyonel içerik düzeniyle
+          renk, sektörel tipografi ve hareketli bilgi sahneleriyle
           görsele ihtiyaç duymadan bağımsız bir web sitesi oluştursun.
         </p>
 
@@ -72,10 +72,10 @@ export default function AnaSayfa() {
           </div>
 
           <div className="ozellikMetni">
-            <h2>Sektöre özel hareketli dil</h2>
+            <h2>Sektöre özel tasarım dili</h2>
             <p>
-              36 sektör için ayrı ikon kümeleri, hareket karakterleri ve tema
-              düzenleriyle görsel olmadan da güçlü siteler oluştur.
+              36 sektör için ayrı tipografik sahneler, hareket karakterleri ve
+              tema düzenleriyle görsel olmadan da güçlü siteler oluştur.
             </p>
           </div>
         </div>

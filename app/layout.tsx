@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Sitemix Studio",
   description:
-    "Görsele ihtiyaç duymadan, hareketli sektör simgeleriyle profesyonel ve çok sayfalı web siteleri oluşturma sistemi.",
+    "Görsele ihtiyaç duymadan, sektörel tipografi ve hareketli bilgi sahneleriyle profesyonel web siteleri oluşturma sistemi.",
 };
 
 export default function RootLayout({

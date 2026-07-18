@@ -1780,8 +1780,8 @@ export default function KolayIcerikDuzenleyici() {
             <span>İSTEĞE BAĞLI İŞ GÖRSELLERİ</span>
             <h2>Temanız görselsiz kullanıma hazır</h2>
             <p>
-              Sektöre özel hareketli simgeler tüm boş alanları profesyonel
-              biçimde tamamlar. Yalnızca gerçek çalışmalarınızı göstermek
+              Sektöre özel tipografik sahneler, bilgi şeritleri ve geometrik
+              hareketler tüm boş alanları profesyonel biçimde tamamlar. Yalnızca gerçek çalışmalarınızı göstermek
               isterseniz her seçili işler alanına en fazla {SECILI_IS_GORSEL_LIMITI}
               görsel eklemeniz yeterli.
             </p>
@@ -1844,8 +1844,8 @@ export default function KolayIcerikDuzenleyici() {
         </div>
 
         <p className={styles.dosyaSirasiNotu}>
-          Bu alanlar zorunlu değildir. Yükleme yapmazsanız hareketli sektör
-          simgeleri ve tipografik düzen otomatik olarak görünür.
+          Bu alanlar zorunlu değildir. Yükleme yapmazsanız sektörel tipografi,
+          bilgi çizgileri ve hareketli geometrik düzen otomatik olarak görünür.
         </p>
 
         <div className={styles.gorselSayfaGruplari}>

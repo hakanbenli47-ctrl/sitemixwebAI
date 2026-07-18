@@ -444,9 +444,10 @@
 
 .temaSecenegi > p {
   margin: 14px 0 0;
-  color: #626a64;
-  font-size: 13px;
-  line-height: 1.65;
+  color: #3f4942;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.72;
 }
 
 .karakterSatiri {
@@ -518,9 +519,10 @@
 
 .sabitAlan > p {
   margin: 0;
-  color: #626a64;
-  font-size: 14px;
-  line-height: 1.65;
+  color: #3f4942;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.72;
 }
 
 .seciliTemaKart {

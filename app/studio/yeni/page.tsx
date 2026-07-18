@@ -263,7 +263,7 @@ export default function YeniProjeSayfasi() {
 
         if (!cevap.ok || !veri.basarili || !veri.proje) {
           throw new Error(
-            veri.mesaj || "Otomatik içerik ve görseller hazırlanamadı.",
+            veri.mesaj || "Otomatik içerik ve tasarım sahnesi hazırlanamadı.",
           );
         }
 
@@ -339,7 +339,7 @@ export default function YeniProjeSayfasi() {
 
         <p>
           Sektör, şehir ve ilçe bilgilerine göre sayfalar, içerikler ve
-          eksik görseller otomatik hazırlanacak.
+          görselsiz profesyonel sunum sahneleri otomatik hazırlanacak.
         </p>
       </section>
 
@@ -687,8 +687,8 @@ export default function YeniProjeSayfasi() {
             </button>
 
             <p className="kayitNotu">
-              Oluşturulan bütün metinleri ve görselleri daha sonra
-              değiştirebilirsin.
+              Oluşturulan bütün metinleri ve isteğe bağlı iş görsellerini daha
+              sonra değiştirebilirsin.
             </p>
           </div>
         </aside>

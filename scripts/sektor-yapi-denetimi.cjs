@@ -212,8 +212,8 @@ for (const sektor of sektorler.sektorler) {
     sorunlar.push(`${sektor.id}: sektöre özel tasarım kaydı bulunamadı`);
   }
 
-  if (!gorselDilleri.sektorGorselDiliKaydiVarMi(sektor.id)) {
-    sorunlar.push(`${sektor.id}: hareketli ikon dili bulunamadı`);
+  if (!gorselDilleri.sektorSahneDiliKaydiVarMi(sektor.id)) {
+    sorunlar.push(`${sektor.id}: sektörel tipografik sahne dili bulunamadı`);
   }
 
   if (tasarimSecenekleri.length !== 3) {
@@ -242,7 +242,7 @@ for (const sektor of sektorler.sektorler) {
     }
 
     if (
-      secenek.medyaStratejisi !== "gorselsiz-ikon" ||
+      secenek.medyaStratejisi !== "gorselsiz-sahne" ||
       secenek.gorselLimiti !== gorselDilleri.SECILI_IS_GORSEL_LIMITI
     ) {
       sorunlar.push(`${sektor.id}: görselsiz medya stratejisi uygulanmadı`);
@@ -610,13 +610,13 @@ const siteBileseni = fs.readFileSync(
   path.join(kok, "components/site/SiteGorunumu.tsx"),
   "utf8",
 );
-const sektorMotifi = fs.readFileSync(
-  path.join(kok, "components/site/SektorMotifi.tsx"),
+const sektorSahnesi = fs.readFileSync(
+  path.join(kok, "components/site/SektorSahnesi.tsx"),
   "utf8",
 );
 
-if (!siteBileseni.includes("SektorMotifi") || !sektorMotifi.includes("motion")) {
-  sorunlar.push("hareketli sektör motifi site görünümüne bağlanmadı");
+if (!siteBileseni.includes("SektorSahnesi") || !sektorSahnesi.includes("motion")) {
+  sorunlar.push("tipografik sektör sahnesi site görünümüne bağlanmadı");
 }
 
 if (/initial="gizli"[\s\S]{0,120}whileInView=/.test(siteBileseni)) {
@@ -723,9 +723,9 @@ for (const semaParcasi of [
   "data-site-parcasi=\"kart\"",
   "data-site-parcasi=\"galeri\"",
   "data-site-parcasi=\"bolum-sahnesi\"",
-  "data-site-parcasi=\"sektor-motifi\"",
+  "data-site-parcasi=\"sektor-sahnesi\"",
 ]) {
-  if (!siteBileseni.includes(semaParcasi) && !sektorMotifi.includes(semaParcasi)) {
+  if (!siteBileseni.includes(semaParcasi) && !sektorSahnesi.includes(semaParcasi)) {
     sorunlar.push(`sektör şeması bağlantısı eksik: ${semaParcasi}`);
   }
 }

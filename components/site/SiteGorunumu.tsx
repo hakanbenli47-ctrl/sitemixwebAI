@@ -29,6 +29,7 @@ import metinStyles from "./metinTemalari.module.css";
 import {
   sektorKararNoktalariniGetir,
   sektorOperasyonProfiliniGetir,
+  sektorSahneDiliniGetir,
 } from "@/data/sektorGorselDili";
 import type {
   AnimasyonTuru,
@@ -1663,6 +1664,7 @@ export default function SiteGorunumu({
     proje.tema,
   );
   const profesyonelProfil = sektorOperasyonProfiliniGetir(proje.sektor);
+  const sektorSahneDili = sektorSahneDiliniGetir(proje.sektor);
   const sunumProfili = sektorSunumProfiliniGetir(proje.sektor);
   const profesyonelHeaderHedefi = profesyonelProfil
     ? proje.siteTipi === "cok-sayfa" && sunumProfili.aksiyonSayfasi
@@ -1691,6 +1693,12 @@ export default function SiteGorunumu({
     "--site-buton-yazi": renkler.butonYazi,
     "--site-ters-zemin": renkler.yazi,
     "--site-ters-yazi": renkler.arkaPlan,
+    "--site-aksiyon-zemin": renkler.vurgu,
+    "--site-aksiyon-yazi": renkler.butonYazi,
+    "--site-form-zemin": renkler.ikinciArkaPlan,
+    "--site-form-yazi": renkler.yazi,
+    "--site-form-soluk": renkler.solukYazi,
+    "--site-form-cizgi": renkler.cizgi,
   } as CSSProperties;
 
   return (
@@ -1707,6 +1715,7 @@ export default function SiteGorunumu({
       data-yogunluk={tasarim?.yogunluk}
       data-gorsel-orani={tasarim?.gorselOrani}
       data-medya-stratejisi={tasarim?.medyaStratejisi}
+      data-hareket-stili={sektorSahneDili.hareket}
       data-gorsel-limiti={tasarim?.gorselLimiti}
       data-ana-sayfa={aktifSayfa.anaSayfa ? "true" : "false"}
     >

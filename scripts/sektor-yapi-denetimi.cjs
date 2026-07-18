@@ -851,9 +851,14 @@ if (/initial="gizli"[\s\S]{0,120}whileInView=/.test(siteBileseni)) {
 
 if (
   !siteBileseni.includes('"--site-ters-zemin": renkler.yazi') ||
-  !siteBileseni.includes('"--site-ters-yazi": renkler.arkaPlan')
+  !siteBileseni.includes('"--site-ters-yazi": renkler.arkaPlan') ||
+  !siteBileseni.includes('"--site-aksiyon-zemin": renkler.vurgu') ||
+  !siteBileseni.includes('"--site-aksiyon-yazi": renkler.butonYazi') ||
+  !siteBileseni.includes('"--site-form-zemin": renkler.ikinciArkaPlan') ||
+  !siteBileseni.includes('"--site-form-yazi": renkler.yazi') ||
+  !siteBileseni.includes('data-hareket-stili={sektorSahneDili.hareket}')
 ) {
-  sorunlar.push("ters renk yüzeyleri gerçek tema değerleriyle sabitlenmemiş");
+  sorunlar.push("ters, randevu, iletişim veya hareket rolleri gerçek tema değerleriyle sabitlenmemiş");
 }
 const temaBlogu = siteBileseni
   .split("const temaRenkleri")[1]
@@ -899,9 +904,12 @@ for (const eslesme of temaBlogu.matchAll(/^  (\w+): \{([\s\S]*?)^  \},/gm)) {
   for (const [alan, onPlan, zemin] of [
     ["yazı", yazi, arkaPlan],
     ["soluk yazı", solukYazi, arkaPlan],
+    ["randevu form yazısı", yazi, ikinciArkaPlan],
+    ["randevu form alt yazısı", solukYazi, ikinciArkaPlan],
     ["soluk yazı / ikinci zemin", solukYazi, ikinciArkaPlan],
     ["vurgu", vurgu, arkaPlan],
     ["vurgu / ikinci zemin", vurgu, ikinciArkaPlan],
+    ["iletişim aksiyon yazısı", butonYazi, vurgu],
     ["buton", butonYazi, vurgu],
   ]) {
     if (onPlan && zemin && kontrastOrani(onPlan, zemin) < 4.5) {
@@ -950,6 +958,8 @@ for (const metinTemaKurali of [
   'data-site-parcasi="hero-bilgi"',
   'data-site-parcasi="liste"',
   'data-site-parcasi="kart"',
+  'section[data-bolum-turu="iletisim"]',
+  'section[data-bolum-turu="form"]',
   "@media (max-width: 650px)",
   "@media (prefers-reduced-motion: reduce)",
 ]) {
@@ -968,6 +978,12 @@ for (const semantikRenk of [
   "--site-ters-yazi",
   "--site-vurgu-zemin",
   "--site-vurgu-yazi",
+  "--site-aksiyon-zemin",
+  "--site-aksiyon-yazi",
+  "--site-form-zemin",
+  "--site-form-yazi",
+  "--site-form-soluk",
+  "--site-form-cizgi",
   "--site-alan-yazi",
   "--site-alan-soluk",
   "--site-kutu-zemin",
@@ -979,11 +995,28 @@ for (const semantikRenk of [
   }
 }
 
+for (const hareketKurali of [
+  'data-hareket-stili="akiskan"',
+  'data-hareket-stili="nabiz"',
+  'data-hareket-stili="salinan"',
+  'data-hareket-stili="donen"',
+  "@supports (animation-timeline: view())",
+  "@keyframes heroMetniNetlesir",
+  "@keyframes gorunurMetinGecisi",
+]) {
+  if (!siteCss.includes(hareketKurali)) {
+    sorunlar.push(`sektörel hareket kuralı eksik: ${hareketKurali}`);
+  }
+}
+
 for (const guvenliYerlesimKurali of [
   "contain: paint",
   "z-index: 4",
   "var(--site-kutu-yazi)",
   "var(--site-kutu-soluk)",
+  ".talepFormu select option",
+  ".talepFormu :is(input, textarea):-webkit-autofill",
+  '.standartBolum[data-bolum-turu="iletisim"] :is(h2, h3, strong, a, svg)',
 ]) {
   if (!siteCss.includes(guvenliYerlesimKurali)) {
     sorunlar.push(`görsel/metin güvenlik kuralı eksik: ${guvenliYerlesimKurali}`);

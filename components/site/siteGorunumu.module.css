@@ -14,6 +14,12 @@
   --site-ters-yazi: var(--site-arka-plan);
   --site-vurgu-zemin: var(--site-vurgu);
   --site-vurgu-yazi: var(--site-buton-yazi);
+  --site-aksiyon-zemin: var(--site-vurgu);
+  --site-aksiyon-yazi: var(--site-buton-yazi);
+  --site-form-zemin: var(--site-ikinci-arka-plan);
+  --site-form-yazi: var(--site-yazi);
+  --site-form-soluk: var(--site-soluk-yazi);
+  --site-form-cizgi: var(--site-cizgi);
   --site-alan-yazi: var(--site-yazi);
   --site-alan-soluk: var(--site-soluk-yazi);
   --site-alan-cizgi: var(--site-cizgi);
@@ -996,43 +1002,61 @@
 }
 
 .standartBolum[data-bolum-turu="iletisim"] {
-  --site-alan-yazi: var(--site-vurgu-yazi);
-  --site-alan-soluk: color-mix(in srgb, var(--site-vurgu-yazi) 78%, transparent);
-  --site-alan-cizgi: color-mix(in srgb, var(--site-vurgu-yazi) 32%, transparent);
+  --site-alan-yazi: var(--site-aksiyon-yazi);
+  --site-alan-soluk: color-mix(in srgb, var(--site-aksiyon-yazi) 82%, transparent);
+  --site-alan-cizgi: color-mix(in srgb, var(--site-aksiyon-yazi) 38%, transparent);
 
   padding: 3vw;
-  background: var(--site-vurgu-zemin);
-  color: var(--site-vurgu-yazi);
+  background: var(--site-aksiyon-zemin);
+  color: var(--site-aksiyon-yazi);
 }
 
 .standartBolum[data-bolum-turu="iletisim"] .bolumIcerikSahnesi {
   padding: clamp(42px, 7vw, 110px);
-  border: 1px solid color-mix(in srgb, var(--site-buton-yazi) 32%, transparent);
+  border: 1px solid color-mix(in srgb, var(--site-aksiyon-yazi) 38%, transparent);
 }
 
 .standartBolum[data-bolum-turu="iletisim"] .kucukBaslik,
 .standartBolum[data-bolum-turu="iletisim"] .iletisimYerlesimi p,
 .standartBolum[data-bolum-turu="iletisim"] .iletisimListesi small {
   border-color: currentColor;
-  color: color-mix(in srgb, var(--site-vurgu-yazi) 78%, transparent);
+  color: color-mix(in srgb, var(--site-aksiyon-yazi) 82%, transparent);
 }
 
 .standartBolum[data-bolum-turu="iletisim"] .iletisimListesi > a,
 .standartBolum[data-bolum-turu="iletisim"] .iletisimListesi > div,
 .standartBolum[data-bolum-turu="iletisim"] .iletisimListesi strong {
-  border-color: color-mix(in srgb, var(--site-vurgu-yazi) 32%, transparent);
-  color: var(--site-vurgu-yazi);
+  border-color: color-mix(in srgb, var(--site-aksiyon-yazi) 38%, transparent);
+  color: var(--site-aksiyon-yazi);
 }
 
 .standartBolum[data-bolum-turu="iletisim"] .bolumNumarasi,
 .standartBolum[data-bolum-turu="iletisim"] .iletisimListesi,
 .standartBolum[data-bolum-turu="iletisim"] .iletisimListesi svg {
   border-color: currentColor;
-  color: var(--site-vurgu-yazi);
+  color: var(--site-aksiyon-yazi);
 }
 
 .standartBolum[data-bolum-turu="iletisim"] .bolumNumarasi i {
-  background: var(--site-vurgu-yazi);
+  background: var(--site-aksiyon-yazi);
+}
+
+.standartBolum[data-bolum-turu="iletisim"] :is(h2, h3, strong, a, svg) {
+  color: var(--site-aksiyon-yazi);
+}
+
+.standartBolum[data-bolum-turu="form"] {
+  --site-kutu-zemin: var(--site-form-zemin);
+  --site-kutu-yazi: var(--site-form-yazi);
+  --site-kutu-soluk: var(--site-form-soluk);
+  --site-kutu-cizgi: var(--site-form-cizgi);
+
+  background: var(--site-arka-plan);
+  color: var(--site-form-yazi);
+}
+
+.standartBolum[data-bolum-turu="form"] :is(.formTanitim h2, .formTanitim p, .formTanitim .kucukBaslik) {
+  color: var(--site-form-yazi);
 }
 
 .bolumNumarasi {
@@ -1346,7 +1370,7 @@
 .listeIcerik p {
   max-width: 680px;
   margin: 17px 0 0;
-  color: color-mix(in srgb, var(--site-kutu-yazi) 78%, var(--site-kutu-zemin));
+  color: var(--site-kutu-soluk);
   font-size: 16px;
   font-weight: 500;
   line-height: 1.75;
@@ -1622,9 +1646,9 @@
   display: grid;
   gap: 22px;
   padding: clamp(28px, 4vw, 52px);
-  border: 1px solid var(--site-cizgi);
-  background: var(--site-kutu-zemin);
-  color: var(--site-kutu-yazi);
+  border: 1px solid var(--site-form-cizgi);
+  background: var(--site-form-zemin);
+  color: var(--site-form-yazi);
 }
 
 .talepFormu label {
@@ -1633,7 +1657,7 @@
 }
 
 .talepFormu label > span {
-  color: var(--site-kutu-soluk);
+  color: var(--site-form-soluk);
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -1647,17 +1671,30 @@
   min-height: 52px;
   padding: 13px 0;
   border: 0;
-  border-bottom: 1px solid var(--site-cizgi);
+  border-bottom: 1px solid var(--site-form-cizgi);
   border-radius: 0;
   outline: none;
   background: transparent;
-  color: var(--site-kutu-yazi);
+  color: var(--site-form-yazi);
+  caret-color: var(--site-vurgu);
   font-size: 16px;
 }
 
 .talepFormu :is(input, textarea)::placeholder {
-  color: var(--site-kutu-soluk);
-  opacity: 0.82;
+  color: var(--site-form-soluk);
+  opacity: 1;
+}
+
+.talepFormu select option {
+  background: var(--site-form-zemin);
+  color: var(--site-form-yazi);
+}
+
+.talepFormu :is(input, textarea):-webkit-autofill,
+.talepFormu :is(input, textarea):-webkit-autofill:hover,
+.talepFormu :is(input, textarea):-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--site-form-yazi);
+  box-shadow: 0 0 0 1000px var(--site-form-zemin) inset;
 }
 
 .talepFormu textarea {
@@ -1692,7 +1729,7 @@
 }
 
 .talepFormu > small {
-  color: var(--site-kutu-soluk);
+  color: var(--site-form-soluk);
   font-size: 10px;
   line-height: 1.6;
 }
@@ -3490,6 +3527,241 @@
   .site[data-gorsel-orani] .galeri img,
   .site[data-gorsel-orani] .listeGorsel img {
     max-width: 100%;
+  }
+}
+
+/* Sektörel hareket sistemi: metin okunaklı kalır, vurgu ve giriş ritmi değişir. */
+@keyframes heroMetniNetlesir {
+  0% {
+    opacity: 0.58;
+    text-shadow: 0 34px 90px color-mix(in srgb, var(--site-vurgu) 24%, transparent);
+  }
+
+  100% {
+    opacity: 1;
+    text-shadow: 0 18px 60px color-mix(in srgb, var(--site-vurgu) 10%, transparent);
+  }
+}
+
+@keyframes aciklamaNetlesir {
+  0% {
+    opacity: 0.58;
+    border-left-width: 8px;
+  }
+
+  100% {
+    opacity: 1;
+    border-left-width: 2px;
+  }
+}
+
+@keyframes vurguNabzi {
+  0%,
+  100% {
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--site-vurgu) 12%, transparent);
+    transform: scale(1);
+  }
+
+  50% {
+    box-shadow: 0 0 0 10px color-mix(in srgb, var(--site-vurgu) 3%, transparent);
+    transform: scale(0.78);
+  }
+}
+
+@keyframes cizgiAkisi {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scaleX(0.28);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes okSalinimi {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(7px);
+  }
+}
+
+@keyframes okDonusu {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(-18deg);
+  }
+}
+
+@keyframes aksiyonRitmi {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--site-vurgu) 0%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--site-vurgu) 10%, transparent);
+  }
+}
+
+@keyframes gorunurMetinGecisi {
+  from {
+    opacity: 0.58;
+    transform: translateY(34px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gorunurKartGecisi {
+  from {
+    opacity: 0.68;
+    transform: translateY(26px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.heroMetni h1 {
+  animation: heroMetniNetlesir 1.05s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.heroMetni p {
+  animation: aciklamaNetlesir 0.9s 0.16s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.butonlar a,
+.headerAksiyon,
+.talepFormu button {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 280ms ease,
+    background-color 280ms ease;
+}
+
+.butonlar a::before,
+.headerAksiyon::before,
+.talepFormu button::before {
+  position: absolute;
+  z-index: 0;
+  top: -40%;
+  bottom: -40%;
+  left: -55%;
+  width: 42%;
+  background: currentColor;
+  content: "";
+  opacity: 0.09;
+  transform: skewX(-18deg);
+  transition: left 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.butonlar a > *,
+.headerAksiyon > *,
+.talepFormu button > * {
+  position: relative;
+  z-index: 1;
+}
+
+.butonlar a:hover::before,
+.headerAksiyon:hover::before,
+.talepFormu button:hover::before {
+  left: 118%;
+}
+
+.butonlar a:hover,
+.headerAksiyon:hover,
+.talepFormu button:hover:not(:disabled) {
+  box-shadow: 0 18px 44px color-mix(in srgb, var(--site-vurgu) 20%, transparent);
+  transform: translateY(-4px);
+}
+
+.iletisimListesi > a {
+  transition:
+    padding 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 300ms ease,
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.standartBolum[data-bolum-turu="iletisim"] .iletisimListesi > a:hover {
+  padding-right: 14px;
+  padding-left: 14px;
+  background: color-mix(in srgb, var(--site-aksiyon-yazi) 9%, transparent);
+}
+
+.talepFormu label {
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.talepFormu label:focus-within {
+  transform: translateY(-3px);
+}
+
+.talepFormu label:focus-within > span {
+  color: var(--site-vurgu);
+}
+
+.talepFormu :is(input, select, textarea) {
+  transition:
+    border-color 240ms ease,
+    box-shadow 240ms ease;
+}
+
+.talepFormu :is(input, select, textarea):focus {
+  box-shadow: 0 6px 0 -5px var(--site-vurgu);
+}
+
+.site[data-hareket-stili="akiskan"] .bolumNumarasi i {
+  animation: cizgiAkisi 3.4s ease-in-out infinite;
+  transform-origin: left;
+}
+
+.site[data-hareket-stili="nabiz"] .kucukBaslik::before {
+  animation: vurguNabzi 2.2s ease-in-out infinite;
+}
+
+.site[data-hareket-stili="nabiz"] :is(.headerAksiyon, .talepFormu button) {
+  animation: aksiyonRitmi 3.2s ease-in-out infinite;
+}
+
+.site[data-hareket-stili="salinan"] .satirOku svg {
+  animation: okSalinimi 2.4s ease-in-out infinite;
+}
+
+.site[data-hareket-stili="donen"] .satirOku svg {
+  animation: okDonusu 2.8s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@supports (animation-timeline: view()) {
+  .standartBolum :is(.bolumBasligi h2, .metinIcerigi h2, .iletisimYerlesimi h2, .formTanitim h2) {
+    animation: gorunurMetinGecisi linear both;
+    animation-range: entry 5% cover 34%;
+    animation-timeline: view();
+  }
+
+  .standartBolum :is(.listeSatiri, .sssOgesi, .iletisimListesi > a, .talepFormu label) {
+    animation: gorunurKartGecisi linear both;
+    animation-range: entry 4% cover 28%;
+    animation-timeline: view();
   }
 }
 

@@ -323,20 +323,26 @@
 }
 
 .sadeSite[data-metin-temasi="true"] section[data-bolum-turu="iletisim"] {
-  background: var(--sade-arka);
+  --sade-yazi: var(--site-aksiyon-yazi);
+  --sade-soluk: color-mix(in srgb, var(--site-aksiyon-yazi) 82%, transparent);
+  --sade-cizgi: color-mix(in srgb, var(--site-aksiyon-yazi) 38%, transparent);
+
+  background: var(--site-aksiyon-zemin);
+  color: var(--site-aksiyon-yazi);
 }
 
 .sadeSite[data-metin-temasi="true"] section[data-bolum-turu="iletisim"] a,
 .sadeSite[data-metin-temasi="true"] section[data-bolum-turu="iletisim"] [data-site-parcasi="kart"] {
   border-color: var(--sade-cizgi);
   background: transparent;
-  color: var(--sade-yazi);
+  color: var(--site-aksiyon-yazi);
 }
 
 .sadeSite[data-metin-temasi="true"] section[data-bolum-turu="form"] form {
-  border: 1px solid var(--sade-cizgi);
+  border: 1px solid var(--site-form-cizgi);
   border-radius: 0;
-  background: var(--sade-yuzey);
+  background: var(--site-form-zemin);
+  color: var(--site-form-yazi);
   box-shadow: none;
 }
 

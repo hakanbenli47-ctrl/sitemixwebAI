@@ -2765,8 +2765,31 @@
   }
 
   .varyasyon_kartli .liste,
+  .varyasyon_iki_kolon .liste,
   .varyasyon_adimlar .liste {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site[data-tasarim-duzen="katalog"] .varyasyon_kartli .liste,
+  .site[data-tasarim-duzen="katalog"] .varyasyon_iki_kolon .liste,
+  .site[data-tasarim-aile="urun-katalogu"] .varyasyon_kartli .liste,
+  .site[data-tasarim-aile="urun-katalogu"] .varyasyon_iki_kolon .liste {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .standartBolum[data-bolum-turu="sss"] .bolumIcerikSahnesi {
+    grid-template-columns: 1fr !important;
+    gap: 42px;
+  }
+
+  .standartBolum[data-bolum-turu="sss"] .bolumBasligi {
+    position: static !important;
+    max-width: 760px;
+  }
+
+  .standartBolum[data-bolum-turu="sss"] .sssListesi,
+  .standartBolum[data-bolum-turu="sss"] .bolumIcerikSahnesi > .butonlar {
+    grid-column: 1;
   }
 
   .heroGorseli img {
@@ -2783,7 +2806,10 @@
 
   .galeri figure,
   .galeri figure:nth-child(5n + 1),
-  .galeri figure:nth-child(5n + 2) {
+  .galeri figure:nth-child(5n + 2),
+  .varyasyon_vitrin .galeri figure:first-child,
+  .varyasyon_vitrin .galeri figure:nth-child(2),
+  .site[data-tasarim-aile="yapi-sistemleri"] .galeri figure:first-child {
     grid-column: span 6;
   }
 }
@@ -3089,11 +3115,15 @@
   .galeri figure,
   .galeri figure:nth-child(5n + 1),
   .galeri figure:nth-child(5n + 2),
+  .varyasyon_vitrin .galeri figure:first-child,
+  .varyasyon_vitrin .galeri figure:nth-child(2),
+  .site[data-tasarim-aile="yapi-sistemleri"] .galeri figure:first-child,
   .galeri .buyukGaleriGorseli {
     grid-column: 1;
   }
 
   .galeri img,
+  .varyasyon_vitrin .galeri figure:first-child img,
   .buyukGaleriGorseli img {
     height: 320px;
   }

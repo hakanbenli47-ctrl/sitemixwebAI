@@ -908,6 +908,16 @@
   box-shadow: var(--sektor-golge);
 }
 
+@media (min-width: 1241px) {
+  .sektorSemasi [data-site-parcasi="hero-metin"] h1 {
+    max-width: 100%;
+    font-size: clamp(50px, 4.3vw, 82px) !important;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
+  }
+}
+
 @media (max-width: 1240px) {
   .sektorSemasi [data-site-alani="hero"] {
     min-height: auto;
@@ -978,6 +988,10 @@
     min-height: 520px;
   }
 
+  .sektorSemasi [data-site-parcasi="hikaye"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
   .sektorSemasi[data-sektor="cam-balkon"] [data-site-parcasi="hero-metin"],
   .sektorSemasi[data-sektor="elektrikci"] [data-site-parcasi="hero-metin"],
   .sektorSemasi[data-sektor="dugun-salonu"] [data-site-parcasi="hero-metin"] {
@@ -1034,8 +1048,18 @@
   .sektorSemasi [data-site-parcasi="hero-metin"] h1,
   .sektorSemasi[data-sektor="mimarlik"] [data-site-parcasi="hero-metin"] h1,
   .sektorSemasi[data-sektor="psikolog"] [data-site-parcasi="hero-metin"] h1 {
-    font-size: clamp(42px, 14vw, 66px);
+    max-width: 100%;
+    font-size: clamp(38px, 10.5vw, 56px) !important;
     line-height: 0.93;
+    overflow-wrap: normal;
+    word-break: normal;
+    hyphens: none;
+  }
+
+  .sektorSemasi [data-site-parcasi="galeri-karti"] {
+    grid-row: auto !important;
+    margin-top: 0 !important;
+    transform: none !important;
   }
 
   .sektorSemasi [data-site-parcasi="liste"],

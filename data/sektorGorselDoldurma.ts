@@ -1,7 +1,7 @@
 import type { ProjeVerisi } from "@/types/proje";
 
 /**
- * Yeni sunum sistemi boş görsel alanlarını sektör ikonlarıyla tamamlar.
+ * Yeni sunum sistemi boş görsel alanlarını sektörel tipografi sahneleriyle tamamlar.
  * Kullanıcının daha önce eklediği gerçek iş görsellerine dokunulmaz.
  */
 export function gorselsizSunumuHazirla(proje: ProjeVerisi): ProjeVerisi {

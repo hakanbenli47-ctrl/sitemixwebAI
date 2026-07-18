@@ -171,6 +171,19 @@ for (const sektor of sektorler.sektorler) {
     if (baslik.trim().split(/\s+/).length > 6) {
       sorunlar.push(`${sektor.id}: uzun bölüm başlığı: ${baslik}`);
     }
+
+    if (baslik.trim().length > 48) {
+      sorunlar.push(`${sektor.id}: başlık mobil görünüm için fazla uzun: ${baslik}`);
+    }
+
+    const uzunKelime = baslik
+      .trim()
+      .split(/\s+/)
+      .find((kelime) => kelime.length > 20);
+
+    if (uzunKelime) {
+      sorunlar.push(`${sektor.id}: başlıkta taşma riski taşıyan kelime: ${uzunKelime}`);
+    }
   }
 
   for (const oge of [
@@ -360,6 +373,14 @@ for (const sektor of sektorler.sektorler) {
 
       if (bolum.tur !== "hero" && bolum.aciklama.trim().length > 210) {
         sorunlar.push(`${sektor.id}/${siteTipi}: bölüm açıklaması fazla yoğun: ${bolum.baslik}`);
+      }
+
+      for (const eleman of bolum.listeElemanlari) {
+        if (eleman.baslik.trim().length > 52) {
+          sorunlar.push(
+            `${sektor.id}/${siteTipi}: kart başlığı dar görünüm için fazla uzun: ${eleman.baslik}`,
+          );
+        }
       }
     }
 
@@ -573,6 +594,10 @@ const sektorSemaCss = fs.readFileSync(
   path.join(kok, "components/site/sektorSemalari.module.css"),
   "utf8",
 );
+const sektorSahneCss = fs.readFileSync(
+  path.join(kok, "components/site/sektorSahnesi.module.css"),
+  "utf8",
+);
 const temaSecimCss = fs.readFileSync(
   path.join(kok, "app/studio/tema/tema.module.css"),
   "utf8",
@@ -703,6 +728,38 @@ for (const guvenliYerlesimKurali of [
 
 if (!sektorSemaCss.includes("@media (max-width: 1240px)")) {
   sorunlar.push("dar masaüstü için güvenli sektör kırılımı eksik");
+}
+
+for (const responsiveGuvenlikKurali of [
+  "@media (min-width: 1241px)",
+  'data-site-parcasi="hikaye"',
+  "overflow-wrap: normal",
+  "word-break: normal",
+]) {
+  if (!sektorSemaCss.includes(responsiveGuvenlikKurali)) {
+    sorunlar.push(`sektör şeması responsive güvenlik kuralı eksik: ${responsiveGuvenlikKurali}`);
+  }
+}
+
+for (const ortakResponsiveKural of [
+  ".varyasyon_vitrin .galeri figure:first-child",
+  ".varyasyon_iki_kolon .liste",
+  'data-bolum-turu="sss"',
+]) {
+  if (!siteCss.includes(ortakResponsiveKural)) {
+    sorunlar.push(`ortak responsive yerleşim kuralı eksik: ${ortakResponsiveKural}`);
+  }
+}
+
+for (const sahneGuvenlikKurali of [
+  "container-type: inline-size",
+  "32cqi",
+  "max-width: 56%",
+  "text-overflow: ellipsis",
+]) {
+  if (!sektorSahneCss.includes(sahneGuvenlikKurali)) {
+    sorunlar.push(`sektör sahnesi taşma kuralı eksik: ${sahneGuvenlikKurali}`);
+  }
 }
 
 if (!sektorSemaCss.includes("section[data-bolum-sira]")) {

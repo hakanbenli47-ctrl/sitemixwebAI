@@ -808,7 +808,7 @@ function HeroBolumu({
 
           <div className={styles.gorselNumarasi}>
             <span>01</span>
-            <strong>{bolum.gorsel ? "SEÇİLİ İŞ" : "İKON DİLİ"}</strong>
+            <strong>{bolum.gorsel ? "SEÇİLİ İŞ" : "SEKTÖR SAHNESİ"}</strong>
           </div>
         </motion.div>
       )}

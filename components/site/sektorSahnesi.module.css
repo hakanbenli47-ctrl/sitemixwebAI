@@ -2,6 +2,7 @@
   position: relative;
   min-height: 100%;
   overflow: hidden;
+  container-type: inline-size;
   border: 1px solid var(--site-cizgi, var(--tema-cizgi, rgba(20, 30, 24, 0.18)));
   background:
     linear-gradient(145deg, color-mix(in srgb, var(--site-ikinci-arka-plan, var(--tema-ikinci, #e8f0e6)) 82%, transparent), color-mix(in srgb, var(--site-arka-plan, var(--tema-arka, #f6f2e8)) 96%, transparent));
@@ -55,12 +56,22 @@
 }
 
 .ustSatir span {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
   color: var(--site-vurgu, var(--tema-vurgu, #176b46));
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .ustSatir strong {
+  max-width: 56%;
+  flex: 0 1 auto;
+  overflow: hidden;
   color: var(--site-soluk-yazi, var(--tema-soluk, #4f5b55));
   font-size: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tipografi {
@@ -68,12 +79,14 @@
   inset: 16% 7% 28%;
   display: flex;
   align-items: center;
-  gap: clamp(18px, 4vw, 54px);
+  gap: clamp(14px, 4cqi, 54px);
 }
 
 .kisaltma {
+  min-width: 0;
+  flex: 0 1 auto;
   color: var(--site-vurgu, var(--tema-vurgu, #176b46));
-  font-size: clamp(96px, 16vw, 230px);
+  font-size: clamp(76px, 32cqi, 230px);
   font-weight: 900;
   line-height: 0.74;
   letter-spacing: -0.09em;
@@ -83,6 +96,8 @@
 
 .sahneMetni {
   min-width: 0;
+  flex: 1;
+  overflow: hidden;
   display: grid;
   align-content: end;
   gap: 10px;
@@ -100,9 +115,10 @@
 
 .sahneMetni strong {
   max-width: 340px;
-  font-size: clamp(18px, 2.4vw, 34px);
+  font-size: clamp(17px, 5cqi, 34px);
   line-height: 1;
   letter-spacing: -0.045em;
+  overflow-wrap: anywhere;
   text-wrap: balance;
 }
 
@@ -197,6 +213,8 @@
 }
 
 .altSatir strong {
+  min-width: 0;
+  max-width: 54%;
   overflow: hidden;
   color: var(--site-yazi, var(--tema-yazi, #101a22));
   font-size: inherit;
@@ -329,7 +347,7 @@
   }
 
   .kisaltma {
-    font-size: clamp(74px, 25vw, 118px);
+    font-size: clamp(68px, 30cqi, 108px);
   }
 
   .sahneMetni strong {

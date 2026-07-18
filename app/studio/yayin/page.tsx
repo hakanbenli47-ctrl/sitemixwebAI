@@ -268,7 +268,7 @@ export default function YayinAyarlariSayfasi() {
 
     if (!aktifProjeKaydedildi) {
       setHata(
-        "Proje kaydedilemedi. Tarayıcı depolama alanı dolmuş olabilir. Büyük görselleri azaltıp tekrar deneyin.",
+        "Proje kaydedilemedi. Tarayıcı depolama alanı dolmuş olabilir. Eski projeleri temizleyip tekrar deneyin.",
       );
       setKaydediliyor(false);
       return false;

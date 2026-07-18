@@ -737,7 +737,7 @@ function genelIcerik(
   if (bolum.tur === "metin") {
     return {
       ustBaslik: anaSayfaMi
-        ? profesyonelSema?.guvenEtiketi ?? "Çalışma yaklaşımımız"
+        ? profesyonelSema?.hikayeEtiketi ?? "Çalışma yaklaşımımız"
         : "Nasıl çalışıyoruz?",
       baslik: donusum.hakkimizdaBaslik || profil.yaklasimBaslik || ton.hakkimizdaBaslik,
       aciklama: anaSayfaMi

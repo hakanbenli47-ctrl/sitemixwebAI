@@ -3391,10 +3391,7 @@
   }
 
   .sabitWhatsapp {
-    right: 14px;
-    bottom: max(14px, env(safe-area-inset-bottom));
-    min-height: 50px;
-    padding: 0 15px;
+    display: none;
   }
 
   .site[data-tasarim-duzen] .heroBolumu,

@@ -316,7 +316,7 @@ function anaSayfaBolumleri(
     }),
     hikaye: bolum("metin", 0, {
       varyasyon: sunum.metinVaryasyonu,
-      ustBaslik: "Yaklaşımımız",
+      ustBaslik: profesyonelSema?.hikayeEtiketi ?? "Yaklaşımımız",
       baslik: donusum.hakkimizdaBaslik,
       aciklama: icerik.detayliYaklasim,
       butonlar: [buton("Bizi daha yakından tanıyın", "/hakkimizda")],

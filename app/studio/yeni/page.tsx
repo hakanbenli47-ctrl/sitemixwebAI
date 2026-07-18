@@ -339,7 +339,7 @@ export default function YeniProjeSayfasi() {
 
         <p>
           Sektör, şehir ve ilçe bilgilerine göre sayfalar, içerikler ve
-          görselsiz profesyonel sunum sahneleri otomatik hazırlanacak.
+          sektöre özel sayfa düzenleri ve profesyonel içerik akışları otomatik hazırlanacak.
         </p>
       </section>
 
@@ -655,8 +655,8 @@ export default function YeniProjeSayfasi() {
               </div>
 
               <div className="ozetSatiri">
-                <span>Görseller</span>
-                <strong>Eksikler internetten tamamlanır</strong>
+                <span>Tasarım sistemi</span>
+                <strong>Sektöre özel ve yüksek kontrastlı</strong>
               </div>
 
               <div className="ozetSatiri">
@@ -687,7 +687,7 @@ export default function YeniProjeSayfasi() {
             </button>
 
             <p className="kayitNotu">
-              Oluşturulan bütün metinleri ve isteğe bağlı iş görsellerini daha
+              Oluşturulan metinleri, bölüm sırasını ve iletişim bilgilerini daha
               sonra değiştirebilirsin.
             </p>
           </div>

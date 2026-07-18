@@ -75,6 +75,16 @@
   --sade-cizgi: #d3dfe2;
 }
 
+/* Seçilen Studio teması bütün yüzeylerde tek kaynak olarak kullanılır. */
+.sadeSite[data-metin-temasi="true"] {
+  --sade-arka: var(--site-arka-plan);
+  --sade-yuzey: var(--site-ikinci-arka-plan);
+  --sade-yazi: var(--site-yazi);
+  --sade-soluk: var(--site-soluk-yazi);
+  --sade-vurgu: var(--site-vurgu);
+  --sade-cizgi: var(--site-cizgi);
+}
+
 .sadeSite[data-metin-temasi="true"] > * {
   --site-arka-plan: var(--sade-arka);
   --site-ikinci-arka-plan: var(--sade-yuzey);
@@ -82,7 +92,6 @@
   --site-soluk-yazi: var(--sade-soluk);
   --site-vurgu: var(--sade-vurgu);
   --site-cizgi: var(--sade-cizgi);
-  --site-buton-yazi: #ffffff;
 }
 
 .sadeSite[data-metin-temasi="true"] > header {
@@ -338,7 +347,7 @@
 
 .sadeSite[data-metin-temasi="true"] [data-site-parcasi="hero-metin"] a:first-child {
   background: var(--sade-vurgu);
-  color: #ffffff;
+  color: var(--site-buton-yazi);
 }
 
 .sadeSite[data-metin-temasi="true"] [data-site-parcasi="hero-metin"] a:nth-child(even) {
@@ -346,7 +355,7 @@
   color: var(--sade-yazi);
 }
 
-/* Tasarım seçenekleri yalnızca yazı ritmi ve içerik yerleşimini değiştirir. */
+/* Her tasarım yönü aynı içeriği farklı bir okuma ve karar akışına dönüştürür. */
 .sadeSite[data-metin-temasi="true"][data-tasarim-duzen="editorial"] [data-site-parcasi="hero-metin"] h1,
 .sadeSite[data-metin-temasi="true"][data-tasarim-duzen="zanaat"] [data-site-parcasi="hero-metin"] h1,
 .sadeSite[data-metin-temasi="true"][data-profesyonel-aile="bakim"] [data-site-parcasi="hero-metin"] h1 {
@@ -386,8 +395,142 @@
 
 .sadeSite[data-metin-temasi="true"][data-tasarim-duzen="katalog"] section[data-bolum-turu="hizmetler"] [data-site-parcasi="kart"],
 .sadeSite[data-metin-temasi="true"][data-tasarim-duzen="portfoy"] section[data-bolum-turu="hizmetler"] [data-site-parcasi="kart"] {
-  grid-template-columns: 36px minmax(0, 1fr);
+  grid-template-columns: 36px minmax(0, 1fr) auto;
   padding-left: clamp(18px, 2vw, 30px);
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="sinematik"] [data-site-alani="hero"] {
+  min-height: min(900px, calc(100svh - 84px));
+  background: var(--site-ters-zemin);
+  color: var(--site-ters-yazi);
+  --sade-yazi: var(--site-ters-yazi);
+  --sade-soluk: color-mix(in srgb, var(--site-ters-yazi) 76%, transparent);
+  --sade-cizgi: color-mix(in srgb, var(--site-ters-yazi) 22%, transparent);
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="sinematik"] [data-site-parcasi="hero-metin"] {
+  grid-template-columns: minmax(0, 1fr);
+  align-content: end;
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="sinematik"] [data-site-parcasi="hero-metin"] h1,
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="sinematik"] [data-site-parcasi="hero-metin"] p,
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="sinematik"] [data-site-parcasi="hero-metin"] > div {
+  grid-column: 1;
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="sinematik"] [data-site-parcasi="hero-metin"] h1 {
+  max-width: 11ch;
+  font-size: clamp(62px, 8.4vw, 132px);
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="sinematik"] [data-site-parcasi="hero-metin"] p {
+  max-width: 720px;
+  border-top-color: var(--sade-vurgu);
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="servis"] [data-site-parcasi="hero-bilgi"] li,
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="rezervasyon"] [data-site-parcasi="hero-bilgi"] li {
+  padding: 24px;
+  background: var(--sade-yuzey);
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="servis"] [data-site-parcasi="hero-bilgi"] li + li,
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="rezervasyon"] [data-site-parcasi="hero-bilgi"] li + li {
+  padding-left: 24px;
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="rezervasyon"] [data-site-parcasi="hero-metin"] {
+  grid-template-columns: minmax(0, 0.85fr) minmax(360px, 0.55fr);
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="rezervasyon"] [data-site-parcasi="hero-metin"] h1 {
+  max-width: 12ch;
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="editorial"] [data-site-parcasi="hikaye"] {
+  margin-left: clamp(0px, 10vw, 150px);
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="editorial"] section[data-bolum-turu="metin"] [data-site-parcasi="hikaye-metin"] p,
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="zanaat"] section[data-bolum-turu="metin"] [data-site-parcasi="hikaye-metin"] p {
+  max-width: 58ch;
+  font-size: clamp(18px, 1.55vw, 24px);
+  line-height: 1.78;
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="portfoy"] section[data-bolum-turu="hizmetler"] [data-site-parcasi="liste"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="portfoy"] section[data-bolum-turu="hizmetler"] [data-site-parcasi="kart"] {
+  min-height: 300px;
+  align-content: space-between;
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="egitim"] section[data-bolum-turu] [data-site-parcasi="liste"] {
+  gap: 18px;
+  border-top: 0;
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="egitim"] section[data-bolum-turu] [data-site-parcasi="kart"],
+.sadeSite[data-metin-temasi="true"][data-tasarim-duzen="egitim"] section[data-bolum-turu] [data-site-parcasi="kart"]:nth-child(even) {
+  padding: clamp(28px, 3vw, 42px);
+  border: 1px solid var(--sade-cizgi);
+  border-radius: 24px;
+  background: var(--sade-yuzey);
+}
+
+.sadeSite[data-metin-temasi="true"][data-kart-stili="yumusak"] section[data-bolum-turu] [data-site-parcasi="kart"],
+.sadeSite[data-metin-temasi="true"][data-kart-stili="yumusak"] section[data-bolum-turu] [data-site-parcasi="kart"]:nth-child(even) {
+  padding: clamp(28px, 3vw, 44px);
+  border: 1px solid var(--sade-cizgi);
+  border-radius: 24px;
+  background: color-mix(in srgb, var(--sade-yuzey) 82%, var(--sade-arka));
+}
+
+.sadeSite[data-metin-temasi="true"][data-kart-stili="cerceveli"] section[data-bolum-turu] [data-site-parcasi="kart"],
+.sadeSite[data-metin-temasi="true"][data-kart-stili="cerceveli"] section[data-bolum-turu] [data-site-parcasi="kart"]:nth-child(even) {
+  padding: clamp(28px, 3vw, 44px);
+  border: 1px solid var(--sade-cizgi);
+  background: transparent;
+}
+
+.sadeSite[data-metin-temasi="true"][data-kart-stili="katmanli"] section[data-bolum-turu] [data-site-parcasi="kart"],
+.sadeSite[data-metin-temasi="true"][data-kart-stili="katmanli"] section[data-bolum-turu] [data-site-parcasi="kart"]:nth-child(even) {
+  padding: clamp(30px, 3.2vw, 48px);
+  border: 1px solid var(--sade-cizgi);
+  background: var(--sade-yuzey);
+}
+
+.sadeSite[data-metin-temasi="true"][data-kart-stili="keskin"] section[data-bolum-turu] [data-site-parcasi="kart"] {
+  border-top: 4px solid var(--sade-vurgu);
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-aile="otomotiv-atolye"] [data-site-parcasi="hero-metin"] h1,
+.sadeSite[data-metin-temasi="true"][data-tasarim-aile="teknik-servis-saha"] [data-site-parcasi="hero-metin"] h1,
+.sadeSite[data-metin-temasi="true"][data-tasarim-aile="lojistik-rota"] [data-site-parcasi="hero-metin"] h1 {
+  font-weight: 850;
+  letter-spacing: -0.065em;
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-aile="butik-bakim"] [data-site-parcasi="hero-metin"] > span:first-child,
+.sadeSite[data-metin-temasi="true"][data-tasarim-aile="saglik-danismanlik"] [data-site-parcasi="hero-metin"] > span:first-child {
+  letter-spacing: 0.26em;
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-aile="temizlik-servisi"] section[data-bolum-turu="neden-biz"] [data-site-parcasi="kart"],
+.sadeSite[data-metin-temasi="true"][data-tasarim-aile="hijyen-kontrol"] section[data-bolum-turu="neden-biz"] [data-site-parcasi="kart"] {
+  border-top-width: 6px;
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-aile="lojistik-rota"] section[data-bolum-turu="neden-biz"] [data-site-parcasi="liste"] {
+  counter-reset: rota-adimi;
+}
+
+.sadeSite[data-metin-temasi="true"][data-tasarim-aile="lojistik-rota"] section[data-bolum-turu="neden-biz"] [data-site-parcasi="kart"] {
+  counter-increment: rota-adimi;
+  border-top: 4px solid var(--sade-vurgu);
 }
 
 .sadeSite[data-metin-temasi="true"][data-tasarim-duzen="rezervasyon"] section[data-bolum-turu="iletisim"],
@@ -407,8 +550,8 @@
 
 .sadeSite[data-metin-temasi="true"] footer {
   border-top: 1px solid var(--sade-cizgi);
-  background: var(--sade-yazi);
-  color: #ffffff;
+  background: var(--site-ters-zemin);
+  color: var(--site-ters-yazi);
 }
 
 @media (max-width: 900px) {
@@ -435,6 +578,16 @@
     margin-top: 56px;
   }
 
+  .sadeSite[data-metin-temasi="true"][data-tasarim-duzen="rezervasyon"] [data-site-parcasi="hero-metin"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sadeSite[data-metin-temasi="true"][data-tasarim-duzen="rezervasyon"] [data-site-parcasi="hero-metin"] h1,
+  .sadeSite[data-metin-temasi="true"][data-tasarim-duzen="rezervasyon"] [data-site-parcasi="hero-metin"] p,
+  .sadeSite[data-metin-temasi="true"][data-tasarim-duzen="rezervasyon"] [data-site-parcasi="hero-metin"] > div {
+    grid-column: 1;
+  }
+
   .sadeSite[data-metin-temasi="true"][data-tasarim-duzen="katalog"] section[data-bolum-turu="hizmetler"] [data-site-parcasi="liste"],
   .sadeSite[data-metin-temasi="true"][data-tasarim-duzen="portfoy"] section[data-bolum-turu="hizmetler"] [data-site-parcasi="liste"] {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -456,6 +609,11 @@
     font-size: clamp(40px, 12.2vw, 58px);
     line-height: 0.98;
     letter-spacing: -0.055em;
+  }
+
+  .sadeSite[data-metin-temasi="true"][data-tasarim-duzen="sinematik"] [data-site-parcasi="hero-metin"] h1 {
+    max-width: 100%;
+    font-size: clamp(43px, 13vw, 62px);
   }
 
   .sadeSite[data-metin-temasi="true"] [data-site-parcasi="hero-metin"] p {

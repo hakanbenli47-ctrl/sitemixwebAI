@@ -19,6 +19,7 @@ import {
   type TemaKimligi,
 } from "@/data/sektorTasarimlari";
 import { sektorKararNoktalariniGetir } from "@/data/sektorGorselDili";
+import { temaPaletiniGetir } from "@/data/temaPaletleri";
 import styles from "./tema.module.css";
 
 interface Tema {
@@ -70,7 +71,7 @@ interface ProjeVerisi {
   guncellenmeTarihi: string;
 }
 
-const temalar: Tema[] = [
+const temaTanimlari: Tema[] = [
   {
     id: "aurora",
     ad: "Aurora",
@@ -473,6 +474,37 @@ const temalar: Tema[] = [
   },
 ];
 
+const temalar = temaTanimlari.map((tema) => ({
+  ...tema,
+  ...temaPaletiniGetir(tema.id),
+}));
+
+const duzenAdlari: Record<SektorTasarimSecenegi["duzen"], string> = {
+  teknik: "Teknik servis akışı",
+  sinematik: "Güçlü marka anlatısı",
+  servis: "Hızlı hizmet akışı",
+  editorial: "Editoryal marka düzeni",
+  klinik: "Sakin güven düzeni",
+  katalog: "Karşılaştırmalı hizmet düzeni",
+  rezervasyon: "Randevu ve talep akışı",
+  portfoy: "Uzmanlık ve sonuç düzeni",
+  egitim: "Program ve bilgi düzeni",
+  zanaat: "Ustalık ve üretim düzeni",
+};
+
+const yogunlukAdlari: Record<SektorTasarimSecenegi["yogunluk"], string> = {
+  ferah: "Ferah ve seçici",
+  dengeli: "Dengeli ve açıklayıcı",
+  kompakt: "Yoğun ve hızlı taranabilir",
+};
+
+const kartStiliAdlari: Record<SektorTasarimSecenegi["kartStili"], string> = {
+  keskin: "Keskin teknik paneller",
+  yumusak: "Yumuşak bilgi alanları",
+  cerceveli: "Çerçeveli içerik blokları",
+  katmanli: "Katmanlı vurgu alanları",
+};
+
 export default function TemaSecimSayfasi() {
   const router = useRouter();
 
@@ -629,13 +661,19 @@ export default function TemaSecimSayfasi() {
 
       <section className={styles.baslikAlani}>
         <div>
-          <span>SEKTÖRE ÖZEL TASARIM</span>
+          <span>OTOMATİK SİTE TASARIMI</span>
 
           <h1>
-            {proje.sektorAdi} için
+            {proje.sektorAdi} için hazırlanmış
             <br />
-            doğru site düzeni.
+            üç farklı site yönü.
           </h1>
+
+          <p className={styles.baslikAciklamasi}>
+            İçerik sırası, renk rolleri, hizmet anlatımı ve ana aksiyon sektör
+            verilerinden birlikte üretilir. Bir yön seçtiğinde yalnız renk değil,
+            sitenin bütün karar akışı değişir.
+          </p>
         </div>
 
         <div className={styles.projeBilgisi}>
@@ -661,10 +699,10 @@ export default function TemaSecimSayfasi() {
           <div className={styles.listeBasligi}>
             <div>
               <Palette size={20} />
-              <h2>{proje.sektorAdi} tasarımları</h2>
+              <h2>Sektör verisinden üretilen site yönleri</h2>
             </div>
 
-            <p>{tasarimSecenekleri.length} profesyonel düzen</p>
+            <p>{tasarimSecenekleri.length} ayrı içerik ve tasarım sistemi</p>
           </div>
 
           <div className={styles.temaIzgarasi}>
@@ -699,6 +737,8 @@ export default function TemaSecimSayfasi() {
                 >
                   <div
                     className={styles.temaOnizleme}
+                    data-onizleme-duzen={tasarim.duzen}
+                    data-onizleme-kart={tasarim.kartStili}
                   >
                     <div className={styles.ornekMenu}>
                       <strong>{proje.firmaAdi}</strong>
@@ -740,7 +780,7 @@ export default function TemaSecimSayfasi() {
 
                   <div className={styles.karakterSatiri}>
                     <strong>
-                      {tema.kategori} · {tasarim.etiket}
+                      {tema.kategori} · {duzenAdlari[tasarim.duzen]}
                     </strong>
                   </div>
 
@@ -751,13 +791,13 @@ export default function TemaSecimSayfasi() {
                   </ul>
 
                   <span className={styles.gorselsizRozet}>
-                    Sadece içerik ve tipografi
+                    İçerik ve tipografi odaklı
                   </span>
 
                   <small className={styles.onerilen}>
                     {tasarim === tasarimSecenekleri[0]
-                      ? "SEKTÖR İÇİN ÖNCELİKLİ"
-                      : "SEKTÖRE ÖZEL ALTERNATİF"}
+                      ? "OTOMATİK OLARAK ÖNERİLEN"
+                      : "FARKLI BİR MARKA YÖNÜ"}
                   </small>
                 </button>
               );
@@ -797,20 +837,30 @@ export default function TemaSecimSayfasi() {
                 <div className={styles.tasarimDetaylari}>
                   <div>
                     <small>Sayfa kurgusu</small>
-                    <strong>{aktifTasarim.duzen}</strong>
+                    <strong>{duzenAdlari[aktifTasarim.duzen]}</strong>
                   </div>
                   <div>
-                    <small>Medya yaklaşımı</small>
+                    <small>Sunum yaklaşımı</small>
                     <strong>Metin odaklı içerik sistemi</strong>
                   </div>
                   <div>
                     <small>İçerik yoğunluğu</small>
-                    <strong>{aktifTasarim.yogunluk}</strong>
+                    <strong>{yogunlukAdlari[aktifTasarim.yogunluk]}</strong>
                   </div>
                   <div>
                     <small>Kart biçimi</small>
-                    <strong>{aktifTasarim.kartStili}</strong>
+                    <strong>{kartStiliAdlari[aktifTasarim.kartStili]}</strong>
                   </div>
+                </div>
+
+                <div className={styles.otomatikKontroller}>
+                  <small>OTOMATİK OLARAK AYARLANANLAR</small>
+                  <ul>
+                    <li>Sektöre göre bölüm ve karar sırası</li>
+                    <li>Okunabilir başlık, açıklama ve düğme renkleri</li>
+                    <li>Mobil ve masaüstüne uyarlanan içerik ritmi</li>
+                    <li>Doğru talep, randevu veya teklif aksiyonu</li>
+                  </ul>
                 </div>
 
                 <div className={styles.sektorKararlari}>
@@ -882,7 +932,7 @@ export default function TemaSecimSayfasi() {
 
                   <div>
                     <Palette size={18} />
-                    <span>Görselsiz, yüksek kontrastlı içerik düzeni</span>
+                    <span>Yüksek kontrastlı, okunabilir içerik düzeni</span>
                   </div>
                 </div>
               </>

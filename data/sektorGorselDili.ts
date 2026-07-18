@@ -57,6 +57,7 @@ export interface SektorIcerikSemasi {
   guvenEtiketi: string;
   hizmetEtiketi: string;
   surecEtiketi: string;
+  hikayeEtiketi: string;
   sssEtiketi: string;
   iletisimEtiketi: string;
   anaSayfaAkisi: ProfesyonelAnaSayfaBolumu[];
@@ -339,9 +340,10 @@ const sektorOperasyonProfilleri: Record<string, SektorOperasyonProfili> = {
       guvenEtiketi: "Teslim standardı",
       hizmetEtiketi: "Kapsama göre paketler",
       surecEtiketi: "Kabulden teslim kontrolüne",
+      hikayeEtiketi: "Yıkama standardımız",
       sssEtiketi: "Aracınızı getirmeden önce",
       iletisimEtiketi: "Araç ve zaman bilgisi",
-      anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "sss", "iletisim"],
+      anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "hikaye", "sss", "iletisim"],
     },
   },
   "oto-detaylandirma": {
@@ -372,9 +374,10 @@ const sektorOperasyonProfilleri: Record<string, SektorOperasyonProfili> = {
       guvenEtiketi: "Ölçümlü işçilik",
       hizmetEtiketi: "İhtiyaca göre uygulamalar",
       surecEtiketi: "Analizden kontrollü teslime",
+      hikayeEtiketi: "Detay atölyesi yaklaşımımız",
       sssEtiketi: "Uygulama kararı öncesi",
       iletisimEtiketi: "Araç yüzeyini değerlendirelim",
-      anaSayfaAkisi: ["hero", "guven", "hizmetler", "surec", "sss", "iletisim"],
+      anaSayfaAkisi: ["hero", "guven", "hizmetler", "surec", "hikaye", "sss", "iletisim"],
     },
   },
   "arac-kaplama": {
@@ -405,9 +408,10 @@ const sektorOperasyonProfilleri: Record<string, SektorOperasyonProfili> = {
       guvenEtiketi: "Malzeme ve işçilik şeffaflığı",
       hizmetEtiketi: "Kaplama çözümleri",
       surecEtiketi: "Yüzey kabulünden kürlenmeye",
+      hikayeEtiketi: "Malzeme ve işçilik yaklaşımımız",
       sssEtiketi: "Film seçmeden önce",
       iletisimEtiketi: "Araç modelini ve kapsamı paylaşın",
-      anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "sss", "iletisim"],
+      anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "hikaye", "sss", "iletisim"],
     },
   },
   "guzellik-salonu": {
@@ -438,9 +442,10 @@ const sektorOperasyonProfilleri: Record<string, SektorOperasyonProfili> = {
       guvenEtiketi: "Uygunluk ve hijyen",
       hizmetEtiketi: "Bakım menüsü",
       surecEtiketi: "Görüşmeden bakım sonrasına",
+      hikayeEtiketi: "Uzman bakım yaklaşımımız",
       sssEtiketi: "Randevu öncesi bilmeniz gerekenler",
       iletisimEtiketi: "Size uygun zamanı bulalım",
-      anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "sss", "iletisim"],
+      anaSayfaAkisi: ["hero", "hizmetler", "hikaye", "guven", "surec", "sss", "iletisim"],
     },
   },
   kuafor: {
@@ -471,9 +476,10 @@ const sektorOperasyonProfilleri: Record<string, SektorOperasyonProfili> = {
       guvenEtiketi: "Teknik reçete",
       hizmetEtiketi: "Saç hizmetleri",
       surecEtiketi: "Danışmanlıktan son şekle",
+      hikayeEtiketi: "Stil ve teknik yaklaşımımız",
       sssEtiketi: "Saç işlemi öncesi",
       iletisimEtiketi: "İstediğiniz görünümü anlatın",
-      anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "sss", "iletisim"],
+      anaSayfaAkisi: ["hero", "hizmetler", "hikaye", "guven", "surec", "sss", "iletisim"],
     },
   },
   berber: {
@@ -504,9 +510,10 @@ const sektorOperasyonProfilleri: Record<string, SektorOperasyonProfili> = {
       guvenEtiketi: "Hijyen ve usta standardı",
       hizmetEtiketi: "Berber hizmetleri",
       surecEtiketi: "Kabulden son kontrole",
+      hikayeEtiketi: "Ustalık ve bakım anlayışımız",
       sssEtiketi: "Randevu ve bakım soruları",
       iletisimEtiketi: "Saatinizi ayırın",
-      anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "sss", "iletisim"],
+      anaSayfaAkisi: ["hero", "hizmetler", "hikaye", "guven", "surec", "sss", "iletisim"],
     },
   },
   temizlik: {
@@ -537,6 +544,7 @@ const sektorOperasyonProfilleri: Record<string, SektorOperasyonProfili> = {
       guvenEtiketi: "Kontrol listeli teslim",
       hizmetEtiketi: "Alan bazlı çözümler",
       surecEtiketi: "Keşiften kalite kontrolüne",
+      hikayeEtiketi: "Hijyen operasyon yaklaşımımız",
       sssEtiketi: "Teklif istemeden önce",
       iletisimEtiketi: "Alan bilgilerini paylaşın",
       anaSayfaAkisi: ["hero", "guven", "hizmetler", "surec", "hikaye", "sss", "iletisim"],
@@ -570,9 +578,10 @@ const sektorOperasyonProfilleri: Record<string, SektorOperasyonProfili> = {
       guvenEtiketi: "Kumaş güvenliği",
       hizmetEtiketi: "Döşeme türüne göre hizmet",
       surecEtiketi: "Testten kontrollü kurumaya",
+      hikayeEtiketi: "Kumaş güvenliği yaklaşımımız",
       sssEtiketi: "Yıkama ve kuruma hakkında",
       iletisimEtiketi: "Koltuk fotoğrafını gönderin",
-      anaSayfaAkisi: ["hero", "guven", "hizmetler", "surec", "sss", "iletisim"],
+      anaSayfaAkisi: ["hero", "guven", "hizmetler", "surec", "hikaye", "sss", "iletisim"],
     },
   },
   "hali-yikama": {
@@ -603,9 +612,10 @@ const sektorOperasyonProfilleri: Record<string, SektorOperasyonProfili> = {
       guvenEtiketi: "Kayıtlı kabul",
       hizmetEtiketi: "Dokumaya göre yıkama",
       surecEtiketi: "Kabul, yıkama, kurutma, iade",
+      hikayeEtiketi: "Kayıt ve dokuma yaklaşımımız",
       sssEtiketi: "Halı teslimi öncesi",
       iletisimEtiketi: "Adet ve adres bilgisi",
-      anaSayfaAkisi: ["hero", "surec", "guven", "hizmetler", "sss", "iletisim"],
+      anaSayfaAkisi: ["hero", "surec", "guven", "hizmetler", "hikaye", "sss", "iletisim"],
     },
   },
   ilaclama: {
@@ -636,9 +646,10 @@ const sektorOperasyonProfilleri: Record<string, SektorOperasyonProfili> = {
       guvenEtiketi: "İnsan ve alan güvenliği",
       hizmetEtiketi: "Sorun türüne göre çözümler",
       surecEtiketi: "Keşif, uygulama ve takip",
+      hikayeEtiketi: "Risk ve güvenlik yaklaşımımız",
       sssEtiketi: "Güvenli uygulama hakkında",
       iletisimEtiketi: "Sorunu ve alanı tarif edin",
-      anaSayfaAkisi: ["hero", "guven", "hizmetler", "surec", "sss", "iletisim"],
+      anaSayfaAkisi: ["hero", "guven", "hizmetler", "surec", "hikaye", "sss", "iletisim"],
     },
   },
   elektrikci: {
@@ -669,9 +680,10 @@ const sektorOperasyonProfilleri: Record<string, SektorOperasyonProfili> = {
       guvenEtiketi: "Ölçüm ve koruma standardı",
       hizmetEtiketi: "Arıza türüne göre servis",
       surecEtiketi: "İzolasyondan fonksiyon testine",
+      hikayeEtiketi: "Ölçüm ve güvenlik disiplinimiz",
       sssEtiketi: "Servis çağırmadan önce",
       iletisimEtiketi: "Belirtiyi ve konumu paylaşın",
-      anaSayfaAkisi: ["hero", "guven", "hizmetler", "surec", "sss", "iletisim"],
+      anaSayfaAkisi: ["hero", "guven", "hizmetler", "surec", "hikaye", "sss", "iletisim"],
     },
   },
   tesisatci: {
@@ -702,9 +714,10 @@ const sektorOperasyonProfilleri: Record<string, SektorOperasyonProfili> = {
       guvenEtiketi: "Kaynak ve sızdırmazlık kontrolü",
       hizmetEtiketi: "Tesisat çözümleri",
       surecEtiketi: "Tespitten basınç testine",
+      hikayeEtiketi: "Teşhis ve müdahale disiplinimiz",
       sssEtiketi: "Müdahale öncesi sorular",
       iletisimEtiketi: "Sorunu fotoğrafla anlatın",
-      anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "sss", "iletisim"],
+      anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "hikaye", "sss", "iletisim"],
     },
   },
   "kombi-servisi": {
@@ -735,9 +748,10 @@ const sektorOperasyonProfilleri: Record<string, SektorOperasyonProfili> = {
       guvenEtiketi: "Yanma ve sızdırmazlık güvenliği",
       hizmetEtiketi: "Cihaza göre servis",
       surecEtiketi: "Kayıttan güvenlik raporuna",
+      hikayeEtiketi: "Bakım ve test yaklaşımımız",
       sssEtiketi: "Kombi servisi hakkında",
       iletisimEtiketi: "Marka, model ve hatayı paylaşın",
-      anaSayfaAkisi: ["hero", "guven", "surec", "hizmetler", "sss", "iletisim"],
+      anaSayfaAkisi: ["hero", "guven", "surec", "hizmetler", "hikaye", "sss", "iletisim"],
     },
   },
   nakliyat: {
@@ -768,9 +782,10 @@ const sektorOperasyonProfilleri: Record<string, SektorOperasyonProfili> = {
       guvenEtiketi: "Envanter ve sorumluluk kaydı",
       hizmetEtiketi: "Taşıma türleri",
       surecEtiketi: "Ekspertizden teslim tutanağına",
+      hikayeEtiketi: "Taşıma sorumluluğumuz",
       sssEtiketi: "Taşınmadan önce",
       iletisimEtiketi: "Rota ve eşya bilgisini paylaşın",
-      anaSayfaAkisi: ["hero", "guven", "surec", "hizmetler", "sss", "iletisim"],
+      anaSayfaAkisi: ["hero", "guven", "surec", "hizmetler", "hikaye", "sss", "iletisim"],
     },
   },
   transfer: {
@@ -801,9 +816,10 @@ const sektorOperasyonProfilleri: Record<string, SektorOperasyonProfili> = {
       guvenEtiketi: "Sabit fiyat ve karşılama",
       hizmetEtiketi: "Transfer seçenekleri",
       surecEtiketi: "Rotadan kapı önü teslime",
+      hikayeEtiketi: "Karşılama ve yolculuk standardımız",
       sssEtiketi: "Yolculuk öncesi",
       iletisimEtiketi: "Uçuş ve rota bilgisini paylaşın",
-      anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "sss", "iletisim"],
+      anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "hikaye", "sss", "iletisim"],
     },
   },
   "arac-kiralama": {
@@ -834,9 +850,10 @@ const sektorOperasyonProfilleri: Record<string, SektorOperasyonProfili> = {
       guvenEtiketi: "Açık kiralama koşulları",
       hizmetEtiketi: "Araç sınıfları",
       surecEtiketi: "Rezervasyondan iadeye",
+      hikayeEtiketi: "Filo ve teslim yaklaşımımız",
       sssEtiketi: "Kiralama öncesi",
       iletisimEtiketi: "Tarih ve kullanım bilgisini paylaşın",
-      anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "sss", "iletisim"],
+      anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "hikaye", "sss", "iletisim"],
     },
   },
 };

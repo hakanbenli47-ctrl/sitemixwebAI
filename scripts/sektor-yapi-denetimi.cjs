@@ -330,8 +330,10 @@ for (const sektor of sektorler.sektorler) {
       !operasyonProfili.panelTuru ||
       !operasyonProfili.icerikSemasi?.heroBasligi ||
       !operasyonProfili.icerikSemasi?.heroAciklamasi ||
+      !operasyonProfili.icerikSemasi?.hikayeEtiketi ||
       operasyonProfili.icerikSemasi?.anaSayfaAkisi?.[0] !== "hero" ||
       operasyonProfili.icerikSemasi?.anaSayfaAkisi?.at(-1) !== "iletisim" ||
+      !operasyonProfili.icerikSemasi?.anaSayfaAkisi?.includes("hikaye") ||
       new Set(operasyonProfili.icerikSemasi?.anaSayfaAkisi).size !==
         operasyonProfili.icerikSemasi?.anaSayfaAkisi?.length)
   ) {
@@ -481,6 +483,7 @@ for (const sektor of sektorler.sektorler) {
         ["istatistik", operasyonProfili.icerikSemasi.guvenEtiketi],
         ["hizmetler", operasyonProfili.icerikSemasi.hizmetEtiketi],
         ["neden-biz", operasyonProfili.icerikSemasi.surecEtiketi],
+        ["metin", operasyonProfili.icerikSemasi.hikayeEtiketi],
         ["sss", operasyonProfili.icerikSemasi.sssEtiketi],
         ["iletisim", operasyonProfili.icerikSemasi.iletisimEtiketi],
       ]) {
@@ -815,6 +818,21 @@ const siteBileseni = fs.readFileSync(
   path.join(kok, "components/site/SiteGorunumu.tsx"),
   "utf8",
 );
+const temaPaletiKaynagi = fs.readFileSync(
+  path.join(kok, "data/temaPaletleri.ts"),
+  "utf8",
+);
+const temaSayfasiKaynagi = fs.readFileSync(
+  path.join(kok, "app/studio/tema/page.tsx"),
+  "utf8",
+);
+
+if (
+  !temaSayfasiKaynagi.includes('from "@/data/temaPaletleri"') ||
+  !temaSayfasiKaynagi.includes("temaPaletiniGetir(tema.id)")
+) {
+  sorunlar.push("Studio tema seçimi merkezi ve kontrast güvenli paleti kullanmıyor");
+}
 
 if (
   siteBileseni.includes("SektorSahnesi") ||
@@ -830,6 +848,13 @@ if (
 if (/initial="gizli"[\s\S]{0,120}whileInView=/.test(siteBileseni)) {
   sorunlar.push("görünürlük viewport animasyonuna bağımlı; bölüm boş kalabilir");
 }
+
+if (
+  !siteBileseni.includes('"--site-ters-zemin": renkler.yazi') ||
+  !siteBileseni.includes('"--site-ters-yazi": renkler.arkaPlan')
+) {
+  sorunlar.push("ters renk yüzeyleri gerçek tema değerleriyle sabitlenmemiş");
+}
 const temaBlogu = siteBileseni
   .split("const temaRenkleri")[1]
   .split("const bolumGecisi")[0];
@@ -844,10 +869,39 @@ for (const eslesme of temaBlogu.matchAll(/^  (\w+): \{([\s\S]*?)^  \},/gm)) {
   const vurgu = renk("vurgu");
   const butonYazi = renk("butonYazi");
 
+  if (temaKimlikleri.has(eslesme[1])) {
+    const merkezBlok = temaPaletiKaynagi.match(
+      new RegExp(`\\b${eslesme[1]}: \\{([^}]*)\\}`),
+    )?.[1];
+
+    for (const alan of [
+      "arkaPlan",
+      "ikinciArkaPlan",
+      "yazi",
+      "solukYazi",
+      "vurgu",
+      "cizgi",
+      "butonYazi",
+    ]) {
+      const siteDegeri = eslesme[2].match(
+        new RegExp(`${alan}: "([^"]+)"`),
+      )?.[1];
+      const merkezDegeri = merkezBlok?.match(
+        new RegExp(`${alan}: "([^"]+)"`),
+      )?.[1];
+
+      if (!siteDegeri || siteDegeri !== merkezDegeri) {
+        sorunlar.push(`${eslesme[1]}: ${alan} merkezi tema paletiyle eşleşmiyor`);
+      }
+    }
+  }
+
   for (const [alan, onPlan, zemin] of [
     ["yazı", yazi, arkaPlan],
     ["soluk yazı", solukYazi, arkaPlan],
     ["soluk yazı / ikinci zemin", solukYazi, ikinciArkaPlan],
+    ["vurgu", vurgu, arkaPlan],
+    ["vurgu / ikinci zemin", vurgu, ikinciArkaPlan],
     ["buton", butonYazi, vurgu],
   ]) {
     if (onPlan && zemin && kontrastOrani(onPlan, zemin) < 4.5) {

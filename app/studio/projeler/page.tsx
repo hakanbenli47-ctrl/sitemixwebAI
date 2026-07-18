@@ -253,7 +253,7 @@ export default function ProjelerSayfasi() {
           <span>DEPOLAMA UYARISI</span>
           <h2>Bazı proje kayıtları tarayıcıya kaydedilemedi.</h2>
           <p>
-            Proje görselleri tarayıcı depolama alanını doldurmuş
+            Proje verileri tarayıcı depolama alanını doldurmuş
             olabilir.
           </p>
         </section>

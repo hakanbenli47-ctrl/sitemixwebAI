@@ -663,7 +663,7 @@ export default function KolayIcerikDuzenleyici() {
       }, 1200);
     } catch {
       setHata(
-        "Tarayıcı depolama alanı doldu. Büyük görsellerden bazılarını kaldır.",
+        "Tarayıcı depolama alanı doldu. Eski projelerden bazılarını temizleyip tekrar dene.",
       );
     }
   }
@@ -1211,7 +1211,7 @@ export default function KolayIcerikDuzenleyici() {
           <Eye size={19} />
           <div>
             <strong>%100</strong>
-            <span>Görselsiz sunum</span>
+            <span>Metin odaklı sunum</span>
           </div>
         </article>
       </section>

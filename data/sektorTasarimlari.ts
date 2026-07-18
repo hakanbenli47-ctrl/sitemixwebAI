@@ -292,7 +292,7 @@ function profilOlustur(sektor: string, kimlik: SektorKimligi): SektorTasarimProf
       id: `${sektor}-tasarim-${index + 1}`,
       ad: kimlik.adlar[index],
       etiket: secenek.etiket,
-      aciklama: `${kimlik.odak}. ${secenek.aciklama} Fotoğraf, galeri veya görsel yer tutucusu kullanmadan güçlü tipografi ve düzenli içerik akışıyla çalışır.`,
+      aciklama: `${kimlik.odak}. ${secenek.aciklama} Güçlü tipografi, belirgin alt metinler ve düzenli içerik akışıyla çalışır.`,
       tema: kimlik.temalar[index],
       aile: kimlik.aile,
       duzen: secenek.duzen,

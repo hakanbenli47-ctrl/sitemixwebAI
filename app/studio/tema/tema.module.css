@@ -84,6 +84,15 @@
   letter-spacing: -0.075em;
 }
 
+.baslikAciklamasi {
+  max-width: 68ch;
+  margin: 30px 0 0;
+  color: #4d5750;
+  font-size: clamp(15px, 1.3vw, 18px);
+  font-weight: 500;
+  line-height: 1.7;
+}
+
 .projeBilgisi {
   border-top: 2px solid #1e4d3a;
 }
@@ -301,6 +310,102 @@
 
 .ornekIcerikSatiri span:last-child {
   border-right: 0;
+}
+
+.temaOnizleme[data-onizleme-duzen="sinematik"] {
+  background: var(--tema-yazi);
+  color: var(--tema-arka);
+}
+
+.temaOnizleme[data-onizleme-duzen="sinematik"] .ornekMenu,
+.temaOnizleme[data-onizleme-duzen="sinematik"] .ornekIcerikSatiri,
+.temaOnizleme[data-onizleme-duzen="sinematik"] .ornekIcerikSatiri span {
+  border-color: color-mix(in srgb, var(--tema-arka) 20%, transparent);
+}
+
+.temaOnizleme[data-onizleme-duzen="sinematik"] .ornekHero h4 {
+  max-width: 10ch;
+  color: var(--tema-arka);
+  font-size: clamp(36px, 4vw, 54px);
+}
+
+.temaOnizleme[data-onizleme-duzen="sinematik"] .ornekHero p,
+.temaOnizleme[data-onizleme-duzen="sinematik"] .ornekHero > strong,
+.temaOnizleme[data-onizleme-duzen="sinematik"] .ornekIcerikSatiri span {
+  color: color-mix(in srgb, var(--tema-arka) 74%, transparent);
+}
+
+.temaOnizleme[data-onizleme-duzen="teknik"] .ornekHero,
+.temaOnizleme[data-onizleme-duzen="servis"] .ornekHero {
+  border-left: 5px solid var(--tema-vurgu);
+  margin: 22px;
+  padding: 8px 0 8px 18px;
+}
+
+.temaOnizleme[data-onizleme-duzen="teknik"] .ornekHero h4,
+.temaOnizleme[data-onizleme-duzen="servis"] .ornekHero h4 {
+  font-weight: 900;
+  letter-spacing: -0.065em;
+}
+
+.temaOnizleme[data-onizleme-duzen="editorial"] .ornekHero h4,
+.temaOnizleme[data-onizleme-duzen="zanaat"] .ornekHero h4 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+.temaOnizleme[data-onizleme-duzen="katalog"] .ornekIcerikSatiri,
+.temaOnizleme[data-onizleme-duzen="portfoy"] .ornekIcerikSatiri {
+  gap: 7px;
+  padding: 8px;
+  border-top: 0;
+}
+
+.temaOnizleme[data-onizleme-duzen="katalog"] .ornekIcerikSatiri span,
+.temaOnizleme[data-onizleme-duzen="portfoy"] .ornekIcerikSatiri span {
+  border: 1px solid var(--tema-cizgi);
+  background: var(--tema-ikinci);
+}
+
+.temaOnizleme[data-onizleme-duzen="rezervasyon"] .ornekHero {
+  width: 76%;
+  min-height: 220px;
+  padding-right: 16px;
+  padding-left: 18px;
+  border-right: 1px solid var(--tema-cizgi);
+}
+
+.temaOnizleme[data-onizleme-duzen="rezervasyon"] .ornekHero h4 {
+  max-width: 100%;
+  font-size: clamp(24px, 1.9vw, 29px);
+  overflow-wrap: anywhere;
+}
+
+.temaOnizleme[data-onizleme-duzen="rezervasyon"] .ornekIcerikSatiri {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  bottom: 0;
+  width: 24%;
+  grid-template-columns: 1fr;
+  align-content: end;
+  border-left: 1px solid var(--tema-cizgi);
+}
+
+.temaOnizleme[data-onizleme-duzen="rezervasyon"] .ornekIcerikSatiri span {
+  border-right: 0;
+  border-top: 1px solid var(--tema-cizgi);
+}
+
+.temaOnizleme[data-onizleme-duzen="klinik"] .ornekHero,
+.temaOnizleme[data-onizleme-duzen="egitim"] .ornekHero {
+  padding-top: 42px;
+  padding-bottom: 38px;
+}
+
+.temaOnizleme[data-onizleme-kart="yumusak"] .ornekIcerikSatiri span {
+  border-radius: 10px;
 }
 
 .ornekBaslik {
@@ -612,6 +717,47 @@
   line-height: 1.72;
 }
 
+.otomatikKontroller {
+  margin-top: 28px;
+  padding: 22px 0;
+  border-top: 1px solid rgba(17, 23, 19, 0.18);
+  border-bottom: 1px solid rgba(17, 23, 19, 0.18);
+}
+
+.otomatikKontroller > small {
+  color: #1e4d3a;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.otomatikKontroller ul {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.otomatikKontroller li {
+  position: relative;
+  padding-left: 18px;
+  color: #3f4942;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.otomatikKontroller li::before {
+  position: absolute;
+  top: 0.55em;
+  left: 0;
+  width: 7px;
+  height: 2px;
+  background: #1e4d3a;
+  content: "";
+}
+
 .seciliTemaKart {
   --tema-arka: #f6f2e8;
   --tema-ikinci: #e8f0e6;
@@ -909,10 +1055,6 @@
 @media (max-width: 1100px) {
   .calismaAlani {
     grid-template-columns: 1fr;
-  }
-
-  .sagAlan {
-    order: -1;
   }
 
   .sabitAlan {

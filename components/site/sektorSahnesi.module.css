@@ -178,7 +178,8 @@
 .hizmetSeridi li {
   min-width: 0;
   display: grid;
-  gap: 8px;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 3px 8px;
   padding: 13px 12px 0 0;
 }
 
@@ -187,18 +188,31 @@
 }
 
 .hizmetSeridi span {
+  grid-row: 1 / 3;
+  align-self: start;
   color: var(--site-vurgu, var(--tema-vurgu, #176b46));
   font-size: 8px;
   font-weight: 850;
 }
 
-.hizmetSeridi strong {
-  padding-right: 8px;
+.hizmetSeridi small {
+  min-width: 0;
   overflow: hidden;
+  color: var(--site-soluk-yazi, var(--tema-soluk, #4f5b55));
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.hizmetSeridi strong {
+  min-width: 0;
+  padding-right: 8px;
   font-size: 10px;
   line-height: 1.25;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  text-wrap: pretty;
 }
 
 .altSatir {
@@ -296,12 +310,18 @@
   font-size: 5px;
 }
 
+.tema .hizmetSeridi small {
+  display: none;
+}
+
 .tema .hizmetSeridi strong {
   font-size: 6px;
 }
 
 .sahne[data-aile="otomotiv-atolye"] .isik,
 .sahne[data-aile="acil-saha-servisi"] .isik,
+.sahne[data-aile="teknik-servis-saha"] .isik,
+.sahne[data-aile="hijyen-kontrol"] .isik,
 .sahne[data-aile="spor-enerjisi"] .isik {
   border-radius: 0;
   transform: skewX(-16deg);
@@ -326,12 +346,192 @@
   transform: rotate(-2deg);
 }
 
+.sahne[data-aile="temizlik-servisi"] .izgara {
+  background-size: 48px 48px;
+  mask-image: radial-gradient(circle at 62% 42%, #000 0 24%, transparent 74%);
+  opacity: 0.46;
+}
+
+.sahne[data-aile="hijyen-kontrol"] .izgara {
+  background-image: repeating-linear-gradient(135deg, color-mix(in srgb, var(--site-vurgu, var(--tema-vurgu, #176b46)) 18%, transparent) 0 2px, transparent 2px 18px);
+  background-size: auto;
+  opacity: 0.64;
+}
+
+.sahne[data-aile="teknik-servis-saha"] .izgara {
+  background-size: 34px 34px;
+  opacity: 0.8;
+}
+
+.sahne[data-aile="teknik-servis-saha"] .hareketHatti::before {
+  height: 2px;
+  background: repeating-linear-gradient(90deg, var(--site-vurgu, var(--tema-vurgu, #176b46)) 0 14px, transparent 14px 22px);
+}
+
+.sahne[data-aile="butik-bakim"] .tipografi {
+  grid-template-columns: minmax(0, 0.86fr) minmax(150px, 1.14fr);
+}
+
+.sahne[data-aile="lojistik-rota"] .izgara {
+  background-size: 88px 44px;
+  opacity: 0.7;
+}
+
+.sahne[data-aile="lojistik-rota"] .hareketHatti span {
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+
+/* Her tasarım seçeneği kendi yerleşim karakterini sahneye de taşır. */
+.sahne[data-duzen="teknik"] .izgara {
+  background-size: 32px 32px;
+  opacity: 0.76;
+}
+
+.sahne[data-duzen="teknik"] .isik {
+  border-radius: 0;
+  clip-path: polygon(24% 0, 100% 0, 76% 100%, 0 100%);
+  transform: skewX(-8deg);
+}
+
+.sahne[data-duzen="teknik"] .sektorAdi {
+  font-family: "Arial Narrow", Arial, Helvetica, sans-serif;
+  font-stretch: condensed;
+  text-transform: uppercase;
+}
+
+.sahne[data-duzen="sinematik"] .isik {
+  width: 74%;
+  top: -24%;
+  right: -18%;
+  border-radius: 0;
+  clip-path: polygon(22% 0, 100% 0, 78% 100%, 0 100%);
+  filter: blur(10px);
+  transform: rotate(-8deg);
+}
+
+.sahne[data-duzen="sinematik"] .sektorAdi {
+  letter-spacing: -0.075em;
+  text-shadow: 0 28px 90px color-mix(in srgb, var(--site-vurgu, var(--tema-vurgu, #176b46)) 34%, transparent);
+}
+
+.sahne[data-duzen="servis"] .sahneMetni {
+  border-left-width: 4px;
+}
+
+.sahne[data-duzen="servis"] .hizmetSeridi li {
+  background: color-mix(in srgb, var(--site-ikinci-arka-plan, var(--tema-ikinci, #e8f0e6)) 48%, transparent);
+}
+
+.sahne[data-duzen="editorial"] .sektorAdi {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 700;
+  letter-spacing: -0.07em;
+}
+
+.sahne[data-duzen="editorial"] .tipografi {
+  grid-template-columns: minmax(0, 1.28fr) minmax(140px, 0.72fr);
+}
+
+.sahne[data-duzen="klinik"] {
+  border-radius: clamp(22px, 5cqi, 52px);
+}
+
+.sahne[data-duzen="klinik"] .izgara {
+  background-size: 72px 72px;
+  mask-image: radial-gradient(circle at 35% 46%, #000 0 18%, transparent 72%);
+  opacity: 0.38;
+}
+
+.sahne[data-duzen="klinik"] .isik {
+  border-radius: 38% 62% 48% 52% / 56% 36% 64% 44%;
+}
+
+.sahne[data-duzen="katalog"] .tipografi {
+  grid-template-columns: minmax(0, 0.92fr) minmax(160px, 1.08fr);
+}
+
+.sahne[data-duzen="katalog"] .hizmetSeridi {
+  gap: 6px;
+  border-top: 0;
+}
+
+.sahne[data-duzen="katalog"] .hizmetSeridi li {
+  padding: 10px;
+  border: 1px solid var(--site-cizgi, var(--tema-cizgi, rgba(20, 30, 24, 0.18)));
+}
+
+.sahne[data-duzen="katalog"] .hizmetSeridi li:not(:last-child) {
+  border-right: 1px solid var(--site-cizgi, var(--tema-cizgi, rgba(20, 30, 24, 0.18)));
+}
+
+.sahne[data-duzen="rezervasyon"] .hareketHatti::before {
+  height: 2px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--site-vurgu, var(--tema-vurgu, #176b46)) 0 10px,
+    transparent 10px 18px
+  );
+}
+
+.sahne[data-duzen="rezervasyon"] .hareketHatti span {
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+
+.sahne[data-duzen="portfoy"] .sektorAdi {
+  font-weight: 800;
+  letter-spacing: -0.08em;
+}
+
+.sahne[data-duzen="portfoy"] .sahneMetni {
+  align-self: end;
+  margin-bottom: 4%;
+}
+
+.sahne[data-duzen="egitim"] {
+  border-radius: clamp(18px, 4cqi, 38px) clamp(18px, 4cqi, 38px) 8px 8px;
+}
+
+.sahne[data-duzen="egitim"] .isik {
+  border-radius: 46% 54% 58% 42% / 42% 38% 62% 58%;
+}
+
+.sahne[data-duzen="egitim"] .hareketHatti span {
+  width: 9px;
+  height: 9px;
+}
+
+.sahne[data-duzen="zanaat"] {
+  border-radius: clamp(24px, 7cqi, 80px) clamp(24px, 7cqi, 80px) 0 0;
+}
+
+.sahne[data-duzen="zanaat"] .sektorAdi {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 700;
+}
+
+.sahne[data-duzen="zanaat"] .izgara {
+  background-size: 80px 24px;
+  opacity: 0.42;
+}
+
 .sahne[data-aile="yaratici-portfoy"] .sektorAdi,
 .sahne[data-aile="etkinlik-sahnesi"] .sektorAdi,
 .sahne[data-aile="urun-katalogu"] .sektorAdi {
   -webkit-text-stroke: 1px var(--site-vurgu, var(--tema-vurgu, #176b46));
   color: transparent;
   text-shadow: none;
+}
+
+@container (max-width: 460px) {
+  .hizmetSeridi {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hizmetSeridi li:nth-child(3) {
+    display: none;
+  }
 }
 
 @media (max-width: 760px) {

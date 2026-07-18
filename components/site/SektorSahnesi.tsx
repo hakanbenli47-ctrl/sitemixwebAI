@@ -1,8 +1,10 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import { sektorSahneDiliniGetir } from "@/data/sektorGorselDili";
-import { sektorHizmetleriniGetir } from "@/data/sektorSablonlari";
+import {
+  sektorKararNoktalariniGetir,
+  sektorSahneDiliniGetir,
+} from "@/data/sektorGorselDili";
 import styles from "./sektorSahnesi.module.css";
 
 type SahneVaryanti = "hero" | "panel" | "kart" | "tema";
@@ -11,6 +13,7 @@ interface SektorSahnesiProps {
   sektor: string;
   sektorAdi: string;
   aile?: string;
+  duzen?: string;
   baslik?: string;
   varyant?: SahneVaryanti;
   index?: number;
@@ -21,6 +24,7 @@ export default function SektorSahnesi({
   sektor,
   sektorAdi,
   aile = "genel-hizmet",
+  duzen = "servis",
   baslik,
   varyant = "panel",
   index = 0,
@@ -28,13 +32,14 @@ export default function SektorSahnesi({
 }: SektorSahnesiProps) {
   const dil = sektorSahneDiliniGetir(sektor);
   const hareketiAzalt = useReducedMotion();
-  const hizmetler = sektorHizmetleriniGetir(sektor).slice(0, 3);
+  const kararNoktalari = sektorKararNoktalariniGetir(sektor);
   const sahneBasligi = baslik?.trim() || dil.etiket;
 
   return (
     <div
       className={`${styles.sahne} ${styles[varyant]} ${className}`}
       data-aile={aile}
+      data-duzen={duzen}
       data-hareket={dil.hareket}
       data-site-parcasi="sektor-sahnesi"
       role="img"
@@ -78,11 +83,16 @@ export default function SektorSahnesi({
         <span />
       </div>
 
-      <ol className={styles.hizmetSeridi} aria-hidden="true">
-        {hizmetler.map((hizmet, sira) => (
-          <li key={hizmet}>
+      <ol
+        className={styles.hizmetSeridi}
+        data-site-parcasi="sektor-kararlari"
+        aria-hidden="true"
+      >
+        {kararNoktalari.map((karar, sira) => (
+          <li key={`${karar.etiket}-${karar.deger}`}>
             <span>{String(sira + 1).padStart(2, "0")}</span>
-            <strong>{hizmet}</strong>
+            <small>{karar.etiket}</small>
+            <strong>{karar.deger}</strong>
           </li>
         ))}
       </ol>

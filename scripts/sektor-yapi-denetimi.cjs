@@ -117,7 +117,28 @@ const temaKimlikleri = new Set([
   "forest",
   "studio",
   "marble",
+  "pearl",
+  "hygiene",
+  "torque",
+  "signal",
+  "cargo",
 ]);
+const hedefSektorMimarisi = {
+  "oto-yikama": ["otomotiv-atolye", "torque"],
+  "oto-detaylandirma": ["otomotiv-atolye", "torque"],
+  "arac-kaplama": ["otomotiv-atolye", "torque"],
+  temizlik: ["temizlik-servisi", "hygiene"],
+  "koltuk-yikama": ["temizlik-servisi", "hygiene"],
+  "hali-yikama": ["temizlik-servisi", "hygiene"],
+  ilaclama: ["hijyen-kontrol", "signal"],
+  "guzellik-salonu": ["butik-bakim", "pearl"],
+  kuafor: ["butik-bakim", "pearl"],
+  berber: ["butik-bakim", "artisan"],
+  elektrikci: ["teknik-servis-saha", "signal"],
+  tesisatci: ["teknik-servis-saha", "signal"],
+  "kombi-servisi": ["teknik-servis-saha", "signal"],
+  nakliyat: ["lojistik-rota", "cargo"],
+};
 const sorunlar = [];
 let sayfaSayisi = 0;
 let bolumSayisi = 0;
@@ -138,6 +159,7 @@ for (const sektor of sektorler.sektorler) {
   const stokGorseller = gorseller.sektorStokGorselleriniGetir(sektor.id);
   const tasarimProfili = tasarimlar.sektorTasarimProfiliniGetir(sektor.id);
   const tasarimSecenekleri = tasarimProfili.secenekler;
+  const kararNoktalari = gorselDilleri.sektorKararNoktalariniGetir(sektor.id);
 
   if (profil === profiller.sektorIcerikProfiliniGetir("__bilinmeyen__")) {
     sorunlar.push(`${sektor.id}: özel içerik profili bulunamadı`);
@@ -229,12 +251,48 @@ for (const sektor of sektorler.sektorler) {
     sorunlar.push(`${sektor.id}: sektörel tipografik sahne dili bulunamadı`);
   }
 
+  if (
+    kararNoktalari ===
+    gorselDilleri.sektorKararNoktalariniGetir("__bilinmeyen__")
+  ) {
+    sorunlar.push(`${sektor.id}: sektöre özel karar mimarisi bulunamadı`);
+  }
+
+  if (
+    kararNoktalari.length !== 3 ||
+    new Set(kararNoktalari.map((karar) => karar.etiket)).size !== 3 ||
+    new Set(kararNoktalari.map((karar) => karar.deger)).size !== 3
+  ) {
+    sorunlar.push(`${sektor.id}: karar noktaları eksik veya tekrarlı`);
+  }
+
+  for (const karar of kararNoktalari) {
+    if (
+      karar.etiket.trim().length < 3 ||
+      karar.etiket.length > 28 ||
+      karar.deger.trim().length < 8 ||
+      karar.deger.length > 52
+    ) {
+      sorunlar.push(`${sektor.id}: karar noktası mobil sunuma uygun değil`);
+    }
+  }
+
   if (tasarimSecenekleri.length !== 3) {
     sorunlar.push(`${sektor.id}: tam üç tasarım seçeneği bulunmalı`);
   }
 
   if (tasarimSecenekleri[0]?.tema !== sunum.varsayilanTema) {
     sorunlar.push(`${sektor.id}: öncelikli tasarım varsayılan temayla eşleşmiyor`);
+  }
+
+  const hedefMimari = hedefSektorMimarisi[sektor.id];
+
+  if (
+    hedefMimari &&
+    (tasarimProfili.aile !== hedefMimari[0] ||
+      tasarimSecenekleri[0]?.tema !== hedefMimari[1])
+  ) {
+    sorunlar.push(`${sektor.id}: hedef iş ailesine özel tema mimarisi uygulanmadı`);
   }
 
   if (new Set(tasarimSecenekleri.map((secenek) => secenek.id)).size !== 3) {
@@ -648,6 +706,14 @@ if (sektorSahnesi.includes("kisaltma") || !sektorSahnesi.includes("{sektorAdi}")
   sorunlar.push("sektör sahnesinde kısaltma kaldı veya tam sektör adı gösterilmiyor");
 }
 
+if (
+  !sektorSahnesi.includes("sektorKararNoktalariniGetir") ||
+  !sektorSahnesi.includes("data-duzen={duzen}") ||
+  !siteBileseni.includes("sektorKararNoktalariniGetir")
+) {
+  sorunlar.push("sektörel karar mimarisi sahne ve hero alanına bağlanmadı");
+}
+
 if (/initial="gizli"[\s\S]{0,120}whileInView=/.test(siteBileseni)) {
   sorunlar.push("görünürlük viewport animasyonuna bağımlı; bölüm boş kalabilir");
 }
@@ -693,6 +759,8 @@ for (const gerekliSinif of [
   "@media (prefers-reduced-motion: reduce)",
   '[data-tasarim-aile="otomotiv-atolye"]',
   '[data-tasarim-aile="temizlik-servisi"]',
+  '[data-tasarim-aile="hijyen-kontrol"]',
+  '[data-tasarim-aile="teknik-servis-saha"]',
   '[data-tasarim-aile="klinik-guven"]',
   '[data-tasarim-aile="emlak-portfoyu"]',
   '[data-tasarim-aile="seyahat-rezervasyonu"]',
@@ -764,6 +832,23 @@ for (const sahneGuvenlikKurali of [
 ]) {
   if (!sektorSahneCss.includes(sahneGuvenlikKurali)) {
     sorunlar.push(`sektör sahnesi taşma kuralı eksik: ${sahneGuvenlikKurali}`);
+  }
+}
+
+for (const tasarimDuzeni of [
+  "teknik",
+  "sinematik",
+  "servis",
+  "editorial",
+  "klinik",
+  "katalog",
+  "rezervasyon",
+  "portfoy",
+  "egitim",
+  "zanaat",
+]) {
+  if (!sektorSahneCss.includes(`[data-duzen="${tasarimDuzeni}"]`)) {
+    sorunlar.push(`${tasarimDuzeni}: tasarıma özel sektör sahnesi bulunamadı`);
   }
 }
 

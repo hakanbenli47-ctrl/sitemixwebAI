@@ -18,14 +18,21 @@ export type TemaKimligi =
   | "skyline"
   | "forest"
   | "studio"
-  | "marble";
+  | "marble"
+  | "pearl"
+  | "hygiene"
+  | "torque"
+  | "signal"
+  | "cargo";
 
 export type TasarimAilesi =
   | "otomotiv-atolye"
   | "yapi-sistemleri"
   | "proje-portfoyu"
   | "temizlik-servisi"
+  | "hijyen-kontrol"
   | "acil-saha-servisi"
+  | "teknik-servis-saha"
   | "butik-bakim"
   | "saglik-danismanlik"
   | "klinik-guven"
@@ -111,9 +118,9 @@ interface SektorKimligi {
 
 const aileKurgulari: Record<TasarimAilesi, [AileSecenegi, AileSecenegi, AileSecenegi]> = {
   "otomotiv-atolye": [
-    { etiket: "Performans atölyesi", aciklama: "Teknik işçiliği, paketleri ve sonuçları yüksek kontrastlı atölye düzeninde sunar.", duzen: "teknik", kartStili: "keskin", yogunluk: "kompakt", gorselOrani: "panorama", ozellikler: ["Numaralı servis panelleri", "Güçlü teklif ve randevu geçişi"] },
-    { etiket: "Sinematik showroom", aciklama: "Araç hizmetlerini hareketli katmanlar, güçlü tipografi ve teknik bilgi çizgileriyle showroom ritminde sunar.", duzen: "sinematik", kartStili: "katmanli", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Hareketli araç ve yüzey sahnesi", "Sonuç odaklı iş seçkisi"] },
-    { etiket: "Bakım kataloğu", aciklama: "Hizmetleri kolay karşılaştırılan kartlara ayırır ve karar vermeyi hızlandırır.", duzen: "katalog", kartStili: "cerceveli", yogunluk: "dengeli", gorselOrani: "karisik", ozellikler: ["Karşılaştırılabilir hizmet kartları", "Mobilde hızlı paket tarama"] },
+    { etiket: "Araç kabul atölyesi", aciklama: "Araç kabul kaydını, yüzey risklerini, iş emrini ve teslim kontrolünü yüksek kontrastlı teknik panellerde birleştirir.", duzen: "teknik", kartStili: "keskin", yogunluk: "kompakt", gorselOrani: "panorama", ozellikler: ["Araç kabul ve yüzey kayıt sistemi", "İş emrinden teslim kontrolüne izlenebilir akış"] },
+    { etiket: "Yüzey sonuç stüdyosu", aciklama: "Boya, film ve iç yüzey uygulamalarını işlem öncesi durum, yöntem ve sonuç ilişkisiyle sinematik bir showroom düzeninde sunar.", duzen: "sinematik", kartStili: "katmanli", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Panel ve yüzey odaklı sonuç sahnesi", "Uygulama standardı ve bakım sonrası rehber"] },
+    { etiket: "Paket ve iş emri", aciklama: "Hizmet kapsamını araç sınıfı, yüzey ihtiyacı, işlem süresi ve teslim standardıyla karşılaştırılabilir kartlara ayırır.", duzen: "katalog", kartStili: "cerceveli", yogunluk: "dengeli", gorselOrani: "karisik", ozellikler: ["Kapsam ve süre bazlı uygulama kartları", "Onay, teslim ve bakım bilgisini birlikte sunma"] },
   ],
   "yapi-sistemleri": [
     { etiket: "Mimari keşif", aciklama: "Sistem seçimi, ölçü ve keşif çağrısını çizgisel mimari motiflerle dengeli bir düzende birleştirir.", duzen: "editorial", kartStili: "cerceveli", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Ölçü ve keşif vurgusu", "Mimari tipografi ve ızgara dili"] },
@@ -126,19 +133,29 @@ const aileKurgulari: Record<TasarimAilesi, [AileSecenegi, AileSecenegi, AileSece
     { etiket: "Uygulama planı", aciklama: "Hizmet kapsamını, iş sırasını ve teslim yaklaşımını teknik bir düzende netleştirir.", duzen: "teknik", kartStili: "keskin", yogunluk: "kompakt", gorselOrani: "kare", ozellikler: ["Kapsam bazlı hizmet düzeni", "Planlama ve teslim akışı"] },
   ],
   "temizlik-servisi": [
-    { etiket: "Net hizmet akışı", aciklama: "Hizmet kapsamını, güven unsurlarını ve teklif adımını ilk bakışta anlaşılır kılar.", duzen: "servis", kartStili: "yumusak", yogunluk: "dengeli", gorselOrani: "karisik", ozellikler: ["Kapsamı açık hizmet kartları", "Sessiz teklif yönlendirmesi"] },
-    { etiket: "Sonuç vitrini", aciklama: "Temizlik sonucunu ve uygulama ayrıntılarını akışkan katmanlar ve önce-sonra ritmiyle öne çıkarır.", duzen: "sinematik", kartStili: "katmanli", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Sonuç odaklı hareketli akış", "Ekipman ve yöntem anlatımı"] },
-    { etiket: "Kurumsal plan", aciklama: "Düzenli hizmet, alan türü ve çalışma sıklığını kurumsal alıcıların kolay tarayacağı yapıda sunar.", duzen: "katalog", kartStili: "cerceveli", yogunluk: "kompakt", gorselOrani: "kare", ozellikler: ["Alan türüne göre hizmet seçimi", "Periyodik çalışma vurgusu"] },
+    { etiket: "Hijyen operasyon planı", aciklama: "Alan keşfi, yüzey matrisi, ekip planı ve teslim kontrol listesini ilk bakışta anlaşılır bir servis panosuna dönüştürür.", duzen: "servis", kartStili: "yumusak", yogunluk: "dengeli", gorselOrani: "karisik", ozellikler: ["Alan ve yüzey bazlı temizlik matrisi", "Kontrol listeli hizmet teslimi"] },
+    { etiket: "Doğrulanabilir sonuç", aciklama: "Uygulama öncesi durum, kullanılan yöntem, kritik alanlar ve son kontrolü akışkan katmanlarla görünür kılar.", duzen: "sinematik", kartStili: "katmanli", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Öncesi, yöntem ve sonuç ilişkisi", "Leke, kuruma ve yüzey güvenliği anlatımı"] },
+    { etiket: "Periyodik hizmet sistemi", aciklama: "Alan türü, görev sıklığı, ekip sorumluluğu ve kalite kontrolünü kurumsal alıcıların tarayacağı plan kartlarında sunar.", duzen: "katalog", kartStili: "cerceveli", yogunluk: "kompakt", gorselOrani: "kare", ozellikler: ["Günlük, haftalık ve dönemsel görev planı", "Ekip, malzeme ve kalite kontrol görünürlüğü"] },
+  ],
+  "hijyen-kontrol": [
+    { etiket: "Risk keşif protokolü", aciklama: "Zararlı türü, yoğunluk, giriş noktaları ve hassas alanları kayıt altına alan kontrollü keşif düzeni kurar.", duzen: "teknik", kartStili: "keskin", yogunluk: "kompakt", gorselOrani: "kare", ozellikler: ["Risk bölgesi ve zararlı türü kaydı", "Hazırlık ve alan güvenliği protokolü"] },
+    { etiket: "Uygulama güvenliği", aciklama: "Ürün, yöntem, doz, bekleme süresi ve alana dönüş bilgisini güvenlik öncelikli servis panellerinde açıklar.", duzen: "servis", kartStili: "cerceveli", yogunluk: "dengeli", gorselOrani: "karisik", ozellikler: ["Ürün ve uygulama bilgisinin şeffaf sunumu", "İnsan, evcil hayvan ve gıda alanı uyarıları"] },
+    { etiket: "Takip ve raporlama", aciklama: "Uygulama raporunu, kontrol tarihini ve koruyucu önlemleri planlı bir takip akışına bağlar.", duzen: "rezervasyon", kartStili: "yumusak", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Uygulama sonrası kontrol takvimi", "Kayıtlı rapor ve önleyici öneriler"] },
   ],
   "acil-saha-servisi": [
     { etiket: "Hızlı servis", aciklama: "Sorun, hizmet bölgesi ve iletişim yolunu gecikmeden gösteren dönüşüm odaklı yapı kurar.", duzen: "servis", kartStili: "keskin", yogunluk: "kompakt", gorselOrani: "karisik", ozellikler: ["Tek dokunuşla servis talebi", "Hizmet bölgesi görünürlüğü"] },
     { etiket: "Teknik güven", aciklama: "Arıza türlerini, müdahale biçimini ve güvenlik adımlarını teknik bir sunumla açıklar.", duzen: "teknik", kartStili: "cerceveli", yogunluk: "dengeli", gorselOrani: "kare", ozellikler: ["Sorun türüne göre yönlendirme", "Güvenlik ve kontrol adımları"] },
     { etiket: "Yerinde çözüm", aciklama: "Saha, konum ve müdahale bilgisini hareketli teknik panellerle dengeler; kullanıcıyı kısa talep formuna taşır.", duzen: "rezervasyon", kartStili: "yumusak", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["Konum ve uygunluk akışı", "Kısa talep formu önceliği"] },
   ],
+  "teknik-servis-saha": [
+    { etiket: "Güvenli servis kaydı", aciklama: "Arıza belirtisi, konum, cihaz veya tesisat bilgisi ve aciliyet seviyesini düzenli bir servis kabul ekranında toplar.", duzen: "servis", kartStili: "keskin", yogunluk: "kompakt", gorselOrani: "karisik", ozellikler: ["Belirti ve varlık bazlı servis kaydı", "Aciliyet ve hizmet bölgesi görünürlüğü"] },
+    { etiket: "Ölçüm ve teşhis", aciklama: "Güvenli izolasyon, ölçüm, arıza tespiti ve müdahale onayını teknik bir teşhis raporu gibi sunar.", duzen: "teknik", kartStili: "cerceveli", yogunluk: "dengeli", gorselOrani: "kare", ozellikler: ["Ölçüm bulgusu ve müdahale gerekçesi", "İşlem öncesi kapsam ve parça onayı"] },
+    { etiket: "Test ve servis raporu", aciklama: "Onarım sonrası çalışma, sızdırmazlık, koruma ve güvenlik testlerini kayıtlı teslim akışına bağlar.", duzen: "rezervasyon", kartStili: "katmanli", yogunluk: "ferah", gorselOrani: "panorama", ozellikler: ["İşlem sonrası fonksiyon ve güvenlik testi", "Bakım notu ve servis raporu teslimi"] },
+  ],
   "butik-bakim": [
-    { etiket: "Butik randevu", aciklama: "Uygulamaları zarif bir hizmet menüsüyle sunar ve randevuya doğal biçimde yönlendirir.", duzen: "rezervasyon", kartStili: "yumusak", yogunluk: "ferah", gorselOrani: "portre", ozellikler: ["Randevu odaklı hizmet seçimi", "Mobilde rahat uygulama tarama"] },
-    { etiket: "Stil galerisi", aciklama: "Stil sonuçlarını editoryal kartlar ve zarif hareketli katmanlarla öne alarak uzmanlık algısını güçlendirir.", duzen: "portfoy", kartStili: "katmanli", yogunluk: "dengeli", gorselOrani: "portre", ozellikler: ["Model ve uygulama seçkisi", "Stilden hizmete geçiş"] },
-    { etiket: "Bakım menüsü", aciklama: "Hizmetleri sade, kıyaslanabilir ve açıklayıcı kartlarla düzenler.", duzen: "katalog", kartStili: "cerceveli", yogunluk: "kompakt", gorselOrani: "kare", ozellikler: ["Net bakım kategorileri", "Fayda ve süreç açıklamaları"] },
+    { etiket: "Danışmanlık ve randevu", aciklama: "Ön görüşme, uygun işlem, tahmini süre ve bakım sonrası beklentiyi zarif bir randevu yolculuğunda birleştirir.", duzen: "rezervasyon", kartStili: "yumusak", yogunluk: "ferah", gorselOrani: "portre", ozellikler: ["Ön görüşme ve uygunluk değerlendirmesi", "İşlem süresi ve bakım sonrası bilgilendirme"] },
+    { etiket: "Uzmanlık editörü", aciklama: "Kesim, renk, cilt veya bakım sonucunu uzman yaklaşımı ve kişiye özel kararlarla editoryal bir seçkiye dönüştürür.", duzen: "portfoy", kartStili: "katmanli", yogunluk: "dengeli", gorselOrani: "portre", ozellikler: ["Uzmanlık ve sonuç eşleşmesi", "Gerçekçi beklenti ve kişiye uyarlama anlatımı"] },
+    { etiket: "Uygulama protokolü", aciklama: "Hizmetleri hazırlık, hijyen, uygulama ve evde bakım bilgileriyle kıyaslanabilir profesyonel kartlarda sunar.", duzen: "katalog", kartStili: "cerceveli", yogunluk: "kompakt", gorselOrani: "kare", ozellikler: ["Hazırlık ve hijyen standardı", "Uygulama sonrası bakım planı"] },
   ],
   "saglik-danismanlik": [
     { etiket: "Sakin görüşme", aciklama: "Uzmanlık alanlarını mahremiyet ve güven duygusunu koruyan sakin bir akışta anlatır.", duzen: "klinik", kartStili: "yumusak", yogunluk: "ferah", gorselOrani: "portre", ozellikler: ["Uzman yaklaşımı önceliği", "Görüşme biçimi ve mahremiyet"] },
@@ -191,9 +208,9 @@ const aileKurgulari: Record<TasarimAilesi, [AileSecenegi, AileSecenegi, AileSece
     { etiket: "Üretim kataloğu", aciklama: "Ürün gruplarını, ölçü seçeneklerini ve özel üretim yolunu düzenli biçimde gösterir.", duzen: "katalog", kartStili: "keskin", yogunluk: "kompakt", gorselOrani: "kare", ozellikler: ["Ürün grubu karşılaştırması", "Ölçü ve özel üretim talebi"] },
   ],
   "lojistik-rota": [
-    { etiket: "Taşıma planı", aciklama: "Taşınma türünü, kapsamı ve teklif yolunu operasyonel bir akışta netleştirir.", duzen: "servis", kartStili: "keskin", yogunluk: "kompakt", gorselOrani: "karisik", ozellikler: ["Taşınma türüne göre seçim", "Hızlı fiyat talebi"] },
-    { etiket: "Operasyon güveni", aciklama: "Paketleme, taşıma ve teslim adımlarını teknik güven unsurlarıyla destekler.", duzen: "teknik", kartStili: "cerceveli", yogunluk: "dengeli", gorselOrani: "panorama", ozellikler: ["Adım adım operasyon", "Araç ve ekip görünürlüğü"] },
-    { etiket: "Rota ve teklif", aciklama: "Başlangıç, varış ve taşınma bilgilerini kısa teklif formuna bağlayan planlama düzeni kurar.", duzen: "rezervasyon", kartStili: "yumusak", yogunluk: "ferah", gorselOrani: "kare", ozellikler: ["Rota bilgisi önceliği", "Planlı talep toplama"] },
+    { etiket: "Ekspertiz ve envanter", aciklama: "Çıkış-varış, kat, erişim, eşya hacmi ve özel parçaları operasyon öncesi kayıt altına alan taşıma planı kurar.", duzen: "servis", kartStili: "keskin", yogunluk: "kompakt", gorselOrani: "karisik", ozellikler: ["Adres, erişim ve eşya envanteri", "Araç, ekip ve zaman penceresi planı"] },
+    { etiket: "Paketleme operasyonu", aciklama: "Malzeme seçimi, oda kodlama, yükleme sırası ve araç içi sabitlemeyi teknik kontrol noktalarıyla sunar.", duzen: "teknik", kartStili: "cerceveli", yogunluk: "dengeli", gorselOrani: "panorama", ozellikler: ["Oda ve koli kodlama sistemi", "Yükleme sırası ve koruma kontrolü"] },
+    { etiket: "Rota ve teslim tutanağı", aciklama: "Başlangıç, varış, tarih ve hizmet kapsamını teklif akışına; yerleşim ve son kontrolü teslim kaydına bağlar.", duzen: "rezervasyon", kartStili: "yumusak", yogunluk: "ferah", gorselOrani: "kare", ozellikler: ["Rota, tarih ve erişim odaklı teklif", "Teslim, yerleşim ve son kontrol kaydı"] },
   ],
   "seyahat-rezervasyonu": [
     { etiket: "Kolay rezervasyon", aciklama: "Araç veya transfer seçimini tarih, rota ve iletişim bilgisiyle hızlıca birleştirir.", duzen: "rezervasyon", kartStili: "yumusak", yogunluk: "kompakt", gorselOrani: "karisik", ozellikler: ["Tarih ve rota odaklı akış", "Mobilde hızlı rezervasyon"] },
@@ -203,31 +220,34 @@ const aileKurgulari: Record<TasarimAilesi, [AileSecenegi, AileSecenegi, AileSece
 };
 
 const akislar = {
-  otomotiv: ["hero", "guven", "hizmetler", "galeri", "surec", "hikaye", "sss", "iletisim"],
+  otomotiv: ["hero", "guven", "hizmetler", "surec", "galeri", "hikaye", "sss", "iletisim"],
   proje: ["hero", "galeri", "hikaye", "hizmetler", "surec", "guven", "sss", "iletisim"],
   hizmet: ["hero", "hizmetler", "guven", "surec", "galeri", "hikaye", "sss", "iletisim"],
   acil: ["hero", "guven", "hizmetler", "surec", "sss", "hikaye", "iletisim"],
-  bakim: ["hero", "hizmetler", "galeri", "guven", "hikaye", "surec", "sss", "iletisim"],
+  bakim: ["hero", "hizmetler", "surec", "guven", "galeri", "hikaye", "sss", "iletisim"],
+  hijyen: ["hero", "guven", "surec", "hizmetler", "sss", "hikaye", "iletisim"],
+  teknik: ["hero", "guven", "hizmetler", "surec", "sss", "hikaye", "iletisim"],
+  lojistik: ["hero", "guven", "surec", "hizmetler", "galeri", "sss", "hikaye", "iletisim"],
   saglik: ["hero", "guven", "hizmetler", "hikaye", "surec", "galeri", "sss", "iletisim"],
   katalog: ["hero", "hizmetler", "galeri", "guven", "hikaye", "surec", "sss", "iletisim"],
   rezervasyon: ["hero", "hizmetler", "guven", "surec", "galeri", "sss", "hikaye", "iletisim"],
 } satisfies Record<string, AnaSayfaBolumu[]>;
 
 const sektorKimlikleri: Record<string, SektorKimligi> = {
-  "oto-yikama": { aile: "otomotiv-atolye", odak: "Yıkama paketleri, boya güvenliği ve görünür araç sonucu", temalar: ["obsidian", "skyline", "copper"], adlar: ["Yıkama Garajı", "Parlak Showroom", "Bakım Paketleri"], anaSayfaAkisi: akislar.otomotiv },
-  "oto-detaylandirma": { aile: "otomotiv-atolye", odak: "Detaylı işçilik, boya düzeltme ve koruma uygulamaları", temalar: ["obsidian", "noir", "copper"], adlar: ["Detail Lab", "Kusursuz Yüzey", "Koruma Menüsü"], anaSayfaAkisi: akislar.otomotiv },
-  "arac-kaplama": { aile: "otomotiv-atolye", odak: "PPF, renk değişimi, cam filmi ve uygulama kalitesi", temalar: ["obsidian", "studio", "copper"], adlar: ["Wrap Studio", "Kaplama Sahnesi", "Film Seçkisi"], anaSayfaAkisi: akislar.otomotiv },
+  "oto-yikama": { aile: "otomotiv-atolye", odak: "Araç kabul kaydı, yüzey güvenliği, doğru yıkama reçetesi ve kontrollü teslim", temalar: ["torque", "obsidian", "skyline"], adlar: ["Araç Kabul Sistemi", "Yıkama Sonuç Stüdyosu", "Paket ve Teslim Planı"], anaSayfaAkisi: akislar.otomotiv },
+  "oto-detaylandirma": { aile: "otomotiv-atolye", odak: "Yüzey analizi, boya düzeltme, koruma reçetesi ve ışık altında kalite kontrolü", temalar: ["torque", "noir", "copper"], adlar: ["Detay Atölyesi", "Yüzey Koruma Stüdyosu", "Uygulama Reçetesi"], anaSayfaAkisi: akislar.otomotiv },
+  "arac-kaplama": { aile: "otomotiv-atolye", odak: "Yüzey geçmişi, film seçimi, kesim-köşe işçiliği ve kürlenme sonrası teslim", temalar: ["torque", "studio", "copper"], adlar: ["Kaplama Laboratuvarı", "Film ve Yüzey Stüdyosu", "Uygulama Kataloğu"], anaSayfaAkisi: akislar.otomotiv },
   "cam-balkon": { aile: "yapi-sistemleri", odak: "Sistem seçimi, ölçü, yalıtım ve temiz montaj", temalar: ["skyline", "mono", "marble"], adlar: ["Şeffaf Mekân", "Sistem Vitrini", "Teknik Balkon"], anaSayfaAkisi: akislar.proje },
   tente: { aile: "yapi-sistemleri", odak: "Gölgelendirme, ölçülendirme, kumaş ve taşıyıcı sistem", temalar: ["sand", "terra", "copper"], adlar: ["Gölge Mimari", "Pergola Vitrini", "Tente Sistemleri"], anaSayfaAkisi: akislar.proje },
   tadilat: { aile: "proje-portfoyu", odak: "Keşif, iş kalemleri, uygulama sırası ve teslim disiplini", temalar: ["copper", "marble", "mono"], adlar: ["Dönüşüm Stüdyosu", "Önce Sonra", "Uygulama Planı"], anaSayfaAkisi: akislar.proje },
   dekorasyon: { aile: "proje-portfoyu", odak: "Mekân dili, malzeme seçimi ve tamamlanmış uygulamalar", temalar: ["terra", "marble", "artisan"], adlar: ["Mekân Hikâyesi", "Dekor Portföyü", "Malzeme Planı"], anaSayfaAkisi: akislar.proje },
-  temizlik: { aile: "temizlik-servisi", odak: "Alan türü, temizlik kapsamı, ekip güveni ve teklif", temalar: ["aurora", "lagoon", "sand"], adlar: ["Temiz Başlangıç", "Görünür Sonuç", "Kurumsal Temizlik"], anaSayfaAkisi: akislar.hizmet },
-  "koltuk-yikama": { aile: "temizlik-servisi", odak: "Kumaş analizi, leke işlemi, ekipman ve kuruma süreci", temalar: ["lagoon", "aurora", "skyline"], adlar: ["Yerinde Temizlik", "Önce Sonra", "Koltuk Bakım Planı"], anaSayfaAkisi: ["hero", "galeri", "hizmetler", "surec", "guven", "sss", "hikaye", "iletisim"] },
-  "hali-yikama": { aile: "temizlik-servisi", odak: "Teslim alma, yıkama aşamaları, kurutma ve iade düzeni", temalar: ["lagoon", "aurora", "sand"], adlar: ["Halı Servisi", "Yıkama Süreci", "Düzenli Teslim"], anaSayfaAkisi: ["hero", "surec", "hizmetler", "galeri", "guven", "sss", "hikaye", "iletisim"] },
-  ilaclama: { aile: "acil-saha-servisi", odak: "Zararlı türü, güvenli uygulama, hazırlık ve takip", temalar: ["copper", "aurora", "sand"], adlar: ["Güvenli Müdahale", "Teknik İlaçlama", "Hızlı Talep"], anaSayfaAkisi: akislar.acil },
-  "guzellik-salonu": { aile: "butik-bakim", odak: "Bakım uygulaması, uzman yaklaşımı, salon deneyimi ve randevu", temalar: ["ruby", "studio", "ivory"], adlar: ["Bakım Butiği", "Güzellik Editörü", "Uygulama Menüsü"], anaSayfaAkisi: akislar.bakim },
-  kuafor: { aile: "butik-bakim", odak: "Kesim, renklendirme, saç bakımı ve stil sonuçları", temalar: ["studio", "ivory", "ruby"], adlar: ["Saç Stüdyosu", "Stil Galerisi", "Kuaför Menüsü"], anaSayfaAkisi: akislar.bakim },
-  berber: { aile: "butik-bakim", odak: "Kesim, sakal tasarımı, bakım ritüeli ve randevu", temalar: ["artisan", "obsidian", "sand"], adlar: ["Usta Berber", "Kesim Kulübü", "Bakım Menüsü"], anaSayfaAkisi: akislar.bakim },
+  temizlik: { aile: "temizlik-servisi", odak: "Alan keşfi, yüzey matrisi, ekip görev planı ve kontrol listeli hijyen teslimi", temalar: ["hygiene", "lagoon", "aurora"], adlar: ["Hijyen Operasyon Planı", "Doğrulanabilir Sonuç", "Periyodik Hizmet Sistemi"], anaSayfaAkisi: akislar.hizmet },
+  "koltuk-yikama": { aile: "temizlik-servisi", odak: "Kumaş etiketi ve renk testi, leke protokolü, kontrollü ekstraksiyon ve nem takibi", temalar: ["hygiene", "lagoon", "skyline"], adlar: ["Kumaş Kabul Protokolü", "Leke ve Sonuç Stüdyosu", "Kuruma Takip Planı"], anaSayfaAkisi: ["hero", "guven", "hizmetler", "surec", "galeri", "sss", "hikaye", "iletisim"] },
+  "hali-yikama": { aile: "temizlik-servisi", odak: "Barkodlu kabul, dokuma sınıflandırması, yıkama reçetesi, kontrollü kurutma ve iade", temalar: ["hygiene", "aurora", "sand"], adlar: ["Halı Kabul Sistemi", "Yıkama ve Kurutma Hattı", "Kayıtlı Teslim Planı"], anaSayfaAkisi: ["hero", "guven", "surec", "hizmetler", "galeri", "sss", "hikaye", "iletisim"] },
+  ilaclama: { aile: "hijyen-kontrol", odak: "Risk keşfi, güvenli ürün-yöntem seçimi, uygulama raporu ve planlı takip", temalar: ["signal", "hygiene", "copper"], adlar: ["Risk Keşif Protokolü", "Uygulama Güvenliği", "Takip ve Raporlama"], anaSayfaAkisi: akislar.hijyen },
+  "guzellik-salonu": { aile: "butik-bakim", odak: "Ön görüşme, hijyen protokolü, kişiye uygun bakım ve uygulama sonrası takip", temalar: ["pearl", "ruby", "ivory"], adlar: ["Bakım Danışmanlığı", "Uzmanlık Editörü", "Uygulama Protokolü"], anaSayfaAkisi: akislar.bakim },
+  kuafor: { aile: "butik-bakim", odak: "Saç geçmişi analizi, teknik renk-kesim reçetesi, stil sonucu ve evde bakım planı", temalar: ["pearl", "studio", "ivory"], adlar: ["Saç Danışmanlığı", "Stil ve Renk Editörü", "Teknik Uygulama Menüsü"], anaSayfaAkisi: akislar.bakim },
+  berber: { aile: "butik-bakim", odak: "Yüz-saç oranı, hijyenli ekipman, usta kesim protokolü ve bakım periyodu", temalar: ["artisan", "noir", "pearl"], adlar: ["Usta Kabulü", "Kesim ve Sakal Kulübü", "Bakım Protokolü"], anaSayfaAkisi: akislar.bakim },
   diyetisyen: { aile: "saglik-danismanlik", odak: "Kişiye özel değerlendirme, takip ve sürdürülebilir beslenme", temalar: ["lagoon", "sage", "clinic"], adlar: ["Beslenme Rehberi", "Dengeli Yaklaşım", "Görüşme Planı"], anaSayfaAkisi: akislar.saglik },
   psikolog: { aile: "saglik-danismanlik", odak: "Uzmanlık alanı, güvenli görüşme ve mahremiyet", temalar: ["sage", "ivory", "lagoon"], adlar: ["Sakin Alan", "Uzmanlık Notları", "İlk Görüşme"], anaSayfaAkisi: ["hero", "guven", "hikaye", "hizmetler", "surec", "sss", "iletisim"] },
   fizyoterapist: { aile: "klinik-guven", odak: "Değerlendirme, hareket planı, uygulama ve ilerleme takibi", temalar: ["clinic", "lagoon", "sage"], adlar: ["Hareket Kliniği", "Tedavi Rehberi", "Merkez ve Egzersiz"], anaSayfaAkisi: akislar.saglik },
@@ -244,10 +264,10 @@ const sektorKimlikleri: Record<string, SektorKimligi> = {
   cicekci: { aile: "urun-katalogu", odak: "Aranjman türü, gönderim amacı, tazelik ve teslim zamanı", temalar: ["sage", "terra", "ruby"], adlar: ["Çiçek Seçkisi", "Butik Aranjman", "Aynı Gün Sipariş"], anaSayfaAkisi: akislar.katalog },
   pastane: { aile: "urun-katalogu", odak: "Pasta ve ürün çeşitleri, özel gün, kişi sayısı ve teslim", temalar: ["ruby", "bistro", "ivory"], adlar: ["Tatlı Vitrini", "Butik Pastane", "Özel Sipariş"], anaSayfaAkisi: akislar.katalog },
   mobilya: { aile: "zanaat-atolyesi", odak: "Malzeme, ölçü, özel üretim, işçilik ve mekâna uygulama", temalar: ["artisan", "marble", "terra"], adlar: ["Usta Atölye", "Mekân Portföyü", "Üretim Kataloğu"], anaSayfaAkisi: akislar.proje },
-  elektrikci: { aile: "acil-saha-servisi", odak: "Arıza türü, elektrik güvenliği, konum ve servis talebi", temalar: ["copper", "obsidian", "skyline"], adlar: ["Hızlı Elektrik", "Teknik Güven", "Servis Talebi"], anaSayfaAkisi: akislar.acil },
-  tesisatci: { aile: "acil-saha-servisi", odak: "Tesisat sorunu, aciliyet, yerinde tespit ve müdahale", temalar: ["skyline", "lagoon", "copper"], adlar: ["Hızlı Tesisat", "Arıza Rehberi", "Usta Çağır"], anaSayfaAkisi: akislar.acil },
-  "kombi-servisi": { aile: "acil-saha-servisi", odak: "Marka-model, hata bilgisi, bakım ve güvenli servis", temalar: ["copper", "skyline", "obsidian"], adlar: ["Kombi Servisi", "Teknik Bakım", "Servis Kaydı"], anaSayfaAkisi: akislar.acil },
-  nakliyat: { aile: "lojistik-rota", odak: "Taşınma türü, rota, eşya kapsamı, paketleme ve teslim", temalar: ["sand", "skyline", "copper"], adlar: ["Taşıma Planı", "Güvenli Operasyon", "Rota ve Teklif"], anaSayfaAkisi: akislar.rezervasyon },
+  elektrikci: { aile: "teknik-servis-saha", odak: "Güvenli enerji izolasyonu, ölçümle arıza tespiti, müdahale onayı ve koruma testi", temalar: ["signal", "obsidian", "skyline"], adlar: ["Elektrik Servis Kaydı", "Ölçüm ve Teşhis", "Test ve Servis Raporu"], anaSayfaAkisi: akislar.teknik },
+  tesisatci: { aile: "teknik-servis-saha", odak: "Kaçak-kaynak tespiti, kontrollü müdahale, basınç veya sızdırmazlık testi ve teslim", temalar: ["signal", "lagoon", "skyline"], adlar: ["Tesisat Servis Kaydı", "Kaynak ve Müdahale", "Sızdırmazlık Raporu"], anaSayfaAkisi: akislar.teknik },
+  "kombi-servisi": { aile: "teknik-servis-saha", odak: "Cihaz ve hata kaydı, ölçümlü bakım, parça onayı, yanma ve sızdırmazlık güvenliği", temalar: ["signal", "copper", "obsidian"], adlar: ["Cihaz Servis Kaydı", "Bakım ve Teşhis", "Güvenlik Test Raporu"], anaSayfaAkisi: akislar.teknik },
+  nakliyat: { aile: "lojistik-rota", odak: "Ekspertiz ve envanter, erişim-rota planı, kodlu paketleme, kontrollü yükleme ve teslim tutanağı", temalar: ["cargo", "skyline", "copper"], adlar: ["Ekspertiz ve Envanter", "Paketleme Operasyonu", "Rota ve Teslim Tutanağı"], anaSayfaAkisi: akislar.lojistik },
   transfer: { aile: "seyahat-rezervasyonu", odak: "Alış-bırakış noktası, tarih, yolcu sayısı ve araç seçimi", temalar: ["royal", "skyline", "obsidian"], adlar: ["Kolay Transfer", "Premium Filo", "Transfer Seçenekleri"], anaSayfaAkisi: ["hero", "hizmetler", "guven", "surec", "sss", "hikaye", "iletisim"] },
   "arac-kiralama": { aile: "seyahat-rezervasyonu", odak: "Araç sınıfı, kiralama tarihi, teslim koşulları ve uygunluk", temalar: ["skyline", "royal", "obsidian"], adlar: ["Hızlı Kiralama", "Araç Filosu", "Kiralama Rehberi"], anaSayfaAkisi: akislar.rezervasyon },
 };

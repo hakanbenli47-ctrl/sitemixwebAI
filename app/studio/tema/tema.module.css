@@ -463,6 +463,33 @@
   text-transform: uppercase;
 }
 
+.kartOzellikleri {
+  display: grid;
+  gap: 7px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.kartOzellikleri li {
+  position: relative;
+  padding-left: 14px;
+  color: #4d5750;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.kartOzellikleri li::before {
+  position: absolute;
+  top: 0.62em;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--tema-vurgu);
+  content: "";
+}
+
 .gorselsizRozet {
   width: fit-content;
   display: inline-flex;
@@ -598,6 +625,69 @@
   overflow-wrap: anywhere;
   font-size: 12px;
   text-transform: capitalize;
+}
+
+.sektorKararlari {
+  margin-top: 26px;
+  border-top: 2px solid #1e4d3a;
+}
+
+.sektorKararlariBaslik {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(17, 23, 19, 0.2);
+}
+
+.sektorKararlariBaslik span {
+  color: #1e4d3a;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sektorKararlariBaslik strong {
+  max-width: 210px;
+  color: #303a33;
+  font-size: 11px;
+  line-height: 1.35;
+  text-align: right;
+}
+
+.sektorKarari {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 10px;
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(17, 23, 19, 0.2);
+}
+
+.sektorKarari > span {
+  color: #1e4d3a;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.sektorKarari > div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.sektorKarari small {
+  color: #626a64;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sektorKarari strong {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.35;
 }
 
 .tasarimOzellikleri {
@@ -825,5 +915,15 @@
 
   .temaSecenegi {
     padding: 28px 0;
+  }
+
+  .sektorKararlariBaslik {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .sektorKararlariBaslik strong {
+    max-width: none;
+    text-align: left;
   }
 }

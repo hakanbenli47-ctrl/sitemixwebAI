@@ -28,6 +28,7 @@ import {
 import styles from "./siteGorunumu.module.css";
 import semaStyles from "./sektorSemalari.module.css";
 import SektorSahnesi from "./SektorSahnesi";
+import { sektorKararNoktalariniGetir } from "@/data/sektorGorselDili";
 import type {
   AnimasyonTuru,
   SiteBolumu,
@@ -260,6 +261,56 @@ const temaRenkleri: Record<string, TemaRenkleri> = {
     solukYazi: "#56534F",
     vurgu: "#74502F",
     cizgi: "#C9C5BC",
+    butonYazi: "#FFFFFF",
+  },
+
+  pearl: {
+    arkaPlan: "#FFF8F5",
+    ikinciArkaPlan: "#F3E6E2",
+    yazi: "#261A1D",
+    solukYazi: "#67555A",
+    vurgu: "#963A5D",
+    cizgi: "#DCC9C9",
+    butonYazi: "#FFFFFF",
+  },
+
+  hygiene: {
+    arkaPlan: "#F2FBF8",
+    ikinciArkaPlan: "#DDEFEA",
+    yazi: "#102923",
+    solukYazi: "#48645C",
+    vurgu: "#087564",
+    cizgi: "#B9D9D0",
+    butonYazi: "#FFFFFF",
+  },
+
+  torque: {
+    arkaPlan: "#0E1114",
+    ikinciArkaPlan: "#1A2025",
+    yazi: "#F7F4ED",
+    solukYazi: "#B7BEC2",
+    vurgu: "#FF6A1A",
+    cizgi: "#343B40",
+    butonYazi: "#111416",
+  },
+
+  signal: {
+    arkaPlan: "#F3F5F6",
+    ikinciArkaPlan: "#E0E5E7",
+    yazi: "#111A20",
+    solukYazi: "#4F5E66",
+    vurgu: "#C79A00",
+    cizgi: "#C4CDD2",
+    butonYazi: "#111A20",
+  },
+
+  cargo: {
+    arkaPlan: "#F3F0E8",
+    ikinciArkaPlan: "#E1E5E3",
+    yazi: "#162126",
+    solukYazi: "#526167",
+    vurgu: "#B5451B",
+    cizgi: "#C7CDC9",
     butonYazi: "#FFFFFF",
   },
 
@@ -801,6 +852,7 @@ function HeroBolumu({
               sektor={sektor}
               sektorAdi={sektorAdi}
               aile={tasarim?.aile}
+              duzen={tasarim?.duzen}
               baslik={bolum.ustBaslik || sektorAdi}
               varyant="hero"
             />
@@ -834,12 +886,14 @@ function MetinBolumu({
   sektor,
   sektorAdi,
   aile,
+  duzen,
   dahiliBaglantiAc,
 }: {
   bolum: SiteBolumu;
   sektor: string;
   sektorAdi: string;
   aile?: string;
+  duzen?: string;
   dahiliBaglantiAc: DahiliBaglantiFonksiyonu;
 }) {
   const yerlesimSinifi =
@@ -921,6 +975,7 @@ function MetinBolumu({
             sektor={sektor}
             sektorAdi={sektorAdi}
             aile={aile}
+            duzen={duzen}
             baslik={bolum.ustBaslik || bolum.baslik}
             varyant="panel"
           />
@@ -1066,11 +1121,13 @@ function GaleriBolumu({
   sektor,
   sektorAdi,
   aile,
+  duzen,
 }: {
   bolum: SiteBolumu;
   sektor: string;
   sektorAdi: string;
   aile?: string;
+  duzen?: string;
 }) {
   const elemanlar = bolum.listeElemanlari
     .filter(
@@ -1139,6 +1196,7 @@ function GaleriBolumu({
                 sektor={sektor}
                 sektorAdi={sektorAdi}
                 aile={aile}
+                duzen={duzen}
                 baslik={eleman.baslik}
                 varyant="kart"
                 index={index}
@@ -1548,32 +1606,9 @@ function BolumRender({
   }
 
   if (bolum.tur === "hero") {
-    const hizmetler = sektorHizmetleriniGetir(proje.sektor);
-    const hizmetBolgesi =
-      proje.hizmetBolgesi?.trim() ||
-      [proje.ilce, proje.sehir].filter(Boolean).join(", ");
-    const iletisimYolu = whatsappBaglantisi(proje.whatsapp)
-      ? telefonBaglantisi(proje.telefon)
-        ? "WhatsApp ve telefon"
-        : "WhatsApp"
-      : telefonBaglantisi(proje.telefon)
-        ? "Telefon"
-        : "İletişim formu";
+    const kararNoktalari = sektorKararNoktalariniGetir(proje.sektor);
     const heroBilgileri: HeroBilgisi[] = anaSayfaMi
-      ? [
-          {
-            etiket: "Öne çıkan",
-            deger: hizmetler[0] || proje.sektorAdi,
-          },
-          {
-            etiket: hizmetBolgesi ? "Hizmet bölgesi" : "Uzmanlık",
-            deger: hizmetBolgesi || hizmetler[1] || proje.sektorAdi,
-          },
-          {
-            etiket: "Doğrudan iletişim",
-            deger: iletisimYolu,
-          },
-        ]
+      ? kararNoktalari.map((karar) => ({ ...karar }))
       : [];
 
     return (
@@ -1641,6 +1676,7 @@ function BolumRender({
               sektor={proje.sektor}
               sektorAdi={proje.sektorAdi}
               aile={tasarim?.aile}
+              duzen={tasarim?.duzen}
             />
 
             <Butonlar bolum={bolum} dahiliBaglantiAc={dahiliBaglantiAc} />
@@ -1672,6 +1708,7 @@ function BolumRender({
             sektor={proje.sektor}
             sektorAdi={proje.sektorAdi}
             aile={tasarim?.aile}
+            duzen={tasarim?.duzen}
             dahiliBaglantiAc={dahiliBaglantiAc}
           />
         )}

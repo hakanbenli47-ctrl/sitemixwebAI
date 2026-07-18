@@ -471,7 +471,7 @@
 
 .heroBilgiListesi li {
   min-width: 0;
-  min-height: 88px;
+  min-height: 96px;
   display: grid;
   grid-template-columns: 26px minmax(0, 1fr);
   align-items: center;
@@ -507,12 +507,10 @@
 }
 
 .heroBilgiListesi strong {
-  overflow: hidden;
   font-size: 11px;
   line-height: 1.35;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   color: var(--site-alan-yazi);
+  text-wrap: pretty;
 }
 
 .gorselliHero {
@@ -2375,6 +2373,9 @@
 
 .site[data-tasarim-aile="otomotiv-atolye"] .heroBolumu:not(.gorselliHero) {
   grid-template-columns: minmax(0, 0.72fr) minmax(480px, 1.28fr);
+  background-image:
+    linear-gradient(118deg, transparent 0 58%, color-mix(in srgb, var(--site-vurgu) 9%, transparent) 58% 72%, transparent 72%),
+    repeating-linear-gradient(90deg, transparent 0 79px, color-mix(in srgb, var(--site-yazi) 5%, transparent) 79px 80px);
 }
 
 .site[data-tasarim-aile="otomotiv-atolye"] .heroMetni h1 {
@@ -2390,6 +2391,35 @@
 
 .site[data-tasarim-aile="otomotiv-atolye"] .varyasyon_kartli .listeGorsel img {
   height: 220px;
+}
+
+.site[data-tasarim-aile="otomotiv-atolye"] .heroBilgiListesi li,
+.site[data-tasarim-aile="otomotiv-atolye"] .varyasyon_kartli .listeSatiri {
+  border-top: 3px solid var(--site-vurgu);
+  border-radius: 0;
+}
+
+.site[data-tasarim-aile="otomotiv-atolye"] .listeNumara,
+.site[data-tasarim-aile="otomotiv-atolye"] [data-site-parcasi="hero-bilgi"] li > span {
+  font-family: "Arial Narrow", "Roboto Condensed", Arial, sans-serif;
+  letter-spacing: 0.12em;
+}
+
+.site[data-sektor="oto-yikama"] .heroBolumu:not(.gorselliHero) {
+  background-image:
+    radial-gradient(ellipse at 84% 18%, color-mix(in srgb, var(--site-vurgu) 16%, transparent), transparent 32%),
+    repeating-linear-gradient(104deg, transparent 0 54px, color-mix(in srgb, var(--site-vurgu) 7%, transparent) 54px 56px);
+}
+
+.site[data-sektor="oto-detaylandirma"] .heroBolumu:not(.gorselliHero) {
+  background-image:
+    linear-gradient(90deg, transparent 49.9%, color-mix(in srgb, var(--site-vurgu) 16%, transparent) 50%, transparent 50.1%),
+    linear-gradient(0deg, transparent 49.9%, color-mix(in srgb, var(--site-vurgu) 9%, transparent) 50%, transparent 50.1%);
+  background-size: 86px 86px;
+}
+
+.site[data-sektor="arac-kaplama"] .heroBolumu:not(.gorselliHero) {
+  background-image: repeating-linear-gradient(128deg, transparent 0 86px, color-mix(in srgb, var(--site-vurgu) 9%, transparent) 86px 89px);
 }
 
 /* Cam balkon ve tente: sistem, mekân ve keşif. */
@@ -2436,6 +2466,9 @@
   margin: 24px 2vw 0;
   border: 1px solid var(--site-cizgi);
   border-radius: 34px;
+  background-image:
+    radial-gradient(circle at 86% 16%, color-mix(in srgb, var(--site-vurgu) 15%, transparent), transparent 24%),
+    linear-gradient(90deg, transparent 0 49.8%, color-mix(in srgb, var(--site-vurgu) 7%, transparent) 50%, transparent 50.2%);
 }
 
 .site[data-tasarim-aile="temizlik-servisi"] .heroMetni h1 {
@@ -2448,6 +2481,52 @@
 
 .site[data-tasarim-aile="temizlik-servisi"] .listeGorsel img {
   border-radius: 16px;
+}
+
+.site[data-tasarim-aile="temizlik-servisi"] .heroBilgiListesi li,
+.site[data-tasarim-aile="temizlik-servisi"] .varyasyon_kartli .listeSatiri {
+  box-shadow: inset 0 3px 0 color-mix(in srgb, var(--site-vurgu) 72%, transparent);
+}
+
+.site[data-tasarim-aile="temizlik-servisi"] .listeNumara {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--site-vurgu);
+  border-radius: 50%;
+}
+
+.site[data-sektor="hali-yikama"] .varyasyon_adimlar .listeSatiri {
+  border-left: 4px solid var(--site-vurgu);
+  border-radius: 0 20px 20px 0;
+}
+
+.site[data-sektor="koltuk-yikama"] .varyasyon_kartli .listeSatiri {
+  border-radius: 32px 12px 32px 12px;
+}
+
+/* İlaçlama: keşif, uygulama güvenliği ve kayıtlı takip. */
+
+.site[data-tasarim-aile="hijyen-kontrol"] .siteHeader {
+  border-bottom: 3px solid var(--site-vurgu);
+}
+
+.site[data-tasarim-aile="hijyen-kontrol"] .heroBolumu:not(.gorselliHero) {
+  background-image:
+    repeating-linear-gradient(135deg, color-mix(in srgb, var(--site-vurgu) 8%, transparent) 0 14px, transparent 14px 30px),
+    linear-gradient(90deg, transparent 0 66%, color-mix(in srgb, var(--site-vurgu) 10%, transparent) 66%);
+}
+
+.site[data-tasarim-aile="hijyen-kontrol"] .heroBilgiListesi li,
+.site[data-tasarim-aile="hijyen-kontrol"] .listeSatiri {
+  border-left: 4px solid var(--site-vurgu);
+  border-radius: 0;
+}
+
+.site[data-tasarim-aile="hijyen-kontrol"] .talepFormu {
+  border-top: 7px solid var(--site-vurgu);
+  border-radius: 0;
 }
 
 /* Elektrik, tesisat, kombi ve ilaçlama: hızlı saha servisi. */
@@ -2481,6 +2560,55 @@
   color: var(--site-alan-yazi);
 }
 
+/* Teknik servis: kayıt, ölçüm, onay ve test raporu. */
+
+.site[data-tasarim-aile="teknik-servis-saha"] .siteHeader {
+  min-height: 76px;
+  border-bottom: 3px solid var(--site-vurgu);
+}
+
+.site[data-tasarim-aile="teknik-servis-saha"] .heroBolumu:not(.gorselliHero) {
+  background-image:
+    linear-gradient(90deg, transparent 0 71%, color-mix(in srgb, var(--site-vurgu) 12%, transparent) 71% 71.2%, transparent 71.2%),
+    repeating-linear-gradient(0deg, transparent 0 63px, color-mix(in srgb, var(--site-yazi) 6%, transparent) 63px 64px);
+}
+
+.site[data-tasarim-aile="teknik-servis-saha"] .heroMetni h1,
+.site[data-tasarim-aile="teknik-servis-saha"] .bolumBasligi h2 {
+  font-family: "Arial Narrow", "Roboto Condensed", Arial, sans-serif;
+  font-stretch: condensed;
+  text-transform: uppercase;
+}
+
+.site[data-tasarim-aile="teknik-servis-saha"] .heroBilgiListesi li,
+.site[data-tasarim-aile="teknik-servis-saha"] .listeSatiri {
+  border-radius: 0;
+  box-shadow: inset 4px 0 0 var(--site-vurgu);
+}
+
+.site[data-tasarim-aile="teknik-servis-saha"] .listeNumara {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color: var(--site-vurgu);
+}
+
+.site[data-tasarim-aile="teknik-servis-saha"] .talepFormu {
+  border-radius: 0;
+  border-top: 7px solid var(--site-vurgu);
+}
+
+.site[data-sektor="elektrikci"] .heroBolumu:not(.gorselliHero) {
+  background-image: repeating-linear-gradient(90deg, transparent 0 96px, color-mix(in srgb, var(--site-vurgu) 11%, transparent) 96px 98px);
+}
+
+.site[data-sektor="tesisatci"] .varyasyon_adimlar .listeSatiri {
+  border-radius: 999px 24px 24px 999px;
+}
+
+.site[data-sektor="kombi-servisi"] .heroBilgiListesi {
+  outline: 1px solid color-mix(in srgb, var(--site-vurgu) 52%, transparent);
+  outline-offset: 8px;
+}
+
 /* Kuaför, berber ve güzellik: portre, stil ve randevu. */
 
 .site[data-tasarim-aile="butik-bakim"] .heroMetni h1,
@@ -2497,6 +2625,36 @@
 
 .site[data-tasarim-aile="butik-bakim"] .varyasyon_kartli .listeSatiri {
   border-radius: 24px;
+}
+
+.site[data-tasarim-aile="butik-bakim"] .heroBolumu:not(.gorselliHero) {
+  background-image:
+    radial-gradient(ellipse at 88% 18%, color-mix(in srgb, var(--site-vurgu) 16%, transparent), transparent 34%),
+    radial-gradient(ellipse at 12% 88%, color-mix(in srgb, var(--site-vurgu) 7%, transparent), transparent 30%);
+}
+
+.site[data-tasarim-aile="butik-bakim"] .heroBilgiListesi li {
+  border-radius: 18px 18px 4px 18px;
+}
+
+.site[data-tasarim-aile="butik-bakim"] .listeNumara {
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  color: var(--site-vurgu);
+}
+
+.site[data-tasarim-aile="butik-bakim"] .talepFormu {
+  border-radius: 32px 32px 8px 32px;
+}
+
+.site[data-sektor="berber"] .heroBolumu:not(.gorselliHero),
+.site[data-sektor="berber"] .heroBilgiListesi li,
+.site[data-sektor="berber"] .talepFormu {
+  border-radius: 0;
+}
+
+.site[data-sektor="kuafor"] .varyasyon_kartli .listeSatiri:nth-child(even) {
+  transform: translateY(26px);
 }
 
 /* Danışmanlık sağlığı: daha sakin ve mahrem. */
@@ -2666,7 +2824,9 @@
 .site[data-tasarim-aile="lojistik-rota"] .heroBolumu,
 .site[data-tasarim-aile="lojistik-rota"] .standartBolum {
   background-image:
-    linear-gradient(90deg, transparent 9%, color-mix(in srgb, var(--site-vurgu) 16%, transparent) calc(9% + 1px), transparent calc(9% + 2px));
+    radial-gradient(circle at 9% 20%, var(--site-vurgu) 0 4px, transparent 5px),
+    linear-gradient(90deg, transparent 9%, color-mix(in srgb, var(--site-vurgu) 18%, transparent) calc(9% + 1px), transparent calc(9% + 2px));
+  background-size: 100% 180px, 100% 100%;
 }
 
 .site[data-tasarim-aile="lojistik-rota"] .surec,
@@ -2676,6 +2836,26 @@
 
 .site[data-tasarim-aile="lojistik-rota"] .varyasyon_adimlar .listeSatiri {
   border-top: 4px solid var(--site-vurgu);
+}
+
+.site[data-tasarim-aile="lojistik-rota"] .heroBilgiListesi li,
+.site[data-tasarim-aile="lojistik-rota"] .listeSatiri {
+  border-radius: 0;
+  box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--site-vurgu) 70%, transparent);
+}
+
+.site[data-tasarim-aile="lojistik-rota"] .listeNumara {
+  min-width: 36px;
+  min-height: 24px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--site-vurgu);
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+
+.site[data-tasarim-aile="lojistik-rota"] .talepFormu {
+  border-radius: 0;
+  border-left: 8px solid var(--site-vurgu);
 }
 
 /* Transfer ve araç kiralama: filo + rezervasyon. */
@@ -2900,31 +3080,31 @@
 
   .heroBilgiListesi,
   .site[data-tasarim-duzen="servis"] .heroBilgiListesi {
-    width: calc(100vw - 36px);
+    width: 100%;
     max-width: none;
-    display: flex;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
     margin-top: 38px;
-    padding: 0 0 8px;
-    overflow-x: auto;
+    padding: 0;
+    overflow: visible;
     border: 0;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-  }
-
-  .heroBilgiListesi::-webkit-scrollbar {
-    display: none;
   }
 
   .heroBilgiListesi li,
   .site[data-tasarim-duzen="klinik"] .heroBilgiListesi li,
   .site[data-tasarim-duzen="katalog"] .heroBilgiListesi li,
   .site[data-tasarim-duzen="servis"] .heroBilgiListesi li {
-    min-width: min(78vw, 270px);
+    min-width: 0;
     min-height: 82px;
     padding: 14px;
     border: 1px solid var(--site-cizgi);
-    scroll-snap-align: start;
+  }
+
+  .heroBilgiListesi strong {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
   }
 
   .heroGorseli img,
@@ -3076,6 +3256,14 @@
   .varyasyon_adimlar .listeSatiri {
     min-height: auto;
     padding: 24px;
+  }
+
+  .site[data-sektor="kuafor"] .varyasyon_kartli .listeSatiri:nth-child(even) {
+    transform: none;
+  }
+
+  .site[data-sektor="tesisatci"] .varyasyon_adimlar .listeSatiri {
+    border-radius: 24px;
   }
 
   .varyasyon_kartli .listeNumara,

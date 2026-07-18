@@ -19,6 +19,7 @@ import {
   type SektorTasarimSecenegi,
   type TemaKimligi,
 } from "@/data/sektorTasarimlari";
+import { sektorKararNoktalariniGetir } from "@/data/sektorGorselDili";
 import SektorSahnesi from "@/components/site/SektorSahnesi";
 import styles from "./tema.module.css";
 
@@ -392,6 +393,86 @@ const temalar: Tema[] = [
     karakter: "Taş, lüks, mimari",
     uygunSektorler: ["mermer", "mimarlik", "insaat", "mobilya", "dekorasyon"],
   },
+  {
+    id: "pearl",
+    ad: "Pearl Care",
+    kategori: "Bakım ve güzellik",
+    aciklama:
+      "İnci beyazı zemin, pudra katmanlar ve mürdüm vurgu ile danışmanlık ve randevu odaklı zarif salon kimliği.",
+    arkaPlan: "#FFF8F5",
+    ikinciArkaPlan: "#F3E6E2",
+    yazi: "#261A1D",
+    solukYazi: "#67555A",
+    vurgu: "#963A5D",
+    cizgi: "#DCC9C9",
+    butonYazi: "#FFFFFF",
+    karakter: "Zarif, kişisel, uzman",
+    uygunSektorler: ["guzellik-salonu", "kuafor", "berber"],
+  },
+  {
+    id: "hygiene",
+    ad: "Hygiene Mint",
+    kategori: "Temizlik ve hijyen",
+    aciklama:
+      "Steril mint zemin, koyu petrol yazı ve kontrollü yeşil vurgu ile yüzey güvenliği ve kalite kontrolünü öne çıkarır.",
+    arkaPlan: "#F2FBF8",
+    ikinciArkaPlan: "#DDEFEA",
+    yazi: "#102923",
+    solukYazi: "#48645C",
+    vurgu: "#087564",
+    cizgi: "#B9D9D0",
+    butonYazi: "#FFFFFF",
+    karakter: "Temiz, doğrulanabilir, güvenli",
+    uygunSektorler: ["temizlik", "koltuk-yikama", "hali-yikama", "ilaclama"],
+  },
+  {
+    id: "torque",
+    ad: "Torque Garage",
+    kategori: "Otomotiv atölyesi",
+    aciklama:
+      "Grafit atölye zemini, kırık beyaz bilgi alanları ve güvenlik turuncusu ile araç kabul ve iş emri hissi verir.",
+    arkaPlan: "#0E1114",
+    ikinciArkaPlan: "#1A2025",
+    yazi: "#F7F4ED",
+    solukYazi: "#B7BEC2",
+    vurgu: "#FF6A1A",
+    cizgi: "#343B40",
+    butonYazi: "#111416",
+    karakter: "Teknik, güçlü, kontrollü",
+    uygunSektorler: ["oto-yikama", "oto-detaylandirma", "arac-kaplama"],
+  },
+  {
+    id: "signal",
+    ad: "Service Signal",
+    kategori: "Teknik servis",
+    aciklama:
+      "Soğuk servis grisi, koyu teknik yazı ve sinyal sarısı ile ölçüm, güvenlik ve servis raporunu görünür kılar.",
+    arkaPlan: "#F3F5F6",
+    ikinciArkaPlan: "#E0E5E7",
+    yazi: "#111A20",
+    solukYazi: "#4F5E66",
+    vurgu: "#C79A00",
+    cizgi: "#C4CDD2",
+    butonYazi: "#111A20",
+    karakter: "Ölçümlü, güvenli, sahaya hazır",
+    uygunSektorler: ["elektrikci", "tesisatci", "kombi-servisi", "ilaclama"],
+  },
+  {
+    id: "cargo",
+    ad: "Cargo Route",
+    kategori: "Nakliyat operasyonu",
+    aciklama:
+      "Manifesto kremi, rota grisi ve yükleme turuncusu ile envanter, paketleme ve teslim sürecini operasyonel gösterir.",
+    arkaPlan: "#F3F0E8",
+    ikinciArkaPlan: "#E1E5E3",
+    yazi: "#162126",
+    solukYazi: "#526167",
+    vurgu: "#B5451B",
+    cizgi: "#C7CDC9",
+    butonYazi: "#FFFFFF",
+    karakter: "Planlı, izlenebilir, operasyonel",
+    uygunSektorler: ["nakliyat"],
+  },
 ];
 
 export default function TemaSecimSayfasi() {
@@ -434,6 +515,10 @@ export default function TemaSecimSayfasi() {
 
   const tasarimSecenekleri = useMemo(() => {
     return proje ? sektorTasarimSecenekleriniGetir(proje.sektor) : [];
+  }, [proje]);
+
+  const sektorKararNoktalari = useMemo(() => {
+    return proje ? sektorKararNoktalariniGetir(proje.sektor) : [];
   }, [proje]);
 
   const aktifTasarim = tasarimSecenekleri.find(
@@ -628,6 +713,7 @@ export default function TemaSecimSayfasi() {
                       sektor={proje.sektor}
                       sektorAdi={proje.sektorAdi}
                       aile={tasarim.aile}
+                      duzen={tasarim.duzen}
                       baslik={tasarim.ad}
                       varyant="tema"
                     />
@@ -650,9 +736,15 @@ export default function TemaSecimSayfasi() {
 
                   <div className={styles.karakterSatiri}>
                     <strong>
-                      {tasarim.duzen} · {tasarim.yogunluk} · tipografik sahne
+                      {tema.kategori} · {tasarim.etiket}
                     </strong>
                   </div>
+
+                  <ul className={styles.kartOzellikleri}>
+                    {tasarim.ozellikler.slice(-2).map((ozellik) => (
+                      <li key={ozellik}>{ozellik}</li>
+                    ))}
+                  </ul>
 
                   <span className={styles.gorselsizRozet}>
                     <Sparkles size={13} />
@@ -716,6 +808,26 @@ export default function TemaSecimSayfasi() {
                     <small>Kart biçimi</small>
                     <strong>{aktifTasarim.kartStili}</strong>
                   </div>
+                </div>
+
+                <div className={styles.sektorKararlari}>
+                  <div className={styles.sektorKararlariBaslik}>
+                    <small>SEKTÖREL KARAR MİMARİSİ</small>
+                    <strong>{aktifTema.karakter}</strong>
+                  </div>
+
+                  {sektorKararNoktalari.map((karar, index) => (
+                    <div
+                      className={styles.sektorKarari}
+                      key={`${karar.etiket}-${karar.deger}`}
+                    >
+                      <span>{String(index + 1).padStart(2, "0")}</span>
+                      <div>
+                        <small>{karar.etiket}</small>
+                        <strong>{karar.deger}</strong>
+                      </div>
+                    </div>
+                  ))}
                 </div>
 
                 <ul className={styles.tasarimOzellikleri}>

@@ -170,7 +170,7 @@ export default function ProjelerSayfasi() {
   function projeyiAc(
     proje: ProjeVerisi,
     hedef:
-      | "/studio/icerik"
+      | "/studio/duzenle"
       | "/studio/onizleme"
       | "/studio/yayin",
   ) {
@@ -335,7 +335,7 @@ export default function ProjelerSayfasi() {
                 <button
                   type="button"
                   onClick={() =>
-                    projeyiAc(proje, "/studio/icerik")
+                    projeyiAc(proje, "/studio/duzenle")
                   }
                 >
                   <FilePenLine size={16} />

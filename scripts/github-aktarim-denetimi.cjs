@@ -129,15 +129,41 @@ const siteKaynagi = fs.readFileSync(
   "utf8",
 );
 
+const sektorSiteleriKaynagi = fs.readFileSync(
+  path.join(kok, "components/site/SektorSiteleri.tsx"),
+  "utf8",
+);
+
 if (
-  siteKaynagi.includes("SektorSahnesi") ||
-  /<(?:img|Image)\b/.test(siteKaynagi) ||
-  !siteKaynagi.includes("metinTemalari.module.css") ||
-  !siteKaynagi.includes("BolumGorselAlani") ||
-  !siteKaynagi.includes('data-site-parcasi="istege-bagli-gorsel"') ||
-  !siteKaynagi.includes("IskeletliSayfaAkisi")
+  !siteKaynagi.includes("SektorSiteleri") ||
+  !sektorSiteleriKaynagi.includes("medya?.acik") ||
+  !sektorSiteleriKaynagi.includes("!medya.url.trim()") ||
+  !sektorSiteleriKaynagi.includes("BarberPole")
 ) {
   sorunlar.push("Yayın görünümünde iskelet veya isteğe bağlı görsel altyapısı eksik.");
+}
+
+for (const motorGuvence of [
+  "function Kuafor(",
+  "function Berber(",
+  "function Guzellik(",
+  "function Nail(",
+  "function Nakliye(",
+  "function Vip(",
+  "function Hali(",
+  "function Dovme(",
+  "function Elektrik(",
+  "function Tesisat(",
+  "function Organizasyon(",
+  "function Duvar(",
+  "function OtoYikama(",
+  "function OtoKurtarma(",
+  "function OtoServis(",
+  "Iletisim",
+]) {
+  if (!sektorSiteleriKaynagi.includes(motorGuvence)) {
+    sorunlar.push(`Bagimsiz site motoru guvencesi eksik: ${motorGuvence}`);
+  }
 }
 
 console.log(`Yayın kaynağı: ${kaynakYollari.length}`);

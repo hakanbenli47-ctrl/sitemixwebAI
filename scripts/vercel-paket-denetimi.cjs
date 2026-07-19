@@ -116,9 +116,9 @@ async function calistir() {
     ilce: "Çankaya",
     hizmetBolgesi: "Ankara",
     slug: "vercel-test-elektrik",
-    tema: "signal",
-    iskelet: "elektrikci-iskelet-11",
-    icerikPaketi: "hizli",
+    tema: "tema-1",
+    sektorTemasi: "tema-1",
+    yeniSistemMi: true,
     secilenHizmetler: ["Elektrik arıza tespiti"],
     stilAyarlari: {
       genislik: "genis",
@@ -169,6 +169,15 @@ async function calistir() {
         bolumler: [bolum("detay", "metin", 0, "Servis kapsamı")],
       },
     ],
+    medyalar: [
+      {
+        id: "elektrik-medya-1",
+        slot: "hero",
+        baslik: "Servis görseli",
+        acik: true,
+        url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+      },
+    ],
     sablonSurumu: 9,
     seoBaslik: "Vercel Test Elektrik",
     seoAciklama: "Vercel ve sitemap üretim paketi denetimi.",
@@ -211,7 +220,10 @@ async function calistir() {
   if (
     !projeKaynagi.includes('"slug": "iletisim"') ||
     !projeKaynagi.includes('"slug": "iletisim-2"') ||
-    !projeKaynagi.includes('"iskelet": "elektrikci-iskelet-11"') ||
+    !projeKaynagi.includes('"sektorTemasi": "tema-1"') ||
+    !Object.keys(dosyalar).includes("components/site/SektorSiteleri.tsx") ||
+    !Object.keys(dosyalar).includes("components/site/sektorSiteleri.module.css") ||
+    !Object.keys(dosyalar).includes("data/yeniSektorler.ts") ||
     !projeKaynagi.includes('"gorselAlaniAcikMi": true') ||
     !Object.keys(dosyalar).some((dosyaYolu) => dosyaYolu.startsWith("public/images/")) ||
     projeKaynagi.includes("data:image/png;base64") ||

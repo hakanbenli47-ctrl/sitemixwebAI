@@ -1,7 +1,8 @@
 [
   "components/site/SiteGorunumu.tsx",
-  "components/site/siteGorunumu.module.css",
-  "components/site/metinTemalari.module.css",
+  "components/site/SektorSiteleri.tsx",
+  "components/site/sektorSiteleri.module.css",
+  "data/yeniSektorler.ts",
   "data/sektorSablonlari.ts",
   "data/sektorSunumProfilleri.ts",
   "data/sektorIcerikProfilleri.ts",

@@ -187,6 +187,7 @@ function projeAciklamasiOlustur(proje: ProjeVerisi) {
 
   return (
     proje.seoAciklama?.trim() ||
+    proje.siteIcerigi?.heroAciklama.trim() ||
     heroBolumu?.aciklama.trim() ||
     `${proje.firmaAdi}, ${proje.sektorAdi} alanında profesyonel hizmet sunar.`
   );
@@ -346,28 +347,25 @@ async function kaynakDosyalariOku() {
         path.join(kokDizin, "components", "site", "SiteGorunumu.tsx"),
         "utf8",
       ),
-    "components/site/siteGorunumu.module.css": () =>
+    "components/site/SektorSiteleri.tsx": () =>
       readFile(
-        path.join(
-          kokDizin,
-          "components",
-          "site",
-          "siteGorunumu.module.css",
-        ),
+        path.join(kokDizin, "components", "site", "SektorSiteleri.tsx"),
         "utf8",
       ),
-    "components/site/metinTemalari.module.css": () =>
+    "components/site/sektorSiteleri.module.css": () =>
       readFile(
         path.join(
           kokDizin,
           "components",
           "site",
-          "metinTemalari.module.css",
+          "sektorSiteleri.module.css",
         ),
         "utf8",
       ),
     "data/sektorSablonlari.ts": () =>
       readFile(path.join(kokDizin, "data", "sektorSablonlari.ts"), "utf8"),
+    "data/yeniSektorler.ts": () =>
+      readFile(path.join(kokDizin, "data", "yeniSektorler.ts"), "utf8"),
     "data/sektorSunumProfilleri.ts": () =>
       readFile(
         path.join(kokDizin, "data", "sektorSunumProfilleri.ts"),
@@ -540,6 +538,12 @@ async function gorselleriYerellestir(
       for (const eleman of bolum.listeElemanlari) {
         eleman.gorsel = await gorseliYerellestir(eleman.gorsel);
       }
+    }
+  }
+
+  if (Array.isArray(yayinProjesi.medyalar)) {
+    for (const medya of yayinProjesi.medyalar) {
+      medya.url = await gorseliYerellestir(medya.url);
     }
   }
 

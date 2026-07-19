@@ -12,7 +12,9 @@ import {
   EyeOff,
   FilePlus2,
   GripVertical,
+  ImagePlus,
   LayoutGrid,
+  LayoutTemplate,
   Monitor,
   PanelRight,
   Plus,
@@ -21,7 +23,7 @@ import {
   Tablet,
   Trash2,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { type ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   type BolumTuru,
   type SiteBolumu,
@@ -29,6 +31,12 @@ import {
   sektorHizmetleriniGetir,
 } from "@/data/sektorSablonlari";
 import { sektorTasarimSecenekleriniGetir } from "@/data/sektorTasarimlari";
+import {
+  sektorIskeletSecenekleriniGetir,
+  sektorIskeletiniGetir,
+  sektorVarsayilanIskeletiniGetir,
+  type SektorIskeletSecenegi,
+} from "@/data/sektorIskeletleri";
 import { temaPaletiniGetir } from "@/data/temaPaletleri";
 import {
   hazirIcerikPaketiniUygula,
@@ -85,6 +93,17 @@ const varyasyonlar: Record<string, string[]> = {
   iletisim: ["iletisim-paneli", "standart"],
 };
 
+const gorselAlaniDestekleyenTurler = new Set([
+  "hero",
+  "metin",
+  "hizmetler",
+  "urunler",
+  "istatistik",
+  "neden-biz",
+  "yorumlar",
+  "ekip",
+]);
+
 function slugOlustur(metin: unknown) {
   return String(metin ?? "")
     .toLocaleLowerCase("tr-TR")
@@ -109,6 +128,40 @@ function idOlustur() {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
+function gorselDosyasiniOku(dosya: File) {
+  return new Promise<string>((resolve, reject) => {
+    const okuyucu = new FileReader();
+    okuyucu.onload = () => resolve(String(okuyucu.result ?? ""));
+    okuyucu.onerror = () => reject(new Error("Görsel dosyası okunamadı"));
+    okuyucu.readAsDataURL(dosya);
+  });
+}
+
+async function gorseliWebIcinHazirla(dosya: File) {
+  const kaynak = await gorselDosyasiniOku(dosya);
+  const gorsel = new window.Image();
+
+  await new Promise<void>((resolve, reject) => {
+    gorsel.onload = () => resolve();
+    gorsel.onerror = () => reject(new Error("Görsel açılamadı"));
+    gorsel.src = kaynak;
+  });
+
+  const enBuyukKenar = 1800;
+  const oran = Math.min(1, enBuyukKenar / Math.max(gorsel.width, gorsel.height));
+  const tuval = document.createElement("canvas");
+  tuval.width = Math.max(1, Math.round(gorsel.width * oran));
+  tuval.height = Math.max(1, Math.round(gorsel.height * oran));
+  const cizim = tuval.getContext("2d");
+
+  if (!cizim) {
+    throw new Error("Görsel hazırlanamadı");
+  }
+
+  cizim.drawImage(gorsel, 0, 0, tuval.width, tuval.height);
+  return tuval.toDataURL("image/webp", 0.82);
+}
+
 function bolumuKlonla(kaynak: SiteBolumu, sira: number): SiteBolumu {
   return {
     ...kaynak,
@@ -120,6 +173,35 @@ function bolumuKlonla(kaynak: SiteBolumu, sira: number): SiteBolumu {
       ...eleman,
       id: idOlustur(),
     })),
+  };
+}
+
+function iskeletiProjeyeUygula(
+  proje: ProjeVerisi,
+  iskelet: SektorIskeletSecenegi,
+  zorla = false,
+) {
+  const oncelik = new Map(
+    iskelet.bolumOnceligi.map((tur, index) => [tur, index]),
+  );
+
+  return {
+    ...proje,
+    iskelet: iskelet.id,
+    sayfalar: proje.sayfalar.map((sayfa) => {
+      if (sayfa.ozelBolumSirasi && !zorla) return sayfa;
+
+      const bolumler = [...sayfa.bolumler]
+        .sort((birinci, ikinci) => {
+          const birinciOncelik = oncelik.get(birinci.tur) ?? 100 + birinci.sira;
+          const ikinciOncelik = oncelik.get(ikinci.tur) ?? 100 + ikinci.sira;
+
+          return birinciOncelik - ikinciOncelik || birinci.sira - ikinci.sira;
+        })
+        .map((bolum, sira) => ({ ...bolum, sira }));
+
+      return { ...sayfa, ozelBolumSirasi: false, bolumler };
+    }),
   };
 }
 
@@ -145,6 +227,7 @@ function varsayilanBolumOlustur(
     aciklama: "Bu alanın metnini sağdaki içerik panelinden düzenleyebilirsiniz.",
     gorsel: "",
     arkaPlanGorseli: "",
+    gorselAlaniAcikMi: false,
     animasyon: "asagidan" as const,
     butonlar: [],
     listeElemanlari: [],
@@ -300,12 +383,14 @@ export default function DuzenleyiciSayfasi() {
 
       try {
         const kayitli = JSON.parse(kayit) as ProjeVerisi;
-        const guncel: ProjeVerisi = {
+        const temelProje: ProjeVerisi = {
           ...kayitli,
           siteTipi: "cok-sayfa",
           icerikPaketi:
             kayitli.icerikPaketi ??
             sektorVarsayilanIcerikPaketiniGetir(kayitli.sektor),
+          iskelet:
+            kayitli.iskelet ?? sektorVarsayilanIskeletiniGetir(kayitli.sektor),
           secilenHizmetler:
             kayitli.secilenHizmetler?.length
               ? kayitli.secilenHizmetler
@@ -313,6 +398,10 @@ export default function DuzenleyiciSayfasi() {
           stilAyarlari:
             kayitli.stilAyarlari ?? sektorVarsayilanStiliniGetir(kayitli.sektor),
         };
+        const guncel = iskeletiProjeyeUygula(
+          temelProje,
+          sektorIskeletiniGetir(temelProje.sektor, temelProje.iskelet),
+        );
         const ilkSayfa = sayfalariSirala(guncel.sayfalar)[0];
 
         setProje(guncel);
@@ -360,6 +449,11 @@ export default function DuzenleyiciSayfasi() {
 
   const tasarimSecenekleri = useMemo(
     () => (proje ? sektorTasarimSecenekleriniGetir(proje.sektor) : []),
+    [proje],
+  );
+
+  const iskeletSecenekleri = useMemo(
+    () => (proje ? sektorIskeletSecenekleriniGetir(proje.sektor) : []),
     [proje],
   );
 
@@ -552,7 +646,9 @@ export default function DuzenleyiciSayfasi() {
     projeyiKaydet({
       ...proje,
       sayfalar: proje.sayfalar.map((sayfa) =>
-        sayfa.id === aktifSayfa.id ? { ...sayfa, bolumler } : sayfa,
+        sayfa.id === aktifSayfa.id
+          ? { ...sayfa, ozelBolumSirasi: true, bolumler }
+          : sayfa,
       ),
     });
   }
@@ -599,6 +695,34 @@ export default function DuzenleyiciSayfasi() {
         eleman.id === elemanId ? { ...eleman, [alan]: deger } : eleman,
       ),
     });
+  }
+
+  async function gorselDosyasiSecildi(event: ChangeEvent<HTMLInputElement>) {
+    const dosya = event.target.files?.[0];
+
+    if (!dosya || !aktifBolum) return;
+
+    if (!dosya.type.startsWith("image/")) {
+      setBildirim("Lütfen geçerli bir görsel dosyası seçin");
+      return;
+    }
+
+    try {
+      setBildirim("Görsel web için hazırlanıyor");
+      const gorsel = await gorseliWebIcinHazirla(dosya);
+
+      if (gorsel.length > 3_500_000) {
+        setBildirim("Görsel çok büyük; daha küçük bir dosya seçin");
+        return;
+      }
+
+      bolumGuncelle({ gorsel });
+    } catch (error) {
+      console.error("Görsel hazırlanamadı:", error);
+      setBildirim("Görsel hazırlanamadı");
+    } finally {
+      event.target.value = "";
+    }
   }
 
   function stilGuncelle<K extends keyof SiteStilAyarlari>(
@@ -981,6 +1105,50 @@ export default function DuzenleyiciSayfasi() {
                     </select>
                   </label>
 
+                  {gorselAlaniDestekleyenTurler.has(aktifBolum.tur) && (
+                    <div className={styles.gorselAlaniAyari}>
+                      <label className={styles.anahtarSatiri}>
+                        <span>
+                          <strong>Görsel alanını aç</strong>
+                          <small>İlk oluşturulduğunda kapalıdır; açılmadıkça sitede yer kaplamaz</small>
+                        </span>
+                        <input
+                          type="checkbox"
+                          checked={aktifBolum.gorselAlaniAcikMi ?? false}
+                          onChange={(event) =>
+                            bolumGuncelle({ gorselAlaniAcikMi: event.target.checked })
+                          }
+                        />
+                      </label>
+
+                      {aktifBolum.gorselAlaniAcikMi && (
+                        <label className={styles.gorselBaglantiAlani}>
+                          <span>
+                            <ImagePlus size={15} />
+                            Görsel bağlantısı
+                          </span>
+                          <input
+                            type="url"
+                            value={aktifBolum.gorsel}
+                            placeholder="https://... veya /images/..."
+                            onChange={(event) => bolumGuncelle({ gorsel: event.target.value })}
+                          />
+                          <span className={styles.veyaAyirici}>VEYA</span>
+                          <span className={styles.dosyaSecici}>
+                            <ImagePlus size={15} />
+                            Bilgisayardan görsel seç
+                            <input
+                              type="file"
+                              accept="image/jpeg,image/png,image/webp,image/avif"
+                              onChange={gorselDosyasiSecildi}
+                            />
+                          </span>
+                          <small>Görsel web için otomatik küçültülür. Boş bırakılırsa bekleyen alan görünür.</small>
+                        </label>
+                      )}
+                    </div>
+                  )}
+
                   {aktifBolum.listeElemanlari.length > 0 && (
                     <div className={styles.listeEditoru}>
                       <span>KART VE LİSTE METİNLERİ</span>
@@ -1016,7 +1184,52 @@ export default function DuzenleyiciSayfasi() {
             <div className={styles.panelIcerigi}>
               <section className={styles.ayarGrubu}>
                 <div className={styles.ayarBasligi}>
-                  <span>HAZIR TASARIM YÖNLERİ</span>
+                  <span>SEKTÖREL İSKELET ŞABLONLARI · {iskeletSecenekleri.length} SEÇENEK</span>
+                </div>
+                <p className={styles.iskeletAciklamasi}>
+                  Bunlar tema değildir. Menü, açılış, bölüm sırası ve sayfa geometrisi birlikte değişir.
+                </p>
+                <div className={styles.iskeletSecenekleri}>
+                  {iskeletSecenekleri.map((secenek) => {
+                    const aktifMi = proje.iskelet === secenek.id;
+
+                    return (
+                      <button
+                        type="button"
+                        key={secenek.id}
+                        className={aktifMi ? styles.aktif : ""}
+                        onClick={() =>
+                          projeyiKaydet(
+                            iskeletiProjeyeUygula(proje, secenek, true),
+                            "Site iskeleti uygulandı",
+                          )
+                        }
+                      >
+                        <span
+                          className={styles.iskeletOnizleme}
+                          data-iskelet-akis={secenek.akis}
+                        >
+                          <i />
+                          <i />
+                          <i />
+                          <i />
+                        </span>
+                        <span className={styles.iskeletKartBasligi}>
+                          <LayoutTemplate size={15} />
+                          <strong>{secenek.ad}</strong>
+                        </span>
+                        <small>{secenek.etiket}</small>
+                        <p>{secenek.ozellikler.join(" · ")}</p>
+                        {aktifMi && <Check size={15} />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+
+              <section className={styles.ayarGrubu}>
+                <div className={styles.ayarBasligi}>
+                  <span>RENK VE YÜZEY YÖNÜ</span>
                 </div>
                 <div className={styles.tasarimSecenekleri}>
                   {tasarimSecenekleri.map((secenek) => {

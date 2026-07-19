@@ -7,6 +7,7 @@
   "data/sektorIcerikProfilleri.ts",
   "data/sektorFormProfilleri.ts",
   "data/sektorTasarimlari.ts",
+  "data/sektorIskeletleri.ts",
   "data/sektorDonusumProfilleri.ts",
   "data/sektorGorselDili.ts",
   "lib/iletisim.ts",

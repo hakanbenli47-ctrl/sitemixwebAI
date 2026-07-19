@@ -598,6 +598,223 @@
   font-size: 7px;
 }
 
+.gorselAlaniAyari {
+  display: grid;
+  gap: 9px;
+  padding: 10px;
+  border: 1px solid color-mix(in srgb, var(--vurgu) 36%, var(--cizgi));
+  background: color-mix(in srgb, var(--vurgu) 5%, #ffffff);
+}
+
+.gorselBaglantiAlani {
+  gap: 7px;
+  padding: 10px;
+  border: 1px dashed var(--cizgi);
+  background: #ffffff;
+}
+
+.gorselBaglantiAlani > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--yazi);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.gorselBaglantiAlani > span svg {
+  color: var(--vurgu);
+}
+
+.gorselBaglantiAlani > small {
+  color: var(--soluk);
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+.veyaAyirici {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--soluk);
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.veyaAyirici::before,
+.veyaAyirici::after {
+  height: 1px;
+  flex: 1;
+  content: "";
+  background: var(--cizgi);
+}
+
+.dosyaSecici {
+  position: relative;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  overflow: hidden;
+  border: 1px solid var(--yazi);
+  background: var(--yazi);
+  color: #ffffff !important;
+  font-size: 8px !important;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.dosyaSecici svg {
+  color: #ffffff !important;
+}
+
+.dosyaSecici input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.iskeletAciklamasi {
+  margin: -2px 0 2px;
+  color: var(--soluk);
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+.iskeletSecenekleri {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.iskeletSecenekleri > button {
+  position: relative;
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+  padding: 9px;
+  overflow: hidden;
+  border: 1px solid var(--cizgi);
+  background: #ffffff;
+  color: var(--yazi);
+  text-align: left;
+  cursor: pointer;
+}
+
+.iskeletSecenekleri > button.aktif {
+  border-color: var(--vurgu);
+  box-shadow: inset 3px 0 0 var(--vurgu);
+}
+
+.iskeletSecenekleri > button > svg {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  color: var(--vurgu);
+}
+
+.iskeletKartBasligi {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.iskeletKartBasligi svg {
+  flex: 0 0 auto;
+  color: var(--vurgu);
+}
+
+.iskeletKartBasligi strong {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 9px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+}
+
+.iskeletSecenekleri > button > small {
+  color: var(--soluk);
+  font-size: 7px;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+}
+
+.iskeletSecenekleri > button > p {
+  margin: 0;
+  color: var(--soluk);
+  font-size: 7px;
+  line-height: 1.4;
+}
+
+.iskeletOnizleme {
+  height: 58px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: 12px repeat(2, 1fr);
+  gap: 3px;
+  padding: 5px;
+  border: 1px solid var(--cizgi);
+  background: #f2f1ec;
+}
+
+.iskeletOnizleme i {
+  display: block;
+  background: #d6d2c8;
+}
+
+.iskeletOnizleme i:first-child {
+  grid-column: 1 / -1;
+  background: var(--yazi);
+}
+
+.iskeletOnizleme i:nth-child(2) {
+  grid-column: span 3;
+  background: color-mix(in srgb, var(--vurgu) 70%, #ffffff);
+}
+
+.iskeletOnizleme[data-iskelet-akis="yan-ray"] i:nth-child(2),
+.iskeletOnizleme[data-iskelet-akis="yerel"] i:nth-child(2) {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.iskeletOnizleme[data-iskelet-akis="editorial"] i:nth-child(3) {
+  grid-column: 2 / span 3;
+}
+
+.iskeletOnizleme[data-iskelet-akis="katalog"] i:not(:first-child),
+.iskeletOnizleme[data-iskelet-akis="mozaik"] i:not(:first-child),
+.iskeletOnizleme[data-iskelet-akis="konsol"] i:not(:first-child) {
+  grid-column: span 2;
+}
+
+.iskeletOnizleme[data-iskelet-akis="rota"] {
+  grid-template-columns: 7px minmax(0, 1fr);
+}
+
+.iskeletOnizleme[data-iskelet-akis="rota"] i:not(:first-child) {
+  grid-column: 2;
+}
+
+.iskeletOnizleme[data-iskelet-akis="rezervasyon"] i:nth-child(2),
+.iskeletOnizleme[data-iskelet-akis="rezervasyon"] i:nth-child(3) {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.iskeletOnizleme[data-iskelet-akis="atolye"] i:nth-child(2) {
+  grid-column: span 1;
+  grid-row: span 2;
+}
+
+.iskeletOnizleme[data-iskelet-akis="premium"] i:not(:first-child) {
+  grid-column: 2 / span 2;
+}
+
 .tasarimSecenekleri,
 .paketSecenekleri {
   display: grid;

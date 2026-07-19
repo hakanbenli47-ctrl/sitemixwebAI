@@ -117,6 +117,7 @@ async function calistir() {
     hizmetBolgesi: "Ankara",
     slug: "vercel-test-elektrik",
     tema: "signal",
+    iskelet: "elektrikci-iskelet-11",
     icerikPaketi: "hizli",
     secilenHizmetler: ["Elektrik arıza tespiti"],
     stilAyarlari: {
@@ -136,7 +137,14 @@ async function calistir() {
         menuGoster: true,
         anaSayfa: true,
         sira: 0,
-        bolumler: [bolum("hero", "hero", 0, "Güvenli elektrik servisi")],
+        bolumler: [
+          {
+            ...bolum("hero", "hero", 0, "Güvenli elektrik servisi"),
+            gorselAlaniAcikMi: true,
+            gorsel:
+              "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+          },
+        ],
       },
       {
         id: "iletisim-sayfasi",
@@ -203,9 +211,13 @@ async function calistir() {
   if (
     !projeKaynagi.includes('"slug": "iletisim"') ||
     !projeKaynagi.includes('"slug": "iletisim-2"') ||
+    !projeKaynagi.includes('"iskelet": "elektrikci-iskelet-11"') ||
+    !projeKaynagi.includes('"gorselAlaniAcikMi": true') ||
+    !Object.keys(dosyalar).some((dosyaYolu) => dosyaYolu.startsWith("public/images/")) ||
+    projeKaynagi.includes("data:image/png;base64") ||
     sitemapKaynagi.includes("gecersiz-tarih")
   ) {
-    throw new Error("Slug veya sitemap normalizasyonu beklenen sonucu vermedi.");
+    throw new Error("Slug, iskelet, görsel veya sitemap normalizasyonu beklenen sonucu vermedi.");
   }
 
   const npmKomutu = process.env.npm_execpath;

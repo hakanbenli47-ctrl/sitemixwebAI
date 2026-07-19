@@ -46,6 +46,10 @@ import {
   sektorTasariminiGetir,
 } from "@/data/sektorTasarimlari";
 import {
+  sektorIskeletiniGetir,
+  type SektorIskeletSecenegi,
+} from "@/data/sektorIskeletleri";
+import {
   epostaGecerliMi,
   telefonBaglantisi,
   whatsappBaglantisi,
@@ -686,15 +690,189 @@ interface HeroBilgisi {
   deger: string;
 }
 
+interface OzgunSektorMimarisi {
+  kimlik: string;
+  kod: string;
+  baslik: string;
+  not: string;
+  etaplar: [string, string, string];
+}
+
+const ozgunSektorMimarileri: Record<string, OzgunSektorMimarisi> = {
+  kuafor: {
+    kimlik: "salon-editorial",
+    kod: "SALON / 01",
+    baslik: "Stil dosyası",
+    not: "Danışmanlık ve randevu akışı",
+    etaplar: ["Saç geçmişi", "Teknik reçete", "Evde bakım"],
+  },
+  nakliyat: {
+    kimlik: "lojistik-rota",
+    kod: "ROTA / 24",
+    baslik: "Taşıma manifestosu",
+    not: "Kayıtlı yük ve teslim planı",
+    etaplar: ["Ekspertiz", "Yükleme", "Teslim"],
+  },
+  tesisatci: {
+    kimlik: "tesisat-teshis",
+    kod: "HAT / BASINÇ",
+    baslik: "Servis teşhis kaydı",
+    not: "Kaynak tespiti ve sızdırmazlık",
+    etaplar: ["Belirti", "Müdahale", "Basınç testi"],
+  },
+  elektrikci: {
+    kimlik: "elektrik-teshis",
+    kod: "ENERJİ / TEST",
+    baslik: "Güvenli servis kaydı",
+    not: "İzolasyon, ölçüm ve koruma",
+    etaplar: ["İzolasyon", "Ölçüm", "Koruma testi"],
+  },
+  "oto-yikama": {
+    kimlik: "oto-bakim-hatti",
+    kod: "BAY / 01",
+    baslik: "Araç kabul hattı",
+    not: "Yüzeye göre uygulama reçetesi",
+    etaplar: ["Araç kabul", "Uygulama", "Teslim"],
+  },
+  "hali-yikama": {
+    kimlik: "hali-takip-hatti",
+    kod: "PARTİ / TAKİP",
+    baslik: "Kayıtlı yıkama hattı",
+    not: "Dokuma, leke ve kurutma kontrolü",
+    etaplar: ["Barkodlu kabul", "Yıkama", "Kurutma"],
+  },
+  temizlik: {
+    kimlik: "temizlik-operasyon",
+    kod: "ALAN / PLAN",
+    baslik: "Hijyen operasyonu",
+    not: "Görev ve kalite kontrol matrisi",
+    etaplar: ["Alan keşfi", "Ekip planı", "Son kontrol"],
+  },
+  "arac-kiralama": {
+    kimlik: "kiralama-rezervasyon",
+    kod: "FİLO / UYGUNLUK",
+    baslik: "Araç seçim masası",
+    not: "Tarih, sınıf ve teslim koşulları",
+    etaplar: ["Tarih", "Araç sınıfı", "Teslim"],
+  },
+  transfer: {
+    kimlik: "vip-rota",
+    kod: "VIP / ROUTE",
+    baslik: "Yolculuk konsiyerji",
+    not: "Uçuş takipli özel karşılama",
+    etaplar: ["Uçuş", "Karşılama", "Varış"],
+  },
+  mobilya: {
+    kimlik: "mobilya-atolye",
+    kod: "ATÖLYE / PROJE",
+    baslik: "Üretim dosyası",
+    not: "Mekâna özel ölçü ve malzeme",
+    etaplar: ["Ölçü", "Malzeme", "Montaj"],
+  },
+};
+
+const varsayilanSektorMimarisi: OzgunSektorMimarisi = {
+  kimlik: "servis-standart",
+  kod: "HİZMET / PLAN",
+  baslik: "Çalışma dosyası",
+  not: "Planlı hizmet ve kontrollü teslim",
+  etaplar: ["İhtiyaç", "Uygulama", "Teslim"],
+};
+
+function ozgunSektorMimarisiniGetir(sektor: string) {
+  return ozgunSektorMimarileri[sektor] ?? varsayilanSektorMimarisi;
+}
+
+function SektorMimariImzasi({ proje }: { proje: ProjeVerisi }) {
+  const mimari = ozgunSektorMimarisiniGetir(proje.sektor);
+  const konum = [proje.ilce, proje.sehir].filter(Boolean).join(" · ");
+
+  return (
+    <motion.aside
+      className={styles.mimariImza}
+      data-site-parcasi="sektor-mimarisi"
+      variants={listeElemaniGecisi}
+    >
+      <div className={styles.mimariImzaUst}>
+        <span>{mimari.kod}</span>
+        <strong>{mimari.baslik}</strong>
+      </div>
+
+      <ol className={styles.mimariEtaplar}>
+        {mimari.etaplar.map((etap, index) => (
+          <li key={etap}>
+            <span>{bolumNumarasi(index)}</span>
+            <strong>{etap}</strong>
+          </li>
+        ))}
+      </ol>
+
+      <div className={styles.mimariImzaAlt}>
+        <span>{konum || proje.sektorAdi}</span>
+        <small>{mimari.not}</small>
+      </div>
+    </motion.aside>
+  );
+}
+
+const gorselAlaniDestekleyenTurler = new Set([
+  "hero",
+  "metin",
+  "hizmetler",
+  "urunler",
+  "istatistik",
+  "neden-biz",
+  "yorumlar",
+  "ekip",
+]);
+
+function BolumGorselAlani({ bolum }: { bolum: SiteBolumu }) {
+  if (
+    !bolum.gorselAlaniAcikMi ||
+    !gorselAlaniDestekleyenTurler.has(bolum.tur)
+  ) {
+    return null;
+  }
+
+  const gorsel = bolum.gorsel.trim();
+
+  return (
+    <motion.figure
+      className={styles.istegeBagliGorsel}
+      data-site-parcasi="istege-bagli-gorsel"
+      data-gorsel-durumu={gorsel ? "dolu" : "bekliyor"}
+      variants={listeElemaniGecisi}
+    >
+      {gorsel ? (
+        <div
+          className={styles.istegeBagliGorselYuzeyi}
+          role="img"
+          aria-label={bolum.baslik || "İşletme görseli"}
+          style={{ backgroundImage: `url(${JSON.stringify(gorsel)})` }}
+        />
+      ) : (
+        <div className={styles.istegeBagliGorselBos}>
+          <span>GÖRSEL ALANI AÇIK</span>
+          <strong>Düzenle ekranından görsel bağlantısı ekleyin</strong>
+        </div>
+      )}
+    </motion.figure>
+  );
+}
+
 function HeroBolumu({
   bolum,
+  proje,
   tema,
   bilgiler,
+  mimariyiGoster,
   dahiliBaglantiAc,
 }: {
   bolum: SiteBolumu;
+  proje: ProjeVerisi;
   tema: string;
   bilgiler: HeroBilgisi[];
+  mimariyiGoster: boolean;
   dahiliBaglantiAc: DahiliBaglantiFonksiyonu;
 }) {
   const animasyon = bolumAnimasyonlari[bolum.animasyon] ?? bolumGecisi;
@@ -709,6 +887,7 @@ function HeroBolumu({
       animate="gorunur"
       variants={animasyon}
       data-site-alani="hero"
+      data-gorsel-acik={bolum.gorselAlaniAcikMi ? "true" : "false"}
     >
       <motion.div
         className={styles.heroMetni}
@@ -754,6 +933,10 @@ function HeroBolumu({
           </motion.ul>
         )}
       </motion.div>
+
+      <BolumGorselAlani bolum={bolum} />
+
+      {mimariyiGoster && <SektorMimariImzasi proje={proje} />}
     </motion.section>
   );
 }
@@ -1299,8 +1482,10 @@ function BolumRender({
     return (
       <HeroBolumu
         bolum={bolum}
+        proje={proje}
         tema={proje.tema}
         bilgiler={heroBilgileri}
+        mimariyiGoster={anaSayfaMi}
         dahiliBaglantiAc={dahiliBaglantiAc}
       />
     );
@@ -1326,6 +1511,7 @@ function BolumRender({
       } ${styles[`bolum_${bolum.tur}`] ?? ""} ${varyasyonSinifi(bolum.varyasyon)}`}
       data-bolum-turu={bolum.tur}
       data-bolum-sira={index}
+      data-gorsel-acik={bolum.gorselAlaniAcikMi ? "true" : "false"}
       initial={false}
       whileInView="gorunur"
       viewport={{
@@ -1340,6 +1526,8 @@ function BolumRender({
       </div>
 
       <div className={styles.bolumIcerikSahnesi} data-site-parcasi="bolum-icerigi">
+        <BolumGorselAlani bolum={bolum} />
+
         {bolum.tur === "iletisim" ? (
           <IletisimBolumu bolum={bolum} proje={proje} />
         ) : bolum.tur === "harita" ? (
@@ -1370,6 +1558,175 @@ function BolumRender({
       </div>
     </motion.section>
   );
+}
+
+function bolumleriIskeleteGoreSirala(
+  bolumler: SiteBolumu[],
+  iskelet: SektorIskeletSecenegi,
+) {
+  const oncelik = new Map(
+    iskelet.bolumOnceligi.map((tur, index) => [tur, index]),
+  );
+
+  return [...bolumler].sort((birinci, ikinci) => {
+    const birinciOncelik = oncelik.get(birinci.tur) ?? 100 + birinci.sira;
+    const ikinciOncelik = oncelik.get(ikinci.tur) ?? 100 + ikinci.sira;
+
+    return birinciOncelik - ikinciOncelik || birinci.sira - ikinci.sira;
+  });
+}
+
+function ikiliGrupla<T>(ogeler: T[]) {
+  const gruplar: T[][] = [];
+
+  for (let index = 0; index < ogeler.length; index += 2) {
+    gruplar.push(ogeler.slice(index, index + 2));
+  }
+
+  return gruplar;
+}
+
+function IskeletliSayfaAkisi({
+  bolumler,
+  iskelet,
+  sirayiKoru,
+  proje,
+  anaSayfaMi,
+  dahiliBaglantiAc,
+}: {
+  bolumler: SiteBolumu[];
+  iskelet: SektorIskeletSecenegi;
+  sirayiKoru?: boolean;
+  proje: ProjeVerisi;
+  anaSayfaMi: boolean;
+  dahiliBaglantiAc: DahiliBaglantiFonksiyonu;
+}) {
+  const siraliBolumler = sirayiKoru
+    ? [...bolumler].sort((a, b) => a.sira - b.sira)
+    : bolumleriIskeleteGoreSirala(bolumler, iskelet);
+  const renderla = (bolum: SiteBolumu) => (
+    <BolumRender
+      key={bolum.id}
+      bolum={bolum}
+      proje={proje}
+      index={siraliBolumler.indexOf(bolum)}
+      anaSayfaMi={anaSayfaMi}
+      dahiliBaglantiAc={dahiliBaglantiAc}
+    />
+  );
+  const hero = siraliBolumler.find((bolum) => bolum.tur === "hero");
+  const kalanlar = siraliBolumler.filter((bolum) => bolum !== hero);
+  const iletisimRaylari = kalanlar.filter((bolum) =>
+    ["form", "iletisim"].includes(bolum.tur),
+  );
+  const anaBolumler = kalanlar.filter(
+    (bolum) => !iletisimRaylari.includes(bolum),
+  );
+
+  if (iskelet.akis === "serit") {
+    return <>{siraliBolumler.map(renderla)}</>;
+  }
+
+  if (iskelet.akis === "yan-ray") {
+    return (
+      <>
+        {hero && renderla(hero)}
+        <div className={styles.iskeletYanRay} data-iskelet-grubu="yan-ray">
+          <div>{anaBolumler.map(renderla)}</div>
+          <aside>{iletisimRaylari.map(renderla)}</aside>
+        </div>
+      </>
+    );
+  }
+
+  if (iskelet.akis === "editorial") {
+    return (
+      <>
+        {hero && renderla(hero)}
+        <div className={styles.iskeletEditorial} data-iskelet-grubu="editorial">
+          {kalanlar.map((bolum, index) => (
+            <div data-editorial-yon={index % 2 ? "sag" : "sol"} key={bolum.id}>
+              {renderla(bolum)}
+            </div>
+          ))}
+        </div>
+      </>
+    );
+  }
+
+  if (["katalog", "mozaik", "atolye", "premium", "konsol"].includes(iskelet.akis)) {
+    return (
+      <>
+        {hero && renderla(hero)}
+        <div
+          className={styles.iskeletIzgara}
+          data-iskelet-grubu={iskelet.akis}
+        >
+          {kalanlar.map(renderla)}
+        </div>
+      </>
+    );
+  }
+
+  if (iskelet.akis === "rota") {
+    return (
+      <>
+        {hero && renderla(hero)}
+        <div className={styles.iskeletRota} data-iskelet-grubu="rota">
+          {kalanlar.map(renderla)}
+        </div>
+      </>
+    );
+  }
+
+  if (iskelet.akis === "yerel") {
+    const yerelBant = kalanlar.filter((bolum) =>
+      ["iletisim", "istatistik"].includes(bolum.tur),
+    );
+    const yerelIcerik = kalanlar.filter((bolum) => !yerelBant.includes(bolum));
+
+    return (
+      <>
+        {hero && renderla(hero)}
+        <div className={styles.iskeletYerelBant} data-iskelet-grubu="yerel-bant">
+          {yerelBant.map(renderla)}
+        </div>
+        <div className={styles.iskeletYerelIcerik}>{yerelIcerik.map(renderla)}</div>
+      </>
+    );
+  }
+
+  if (iskelet.akis === "rezervasyon") {
+    const form = kalanlar.find((bolum) => bolum.tur === "form");
+    const digerleri = kalanlar.filter((bolum) => bolum !== form);
+
+    return (
+      <>
+        <div className={styles.iskeletRezervasyonUst} data-iskelet-grubu="rezervasyon">
+          {hero && renderla(hero)}
+          {form && renderla(form)}
+        </div>
+        <div className={styles.iskeletRezervasyonIcerik}>{digerleri.map(renderla)}</div>
+      </>
+    );
+  }
+
+  if (iskelet.akis === "kurumsal") {
+    return (
+      <>
+        {hero && renderla(hero)}
+        <div className={styles.iskeletKurumsal} data-iskelet-grubu="kurumsal">
+          {ikiliGrupla(kalanlar).map((grup, index) => (
+            <div className={styles.iskeletKurumsalSatir} key={`kurumsal-${index}`}>
+              {grup.map(renderla)}
+            </div>
+          ))}
+        </div>
+      </>
+    );
+  }
+
+  return <>{siraliBolumler.map(renderla)}</>;
 }
 
 interface SiteGorunumuProps {
@@ -1677,6 +2034,8 @@ export default function SiteGorunumu({
     .map((karakter) => styles[`tema_${karakter}`] ?? "")
     .filter(Boolean)
     .join(" ");
+  const ozgunMimari = ozgunSektorMimarisiniGetir(proje.sektor);
+  const iskelet = sektorIskeletiniGetir(proje.sektor, proje.iskelet);
 
   const menuSayfalari = siraliSayfalar.filter((sayfa) => sayfa.menuGoster);
 
@@ -1707,6 +2066,11 @@ export default function SiteGorunumu({
       style={cssDegiskenleri}
       data-metin-temasi="true"
       data-sektor={proje.sektor}
+      data-ozgun-mimari={ozgunMimari.kimlik}
+      data-iskelet={iskelet.kimlik}
+      data-iskelet-nav={iskelet.navigasyon}
+      data-iskelet-hero={iskelet.hero}
+      data-iskelet-akis={iskelet.akis}
       data-profesyonel-sema={profesyonelProfil ? "true" : undefined}
       data-profesyonel-aile={profesyonelProfil?.aile}
       data-tasarim-aile={tasarim?.aile}
@@ -1910,16 +2274,14 @@ export default function SiteGorunumu({
           exit="cikis"
         >
           {aktifBolumler.length > 0 ? (
-            aktifBolumler.map((bolum, index) => (
-              <BolumRender
-                key={bolum.id}
-                bolum={bolum}
-                proje={proje}
-                index={index}
-                anaSayfaMi={aktifSayfa.anaSayfa}
-                dahiliBaglantiAc={dahiliBaglantiAc}
-              />
-            ))
+            <IskeletliSayfaAkisi
+              bolumler={aktifBolumler}
+              iskelet={iskelet}
+              sirayiKoru={aktifSayfa.ozelBolumSirasi}
+              proje={proje}
+              anaSayfaMi={aktifSayfa.anaSayfa}
+              dahiliBaglantiAc={dahiliBaglantiAc}
+            />
           ) : (
             <section className={styles.bosSayfa}>
               <span>BOŞ SAYFA</span>

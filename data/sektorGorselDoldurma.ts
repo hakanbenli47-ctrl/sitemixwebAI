@@ -1,10 +1,14 @@
 import type { ProjeVerisi } from "@/types/proje";
 
 /**
- * Yayın verisini tamamen metin tabanlı sunuma dönüştürür.
- * Galeri sayfaları ve bölümleri kaldırılır; eski kayıtlardaki görseller temizlenir.
+ * Projeyi görsel alanları kapalı başlayan sunuma hazırlar.
+ * Kullanıcının özellikle açtığı bölüm görselleri korunur; kapalı alanlar yer tutmaz.
  */
 export function gorselsizSunumuHazirla(proje: ProjeVerisi): ProjeVerisi {
+  const gorselAlaniAcikMi = proje.sayfalar.some((sayfa) =>
+    sayfa.bolumler.some((bolum) => bolum.gorselAlaniAcikMi),
+  );
+
   return {
     ...proje,
     sayfalar: proje.sayfalar
@@ -15,8 +19,11 @@ export function gorselsizSunumuHazirla(proje: ProjeVerisi): ProjeVerisi {
           .filter((bolum) => bolum.tur !== "galeri")
           .map((bolum) => ({
             ...bolum,
-            gorsel: "",
-            arkaPlanGorseli: "",
+            gorselAlaniAcikMi: bolum.gorselAlaniAcikMi ?? false,
+            gorsel: bolum.gorselAlaniAcikMi ? bolum.gorsel : "",
+            arkaPlanGorseli: bolum.gorselAlaniAcikMi
+              ? bolum.arkaPlanGorseli
+              : "",
             listeElemanlari: bolum.listeElemanlari.map((eleman) => ({
               ...eleman,
               gorsel: "",
@@ -24,7 +31,8 @@ export function gorselsizSunumuHazirla(proje: ProjeVerisi): ProjeVerisi {
           })),
       })),
     otomatikGorsellerOlusturulduMu: false,
-    gorselsizSunumHazirlandiMi: true,
+    gorselsizSunumHazirlandiMi: !gorselAlaniAcikMi,
+    gorselAlanlariHazirlandiMi: true,
     guncellenmeTarihi: new Date().toISOString(),
   };
 }

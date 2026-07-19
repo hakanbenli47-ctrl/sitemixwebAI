@@ -26,6 +26,7 @@ export interface ProjeVerisi {
   slug: string;
   tema: string;
   tasarim?: string;
+  iskelet?: string;
   icerikPaketi?: IcerikPaketiKimligi;
   secilenHizmetler?: string[];
   stilAyarlari?: SiteStilAyarlari;
@@ -41,6 +42,7 @@ export interface ProjeVerisi {
   otomatikIcerikOlusturulduMu?: boolean;
   otomatikGorsellerOlusturulduMu?: boolean;
   gorselsizSunumHazirlandiMi?: boolean;
+  gorselAlanlariHazirlandiMi?: boolean;
 
   githubAktarildiMi?: boolean;
   githubRepoAdi?: string;

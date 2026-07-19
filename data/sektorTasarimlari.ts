@@ -303,7 +303,7 @@ function profilOlustur(sektor: string, kimlik: SektorKimligi): SektorTasarimProf
       gorselLimiti: 4,
       ozellikler: [
         kimlik.odak,
-        "Yalnızca metin ve içerik hiyerarşisi",
+        "Görsel alanları kapalı başlayan içerik hiyerarşisi",
         "Sektörel tipografi ve dengeli hareket",
         ...secenek.ozellikler,
       ],

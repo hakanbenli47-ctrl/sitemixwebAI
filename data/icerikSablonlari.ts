@@ -1017,6 +1017,7 @@ export function projeyeOzelIcerigiUygula(proje: ProjeVerisi): ProjeVerisi {
 
           return {
             ...bolum,
+            gorselAlaniAcikMi: eskiBolum.gorselAlaniAcikMi ?? false,
             gorsel: eskiBolum.gorsel || bolum.gorsel,
             arkaPlanGorseli:
               eskiBolum.arkaPlanGorseli || bolum.arkaPlanGorseli,

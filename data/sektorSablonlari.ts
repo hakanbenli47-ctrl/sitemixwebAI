@@ -67,6 +67,7 @@ export interface SiteBolumu {
   aciklama: string;
   gorsel: string;
   arkaPlanGorseli: string;
+  gorselAlaniAcikMi?: boolean;
   animasyon: AnimasyonTuru;
   butonlar: ButonVerisi[];
   listeElemanlari: ListeElemani[];
@@ -81,6 +82,7 @@ export interface SiteSayfasi {
   menuGoster: boolean;
   anaSayfa: boolean;
   sira: number;
+  ozelBolumSirasi?: boolean;
   bolumler: SiteBolumu[];
 }
 
@@ -140,6 +142,7 @@ function bolum(
     aciklama: "",
     gorsel: "",
     arkaPlanGorseli: "",
+    gorselAlaniAcikMi: false,
     animasyon: "asagidan",
     butonlar: [],
     listeElemanlari: [],

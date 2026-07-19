@@ -22,6 +22,7 @@ import {
   sektorSayfalariOlustur,
 } from "@/data/sektorSablonlari";
 import { sektorVarsayilanTemasiniGetir } from "@/data/sektorSunumProfilleri";
+import { sektorVarsayilanIskeletiniGetir } from "@/data/sektorIskeletleri";
 import {
   hazirIcerikPaketiniUygula,
   icerikPaketleri,
@@ -255,6 +256,7 @@ export default function YeniProjeSayfasi() {
         hizmetBolgesi: form.hizmetBolgesi.trim(),
         slug: form.slug.trim(),
         tema: sektorVarsayilanTemasiniGetir(form.sektor),
+        iskelet: sektorVarsayilanIskeletiniGetir(form.sektor),
         icerikPaketi: form.icerikPaketi,
         secilenHizmetler: form.secilenHizmetler,
         stilAyarlari: sektorVarsayilanStiliniGetir(form.sektor),

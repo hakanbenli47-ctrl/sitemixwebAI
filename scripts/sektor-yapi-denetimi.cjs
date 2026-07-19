@@ -89,6 +89,9 @@ const icerikler = tsModulunuYukle(
 const studyoPaketleri = tsModulunuYukle(
   path.join(kok, "data/studyoPaketleri.ts"),
 );
+const iskeletler = tsModulunuYukle(
+  path.join(kok, "data/sektorIskeletleri.ts"),
+);
 
 const beklenenSektorler = [
   "kuafor",
@@ -186,6 +189,7 @@ for (const sektor of sektorler.sektorler) {
   const stokGorseller = gorseller.sektorStokGorselleriniGetir(sektor.id);
   const tasarimProfili = tasarimlar.sektorTasarimProfiliniGetir(sektor.id);
   const tasarimSecenekleri = tasarimProfili.secenekler;
+  const iskeletSecenekleri = iskeletler.sektorIskeletSecenekleriniGetir(sektor.id);
   const kararNoktalari = gorselDilleri.sektorKararNoktalariniGetir(sektor.id);
   const operasyonProfili = gorselDilleri.sektorOperasyonProfiliniGetir(sektor.id);
 
@@ -307,6 +311,38 @@ for (const sektor of sektorler.sektorler) {
 
   if (tasarimSecenekleri.length !== 3) {
     sorunlar.push(`${sektor.id}: tam üç tasarım seçeneği bulunmalı`);
+  }
+
+  if (
+    iskeletSecenekleri.length !== iskeletler.SEKTOR_BASINA_ISKELET_SAYISI ||
+    iskeletSecenekleri.length < 10
+  ) {
+    sorunlar.push(`${sektor.id}: sektör başına onlarca iskelet seçeneği bulunmuyor`);
+  }
+
+  if (
+    new Set(iskeletSecenekleri.map((secenek) => secenek.id)).size !==
+      iskeletSecenekleri.length ||
+    new Set(iskeletSecenekleri.map((secenek) => secenek.ad)).size !==
+      iskeletSecenekleri.length ||
+    new Set(
+      iskeletSecenekleri.map(
+        (secenek) => `${secenek.navigasyon}/${secenek.hero}/${secenek.akis}`,
+      ),
+    ).size !== iskeletSecenekleri.length
+  ) {
+    sorunlar.push(`${sektor.id}: iskelet kimliği, senaryosu veya yapısal duruşu tekrarlı`);
+  }
+
+  for (const iskelet of iskeletSecenekleri) {
+    if (
+      !iskelet.bolumOnceligi.includes("hero") ||
+      !iskelet.bolumOnceligi.includes("hizmetler") ||
+      !iskelet.bolumOnceligi.includes("iletisim") ||
+      iskelet.ozellikler.length !== 3
+    ) {
+      sorunlar.push(`${sektor.id}/${iskelet.id}: iskelet senaryosu eksik`);
+    }
   }
 
   if (tasarimSecenekleri[0]?.tema !== sunum.varsayilanTema) {
@@ -788,6 +824,34 @@ for (const sektor of sektorler.sektorler) {
     if (!gorselliSonuc.gorselsizSunumHazirlandiMi) {
       sorunlar.push(`${sektor.id}/${siteTipi}: görselsiz sunum işareti eksik`);
     }
+
+    if (!gorselliSonuc.gorselAlanlariHazirlandiMi) {
+      sorunlar.push(`${sektor.id}/${siteTipi}: isteğe bağlı görsel alanı hazırlık işareti eksik`);
+    }
+
+    if (sektor.id === "kuafor" && siteTipi === "cok-sayfa") {
+      const gorselAlanTesti = JSON.parse(JSON.stringify(sonuc));
+      const gorselBolumu = gorselAlanTesti.sayfalar
+        .find((sayfa) => sayfa.anaSayfa)
+        ?.bolumler.find((bolum) => bolum.tur === "hero");
+
+      if (gorselBolumu) {
+        gorselBolumu.gorselAlaniAcikMi = true;
+        gorselBolumu.gorsel = "https://example.com/salon.jpg";
+        const gorselAlanliSonuc = gorselDoldurma.gorselsizSunumuHazirla(gorselAlanTesti);
+        const korunanHero = gorselAlanliSonuc.sayfalar
+          .find((sayfa) => sayfa.anaSayfa)
+          ?.bolumler.find((bolum) => bolum.tur === "hero");
+
+        if (
+          korunanHero?.gorsel !== "https://example.com/salon.jpg" ||
+          !korunanHero.gorselAlaniAcikMi ||
+          gorselAlanliSonuc.gorselsizSunumHazirlandiMi
+        ) {
+          sorunlar.push("açılan görsel alanı yayın hazırlığında korunmadı");
+        }
+      }
+    }
   }
 }
 
@@ -867,6 +931,48 @@ const temaSayfasiKaynagi = fs.readFileSync(
   path.join(kok, "app/studio/tema/page.tsx"),
   "utf8",
 );
+
+const ozgunMimariKimlikleri = [
+  "salon-editorial",
+  "lojistik-rota",
+  "tesisat-teshis",
+  "elektrik-teshis",
+  "oto-bakim-hatti",
+  "hali-takip-hatti",
+  "temizlik-operasyon",
+  "kiralama-rezervasyon",
+  "vip-rota",
+  "mobilya-atolye",
+];
+
+if (
+  !siteBileseni.includes("SektorMimariImzasi") ||
+  !siteBileseni.includes("data-ozgun-mimari") ||
+  !siteBileseni.includes('data-site-parcasi="sektor-mimarisi"') ||
+  !siteCss.includes(".mimariImza")
+) {
+  sorunlar.push("sektore ozel sayfa mimarisi render katmanina baglanmadi");
+}
+
+if (
+  !siteBileseni.includes("IskeletliSayfaAkisi") ||
+  !siteBileseni.includes("data-iskelet-nav") ||
+  !siteBileseni.includes("data-iskelet-hero") ||
+  !siteBileseni.includes("data-iskelet-akis") ||
+  !siteBileseni.includes("BolumGorselAlani") ||
+  !siteBileseni.includes('data-site-parcasi="istege-bagli-gorsel"')
+) {
+  sorunlar.push("iskelet renderer'ı veya isteğe bağlı görsel alanı eksik");
+}
+
+for (const mimariKimligi of ozgunMimariKimlikleri) {
+  if (
+    !siteBileseni.includes(`kimlik: "${mimariKimligi}"`) ||
+    !siteCss.includes(`data-ozgun-mimari="${mimariKimligi}"`)
+  ) {
+    sorunlar.push(`${mimariKimligi}: ozgun sektor mimarisi eksik`);
+  }
+}
 
 if (
   !temaSayfasiKaynagi.includes('from "@/data/temaPaletleri"') ||

@@ -3780,7 +3780,1432 @@
   }
 }
 
+/*
+ * Sektörel mimari katmanı
+ * Renk paletinden bağımsız olarak her odak sektörüne farklı bir sayfa
+ * geometrisi, bilgi paneli ve içerik ritmi verir.
+ */
+
+.site[data-ozgun-mimari] .heroBolumu:not(.gorselliHero) {
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.42fr);
+  align-items: stretch;
+}
+
+.mimariImza {
+  position: relative;
+  z-index: 4;
+  width: 100%;
+  max-width: 430px;
+  min-width: 0;
+  min-height: 520px;
+  align-self: stretch;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 34px;
+  padding: clamp(26px, 3vw, 44px);
+  overflow: hidden;
+  border: 1px solid var(--site-cizgi);
+  background: color-mix(in srgb, var(--site-ikinci-arka-plan) 82%, transparent);
+  color: var(--site-yazi);
+}
+
+.mimariImza::after {
+  position: absolute;
+  right: -50px;
+  bottom: -60px;
+  width: 180px;
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--site-vurgu) 38%, transparent);
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+}
+
+.mimariImzaUst,
+.mimariImzaAlt {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 8px;
+}
+
+.mimariImzaUst span,
+.mimariImzaAlt span {
+  color: var(--site-vurgu);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.mimariImzaUst strong {
+  max-width: 260px;
+  font-size: clamp(25px, 2.6vw, 40px);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.mimariEtaplar {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: center;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--site-cizgi);
+  list-style: none;
+}
+
+.mimariEtaplar li {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--site-cizgi);
+}
+
+.mimariEtaplar li > span {
+  color: var(--site-vurgu);
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.mimariEtaplar li > strong {
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.mimariImzaAlt {
+  padding-top: 18px;
+  border-top: 1px solid var(--site-cizgi);
+}
+
+.mimariImzaAlt small {
+  max-width: 280px;
+  color: var(--site-soluk-yazi);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+/* Kuaför: editoryal salon dosyası ve dikey randevu kartı. */
+
+.site[data-ozgun-mimari="salon-editorial"] .siteHeader {
+  grid-template-columns: minmax(240px, 0.7fr) minmax(0, 1fr) auto;
+  border-bottom: 0;
+}
+
+.site[data-ozgun-mimari="salon-editorial"] .firmaLogo span,
+.site[data-ozgun-mimari="salon-editorial"] .mimariImzaUst strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 500;
+}
+
+.site[data-ozgun-mimari="salon-editorial"] .heroBolumu:not(.gorselliHero) {
+  grid-template-columns: minmax(0, 1.3fr) minmax(270px, 0.4fr);
+  margin: 0 clamp(12px, 2vw, 32px) clamp(12px, 2vw, 32px);
+  border: 1px solid var(--site-cizgi);
+  border-radius: 0 0 48px 48px;
+}
+
+.site[data-ozgun-mimari="salon-editorial"] .mimariImza {
+  border-radius: 220px 220px 26px 26px;
+  background: color-mix(in srgb, var(--site-vurgu) 10%, var(--site-arka-plan));
+}
+
+.site[data-ozgun-mimari="salon-editorial"] .standartBolum[data-bolum-turu="hizmetler"] .liste {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(18px, 3vw, 46px);
+}
+
+.site[data-ozgun-mimari="salon-editorial"] .standartBolum[data-bolum-turu="hizmetler"] .listeSatiri {
+  min-height: 360px;
+  border: 0;
+  border-top: 1px solid var(--site-vurgu);
+  background: transparent;
+}
+
+.site[data-ozgun-mimari="salon-editorial"] .standartBolum[data-bolum-turu="hizmetler"] .listeSatiri:nth-child(even) {
+  transform: translateY(54px);
+}
+
+.site[data-ozgun-mimari="salon-editorial"] .standartBolum[data-bolum-turu="neden-biz"] {
+  margin: 0 4vw;
+  border-radius: 42px;
+}
+
+/* Nakliyat: koyu operasyon başlığı, rota şeridi ve manifesto satırları. */
+
+.site[data-ozgun-mimari="lojistik-rota"] .siteHeader {
+  --site-alan-yazi: var(--site-ters-yazi);
+  background: var(--site-ters-zemin);
+  border-bottom-color: color-mix(in srgb, var(--site-ters-yazi) 18%, transparent);
+}
+
+.site[data-ozgun-mimari="lojistik-rota"] .siteHeader :is(.firmaLogo, .masaustuMenu a) {
+  color: var(--site-ters-yazi);
+}
+
+.site[data-ozgun-mimari="lojistik-rota"] .heroBolumu:not(.gorselliHero) {
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+}
+
+.site[data-ozgun-mimari="lojistik-rota"] .heroMetni h1 {
+  max-width: 1250px;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.site[data-ozgun-mimari="lojistik-rota"] .mimariImza {
+  max-width: none;
+  min-height: 0;
+  grid-template-columns: minmax(180px, 0.45fr) minmax(0, 1.2fr) minmax(180px, 0.45fr);
+  grid-template-rows: auto;
+  align-items: center;
+  gap: 28px;
+  border: 0;
+  border-left: 8px solid var(--site-vurgu);
+  background: var(--site-yazi);
+  color: var(--site-arka-plan);
+}
+
+.site[data-ozgun-mimari="lojistik-rota"] .mimariEtaplar {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 0;
+}
+
+.site[data-ozgun-mimari="lojistik-rota"] .mimariEtaplar li {
+  min-height: 72px;
+  padding: 12px 18px;
+  border: 0;
+  border-left: 1px solid color-mix(in srgb, var(--site-arka-plan) 18%, transparent);
+}
+
+.site[data-ozgun-mimari="lojistik-rota"] .mimariImzaAlt {
+  border-color: color-mix(in srgb, var(--site-arka-plan) 20%, transparent);
+}
+
+.site[data-ozgun-mimari="lojistik-rota"] .mimariImza :is(.mimariImzaUst strong, .mimariEtaplar strong),
+.site[data-ozgun-mimari="lojistik-rota"] .mimariImzaAlt small {
+  color: var(--site-arka-plan);
+}
+
+.site[data-ozgun-mimari="lojistik-rota"] .standartBolum[data-bolum-turu="hizmetler"] .liste {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  border-top: 3px solid var(--site-yazi);
+}
+
+.site[data-ozgun-mimari="lojistik-rota"] .standartBolum[data-bolum-turu="hizmetler"] .listeSatiri {
+  min-height: 150px;
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) 40px;
+  border-width: 0 0 1px;
+  background: transparent;
+}
+
+/* Tesisat: boru hattı benzeri yuvarlak teşhis akışı. */
+
+.site[data-ozgun-mimari="tesisat-teshis"] .heroBolumu:not(.gorselliHero) {
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.52fr);
+}
+
+.site[data-ozgun-mimari="tesisat-teshis"] .mimariImza {
+  border: 0;
+  border-radius: 170px 28px 28px 170px;
+  box-shadow: inset 0 0 0 1px var(--site-cizgi);
+  background:
+    radial-gradient(circle at 12% 50%, color-mix(in srgb, var(--site-vurgu) 24%, transparent), transparent 31%),
+    var(--site-ikinci-arka-plan);
+}
+
+.site[data-ozgun-mimari="tesisat-teshis"] .mimariEtaplar li {
+  border-bottom-style: dashed;
+}
+
+.site[data-ozgun-mimari="tesisat-teshis"] .standartBolum[data-bolum-turu="neden-biz"] .listeSatiri {
+  border-radius: 999px 24px 24px 999px;
+}
+
+.site[data-ozgun-mimari="tesisat-teshis"] .standartBolum[data-bolum-turu="hizmetler"] .liste {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Elektrik: koyu teşhis konsolu ve ölçüm kartları. */
+
+.site[data-ozgun-mimari="elektrik-teshis"] .mimariImza {
+  border: 0;
+  border-top: 8px solid var(--site-vurgu);
+  background: var(--site-yazi);
+  color: var(--site-arka-plan);
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+
+.site[data-ozgun-mimari="elektrik-teshis"] .mimariImza :is(.mimariImzaUst strong, .mimariEtaplar strong),
+.site[data-ozgun-mimari="elektrik-teshis"] .mimariImzaAlt small {
+  color: var(--site-arka-plan);
+}
+
+.site[data-ozgun-mimari="elektrik-teshis"] .mimariEtaplar,
+.site[data-ozgun-mimari="elektrik-teshis"] .mimariEtaplar li,
+.site[data-ozgun-mimari="elektrik-teshis"] .mimariImzaAlt {
+  border-color: color-mix(in srgb, var(--site-arka-plan) 20%, transparent);
+}
+
+.site[data-ozgun-mimari="elektrik-teshis"] .mimariEtaplar li::after {
+  width: 8px;
+  aspect-ratio: 1;
+  justify-self: end;
+  border-radius: 50%;
+  background: var(--site-vurgu);
+  box-shadow: 0 0 14px var(--site-vurgu);
+  content: "";
+}
+
+.site[data-ozgun-mimari="elektrik-teshis"] .standartBolum[data-bolum-turu="hizmetler"] .liste {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+  background: var(--site-vurgu);
+}
+
+.site[data-ozgun-mimari="elektrik-teshis"] .standartBolum[data-bolum-turu="hizmetler"] .listeSatiri {
+  border: 0;
+  border-radius: 0;
+}
+
+/* Oto yıkama: araç kabul kabini ve geniş uygulama kutuları. */
+
+.site[data-ozgun-mimari="oto-bakim-hatti"] .siteHeader {
+  border-bottom: 4px solid var(--site-vurgu);
+}
+
+.site[data-ozgun-mimari="oto-bakim-hatti"] .heroBolumu:not(.gorselliHero) {
+  grid-template-columns: minmax(310px, 0.46fr) minmax(0, 1.2fr);
+}
+
+.site[data-ozgun-mimari="oto-bakim-hatti"] .heroMetni {
+  grid-column: 2;
+}
+
+.site[data-ozgun-mimari="oto-bakim-hatti"] .mimariImza {
+  grid-column: 1;
+  grid-row: 1;
+  border: 0;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 2px var(--site-vurgu);
+  background:
+    repeating-linear-gradient(135deg, transparent 0 22px, color-mix(in srgb, var(--site-vurgu) 11%, transparent) 22px 24px),
+    var(--site-ikinci-arka-plan);
+}
+
+.site[data-ozgun-mimari="oto-bakim-hatti"] .standartBolum[data-bolum-turu="hizmetler"] .liste {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 3px;
+  background: var(--site-yazi);
+}
+
+.site[data-ozgun-mimari="oto-bakim-hatti"] .standartBolum[data-bolum-turu="hizmetler"] .listeSatiri {
+  min-height: 430px;
+  border: 0;
+  border-top: 7px solid var(--site-vurgu);
+  border-radius: 0;
+}
+
+/* Halı yıkama: barkodlu kabul ve yıkama hattı. */
+
+.site[data-ozgun-mimari="hali-takip-hatti"] .mimariImza {
+  padding-top: 78px;
+  border-radius: 0 54px 0 54px;
+}
+
+.site[data-ozgun-mimari="hali-takip-hatti"] .mimariImza::before {
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  left: 28px;
+  height: 28px;
+  content: "";
+  background: repeating-linear-gradient(90deg, var(--site-yazi) 0 2px, transparent 2px 7px, var(--site-yazi) 7px 11px, transparent 11px 15px);
+  opacity: 0.65;
+}
+
+.site[data-ozgun-mimari="hali-takip-hatti"] .standartBolum[data-bolum-turu="hizmetler"] .liste {
+  grid-template-columns: minmax(0, 1fr);
+  border-top: 1px solid var(--site-vurgu);
+}
+
+.site[data-ozgun-mimari="hali-takip-hatti"] .standartBolum[data-bolum-turu="hizmetler"] .listeSatiri {
+  min-height: 140px;
+  border: 0;
+  border-bottom: 1px dashed var(--site-cizgi);
+  border-left: 6px solid var(--site-vurgu);
+  border-radius: 0 24px 24px 0;
+}
+
+/* Temizlik şirketi: yumuşak operasyon panosu ve görev matrisi. */
+
+.site[data-ozgun-mimari="temizlik-operasyon"] .heroBolumu:not(.gorselliHero) {
+  grid-template-columns: minmax(0, 1.05fr) minmax(330px, 0.62fr);
+}
+
+.site[data-ozgun-mimari="temizlik-operasyon"] .mimariImza {
+  border: 0;
+  border-radius: 38px;
+  box-shadow: 0 34px 90px color-mix(in srgb, var(--site-vurgu) 14%, transparent);
+  background: color-mix(in srgb, var(--site-ikinci-arka-plan) 80%, white);
+}
+
+.site[data-ozgun-mimari="temizlik-operasyon"] .mimariEtaplar li > span {
+  width: 28px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--site-vurgu);
+  color: var(--site-buton-yazi);
+}
+
+.site[data-ozgun-mimari="temizlik-operasyon"] .standartBolum[data-bolum-turu="hizmetler"] .liste {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.site[data-ozgun-mimari="temizlik-operasyon"] .standartBolum[data-bolum-turu="hizmetler"] .listeSatiri {
+  border: 0;
+  border-radius: 30px;
+  box-shadow: inset 0 0 0 1px var(--site-cizgi);
+}
+
+/* Araç kiralama: yatay müsaitlik masası ve filo kartları. */
+
+.site[data-ozgun-mimari="kiralama-rezervasyon"] .heroBolumu:not(.gorselliHero) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.site[data-ozgun-mimari="kiralama-rezervasyon"] .mimariImza {
+  max-width: none;
+  min-height: 0;
+  grid-template-columns: minmax(190px, 0.5fr) minmax(0, 1.35fr) minmax(190px, 0.5fr);
+  grid-template-rows: auto;
+  align-items: center;
+  gap: 26px;
+  border: 0;
+  border-radius: 20px;
+  box-shadow: inset 0 0 0 1px var(--site-cizgi), 0 30px 70px color-mix(in srgb, var(--site-yazi) 10%, transparent);
+  background: var(--site-arka-plan);
+}
+
+.site[data-ozgun-mimari="kiralama-rezervasyon"] .mimariEtaplar {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 0;
+}
+
+.site[data-ozgun-mimari="kiralama-rezervasyon"] .mimariEtaplar li {
+  min-height: 76px;
+  padding: 12px 18px;
+  border: 0;
+  border-left: 1px solid var(--site-cizgi);
+}
+
+.site[data-ozgun-mimari="kiralama-rezervasyon"] .standartBolum[data-bolum-turu="urunler"] .liste,
+.site[data-ozgun-mimari="kiralama-rezervasyon"] .standartBolum[data-bolum-turu="hizmetler"] .liste {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.site[data-ozgun-mimari="kiralama-rezervasyon"] .standartBolum[data-bolum-turu="urunler"] .listeSatiri,
+.site[data-ozgun-mimari="kiralama-rezervasyon"] .standartBolum[data-bolum-turu="hizmetler"] .listeSatiri {
+  min-height: 330px;
+  border-bottom: 7px solid var(--site-vurgu);
+}
+
+/* VIP transfer: koyu konsiyerj sahnesi ve rota çizgisi. */
+
+.site[data-ozgun-mimari="vip-rota"] .heroBolumu:not(.gorselliHero) {
+  --site-alan-yazi: var(--site-ters-yazi);
+  --site-alan-soluk: color-mix(in srgb, var(--site-ters-yazi) 70%, transparent);
+  --site-alan-cizgi: color-mix(in srgb, var(--site-ters-yazi) 20%, transparent);
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.45fr);
+  margin: clamp(12px, 2vw, 28px);
+  border: 1px solid color-mix(in srgb, var(--site-ters-yazi) 18%, transparent);
+  background: var(--site-ters-zemin);
+  color: var(--site-ters-yazi);
+}
+
+.site[data-ozgun-mimari="vip-rota"] .heroMetni h1 {
+  background: none;
+  color: var(--site-ters-yazi);
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+}
+
+.site[data-ozgun-mimari="vip-rota"] .heroMetni p {
+  color: var(--site-alan-soluk);
+}
+
+.site[data-ozgun-mimari="vip-rota"] .heroMetni .butonlar a:nth-child(even) {
+  color: var(--site-ters-yazi);
+}
+
+.site[data-ozgun-mimari="vip-rota"] .mimariImza {
+  border-color: color-mix(in srgb, var(--site-ters-yazi) 20%, transparent);
+  background: color-mix(in srgb, var(--site-ters-yazi) 6%, transparent);
+  color: var(--site-ters-yazi);
+}
+
+.site[data-ozgun-mimari="vip-rota"] .mimariImza :is(.mimariImzaUst strong, .mimariEtaplar strong),
+.site[data-ozgun-mimari="vip-rota"] .mimariImzaAlt small {
+  color: var(--site-ters-yazi);
+}
+
+.site[data-ozgun-mimari="vip-rota"] .mimariEtaplar,
+.site[data-ozgun-mimari="vip-rota"] .mimariEtaplar li,
+.site[data-ozgun-mimari="vip-rota"] .mimariImzaAlt {
+  border-color: color-mix(in srgb, var(--site-ters-yazi) 18%, transparent);
+}
+
+.site[data-ozgun-mimari="vip-rota"] .mimariEtaplar li > span {
+  position: relative;
+}
+
+.site[data-ozgun-mimari="vip-rota"] .mimariEtaplar li > span::after {
+  position: absolute;
+  top: 50%;
+  left: 22px;
+  width: 28px;
+  height: 1px;
+  content: "";
+  background: var(--site-vurgu);
+}
+
+/* Mobilya: malzeme panosu ve asimetrik atölye portföyü. */
+
+.site[data-ozgun-mimari="mobilya-atolye"] .siteHeader {
+  min-height: 80px;
+}
+
+.site[data-ozgun-mimari="mobilya-atolye"] .heroBolumu:not(.gorselliHero) {
+  grid-template-columns: minmax(0, 0.8fr) minmax(360px, 0.62fr);
+  align-items: end;
+}
+
+.site[data-ozgun-mimari="mobilya-atolye"] .heroMetni h1,
+.site[data-ozgun-mimari="mobilya-atolye"] .mimariImzaUst strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+}
+
+.site[data-ozgun-mimari="mobilya-atolye"] .mimariImza {
+  min-height: 610px;
+  border: 0;
+  border-left: 12px solid var(--site-vurgu);
+  background:
+    linear-gradient(135deg, transparent 0 68%, color-mix(in srgb, var(--site-vurgu) 12%, transparent) 68%),
+    var(--site-ikinci-arka-plan);
+}
+
+.site[data-ozgun-mimari="mobilya-atolye"] .standartBolum[data-bolum-turu="hizmetler"] .liste,
+.site[data-ozgun-mimari="mobilya-atolye"] .standartBolum[data-bolum-turu="urunler"] .liste {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.site[data-ozgun-mimari="mobilya-atolye"] .standartBolum[data-bolum-turu="hizmetler"] .listeSatiri,
+.site[data-ozgun-mimari="mobilya-atolye"] .standartBolum[data-bolum-turu="urunler"] .listeSatiri {
+  grid-column: span 6;
+  min-height: 380px;
+  border: 0;
+  border-left: 1px solid var(--site-vurgu);
+  background: transparent;
+}
+
+.site[data-ozgun-mimari="mobilya-atolye"] .standartBolum[data-bolum-turu="hizmetler"] .listeSatiri:nth-child(3n + 1),
+.site[data-ozgun-mimari="mobilya-atolye"] .standartBolum[data-bolum-turu="urunler"] .listeSatiri:nth-child(3n + 1) {
+  grid-column: span 7;
+}
+
+.site[data-ozgun-mimari="mobilya-atolye"] .standartBolum[data-bolum-turu="hizmetler"] .listeSatiri:nth-child(3n + 2),
+.site[data-ozgun-mimari="mobilya-atolye"] .standartBolum[data-bolum-turu="urunler"] .listeSatiri:nth-child(3n + 2) {
+  grid-column: span 5;
+}
+
+@media (max-width: 1000px) {
+  .site[data-ozgun-mimari="oto-bakim-hatti"] .standartBolum[data-bolum-turu="hizmetler"] .liste {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site[data-ozgun-mimari="lojistik-rota"] .mimariImza,
+  .site[data-ozgun-mimari="kiralama-rezervasyon"] .mimariImza {
+    grid-template-columns: minmax(160px, 0.45fr) minmax(0, 1fr);
+  }
+
+  .site[data-ozgun-mimari="lojistik-rota"] .mimariImzaAlt,
+  .site[data-ozgun-mimari="kiralama-rezervasyon"] .mimariImzaAlt {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .site[data-ozgun-mimari] .heroBolumu:not(.gorselliHero),
+  .site[data-ozgun-mimari="salon-editorial"] .heroBolumu:not(.gorselliHero),
+  .site[data-ozgun-mimari="tesisat-teshis"] .heroBolumu:not(.gorselliHero),
+  .site[data-ozgun-mimari="temizlik-operasyon"] .heroBolumu:not(.gorselliHero),
+  .site[data-ozgun-mimari="vip-rota"] .heroBolumu:not(.gorselliHero),
+  .site[data-ozgun-mimari="mobilya-atolye"] .heroBolumu:not(.gorselliHero),
+  .site[data-ozgun-mimari="oto-bakim-hatti"] .heroBolumu:not(.gorselliHero) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 34px;
+  }
+
+  .site[data-ozgun-mimari="salon-editorial"] .heroBolumu:not(.gorselliHero),
+  .site[data-ozgun-mimari="vip-rota"] .heroBolumu:not(.gorselliHero) {
+    margin: 0;
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
+  }
+
+  .site[data-ozgun-mimari="oto-bakim-hatti"] .heroMetni,
+  .site[data-ozgun-mimari="oto-bakim-hatti"] .mimariImza {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .mimariImza,
+  .site[data-ozgun-mimari="mobilya-atolye"] .mimariImza {
+    max-width: none;
+    min-height: 0;
+    padding: 24px;
+    border-radius: 22px;
+  }
+
+  .site[data-ozgun-mimari="salon-editorial"] .mimariImza {
+    border-radius: 120px 120px 22px 22px;
+  }
+
+  .site[data-ozgun-mimari="tesisat-teshis"] .mimariImza {
+    border-radius: 90px 22px 22px 90px;
+  }
+
+  .mimariEtaplar {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-content: stretch;
+  }
+
+  .mimariEtaplar li,
+  .site[data-ozgun-mimari="lojistik-rota"] .mimariEtaplar li,
+  .site[data-ozgun-mimari="kiralama-rezervasyon"] .mimariEtaplar li {
+    min-height: 84px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 14px 10px;
+    border-right: 1px solid var(--site-cizgi);
+    border-bottom: 0;
+    border-left: 0;
+  }
+
+  .mimariEtaplar li > strong {
+    font-size: 9px;
+  }
+
+  .site[data-ozgun-mimari="lojistik-rota"] .mimariImza,
+  .site[data-ozgun-mimari="kiralama-rezervasyon"] .mimariImza {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .site[data-ozgun-mimari="lojistik-rota"] .mimariEtaplar,
+  .site[data-ozgun-mimari="kiralama-rezervasyon"] .mimariEtaplar {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .site[data-ozgun-mimari="salon-editorial"] .standartBolum[data-bolum-turu="hizmetler"] .liste,
+  .site[data-ozgun-mimari="tesisat-teshis"] .standartBolum[data-bolum-turu="hizmetler"] .liste,
+  .site[data-ozgun-mimari="elektrik-teshis"] .standartBolum[data-bolum-turu="hizmetler"] .liste,
+  .site[data-ozgun-mimari="oto-bakim-hatti"] .standartBolum[data-bolum-turu="hizmetler"] .liste,
+  .site[data-ozgun-mimari="temizlik-operasyon"] .standartBolum[data-bolum-turu="hizmetler"] .liste,
+  .site[data-ozgun-mimari="kiralama-rezervasyon"] .standartBolum[data-bolum-turu="urunler"] .liste,
+  .site[data-ozgun-mimari="kiralama-rezervasyon"] .standartBolum[data-bolum-turu="hizmetler"] .liste,
+  .site[data-ozgun-mimari="mobilya-atolye"] .standartBolum[data-bolum-turu="hizmetler"] .liste,
+  .site[data-ozgun-mimari="mobilya-atolye"] .standartBolum[data-bolum-turu="urunler"] .liste {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  .site[data-ozgun-mimari="salon-editorial"] .standartBolum[data-bolum-turu="hizmetler"] .listeSatiri:nth-child(even) {
+    transform: none;
+  }
+
+  .site[data-ozgun-mimari="mobilya-atolye"] .standartBolum[data-bolum-turu="hizmetler"] .listeSatiri,
+  .site[data-ozgun-mimari="mobilya-atolye"] .standartBolum[data-bolum-turu="urunler"] .listeSatiri,
+  .site[data-ozgun-mimari="mobilya-atolye"] .standartBolum[data-bolum-turu="hizmetler"] .listeSatiri:nth-child(3n + 1),
+  .site[data-ozgun-mimari="mobilya-atolye"] .standartBolum[data-bolum-turu="hizmetler"] .listeSatiri:nth-child(3n + 2),
+  .site[data-ozgun-mimari="mobilya-atolye"] .standartBolum[data-bolum-turu="urunler"] .listeSatiri:nth-child(3n + 1),
+  .site[data-ozgun-mimari="mobilya-atolye"] .standartBolum[data-bolum-turu="urunler"] .listeSatiri:nth-child(3n + 2) {
+    grid-column: auto;
+    min-height: 300px;
+  }
+
+  .site[data-ozgun-mimari="oto-bakim-hatti"] .standartBolum[data-bolum-turu="hizmetler"] .listeSatiri {
+    min-height: 320px;
+  }
+
+  .site[data-ozgun-mimari="salon-editorial"] .standartBolum[data-bolum-turu="neden-biz"] {
+    margin: 0;
+    border-radius: 0;
+  }
+}
+
 /* Sitemix Composer: kullanıcı tarafından seçilen serbest tasarım kontrolleri. */
+/* Gerçek iskelet sistemi: renklerden bağımsız navigasyon, hero ve bölüm omurgaları. */
+.istegeBagliGorsel {
+  position: relative;
+  min-width: 0;
+  min-height: clamp(240px, 31vw, 520px);
+  margin: 0 0 clamp(28px, 4vw, 64px);
+  overflow: hidden;
+  border: 1px solid var(--site-cizgi);
+  background: var(--site-ikinci-arka-plan);
+}
+
+.istegeBagliGorselYuzeyi {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.istegeBagliGorselBos {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: end;
+  gap: 8px;
+  padding: clamp(24px, 4vw, 52px);
+  color: var(--site-yazi);
+}
+
+.istegeBagliGorselBos::before {
+  position: absolute;
+  inset: 22px;
+  border: 1px dashed var(--site-cizgi);
+  content: "";
+}
+
+.istegeBagliGorselBos span,
+.istegeBagliGorselBos strong {
+  position: relative;
+  z-index: 1;
+}
+
+.istegeBagliGorselBos span {
+  color: var(--site-vurgu);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.18em;
+}
+
+.istegeBagliGorselBos strong {
+  max-width: 430px;
+  font-size: clamp(18px, 2.2vw, 30px);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.heroBolumu[data-gorsel-acik="true"] .istegeBagliGorsel {
+  min-height: clamp(360px, 52vw, 720px);
+  margin: 0;
+}
+
+.standartBolum[data-gorsel-acik="true"] .istegeBagliGorsel {
+  width: min(100%, 1080px);
+}
+
+/* 01 · Dengeli marka vitrini */
+.site[data-iskelet="marka-vitrini"] .heroBolumu:not(.gorselliHero) {
+  grid-template-columns: minmax(0, 1.28fr) minmax(320px, 0.72fr);
+  align-items: end;
+}
+
+.site[data-iskelet="marka-vitrini"] .standartBolum:nth-child(odd) .bolumIcerikSahnesi {
+  padding-left: clamp(0px, 5vw, 80px);
+}
+
+/* 02 · Dönüşüm ve hızlı talep */
+.site[data-iskelet-nav="kompakt"] .siteHeader {
+  min-height: 68px;
+  grid-template-columns: minmax(180px, 0.7fr) minmax(0, 1.3fr) auto;
+}
+
+.site[data-iskelet-hero="aksiyon"] .heroBolumu:not(.gorselliHero) {
+  min-height: min(78svh, 820px);
+  grid-template-columns: minmax(0, 1.45fr) minmax(290px, 0.55fr);
+  align-items: center;
+  border-bottom: 8px solid var(--site-vurgu);
+}
+
+.iskeletYanRay {
+  width: min(100%, 1500px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.36fr);
+  gap: 0;
+  margin: 0 auto;
+  padding: clamp(28px, 4vw, 70px);
+}
+
+.iskeletYanRay > div,
+.iskeletYanRay > aside {
+  min-width: 0;
+}
+
+.iskeletYanRay > div > .standartBolum,
+.iskeletYanRay > aside > .standartBolum {
+  padding: clamp(54px, 6vw, 96px);
+}
+
+.iskeletYanRay > aside {
+  position: relative;
+  border-left: 1px solid var(--site-cizgi);
+  background: var(--site-ikinci-arka-plan);
+}
+
+.iskeletYanRay > aside > .standartBolum {
+  position: sticky;
+  top: 88px;
+  padding-right: clamp(28px, 3vw, 48px);
+  padding-left: clamp(28px, 3vw, 48px);
+}
+
+.iskeletYanRay > aside .bolumNumarasi {
+  display: none;
+}
+
+.iskeletYanRay > aside :is(.iletisimYerlesimi, .formYerlesimi) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* 03 · Editoryal uzman dosyası */
+.site[data-iskelet-nav="editorial"] .siteHeader {
+  min-height: 116px;
+  grid-template-columns: minmax(250px, 0.8fr) minmax(0, 1.2fr) auto;
+  border-bottom-width: 2px;
+}
+
+.site[data-iskelet-nav="editorial"] .firmaLogo span {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(26px, 2.5vw, 40px);
+  font-weight: 500;
+}
+
+.site[data-iskelet-hero="editorial"] .heroBolumu:not(.gorselliHero) {
+  min-height: 88svh;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: end;
+}
+
+.site[data-iskelet-hero="editorial"] .heroMetni {
+  grid-column: 1 / span 8;
+}
+
+.site[data-iskelet-hero="editorial"] .mimariImza,
+.site[data-iskelet-hero="editorial"] .istegeBagliGorsel {
+  grid-column: 9 / -1;
+}
+
+.iskeletEditorial > div {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  border-bottom: 1px solid var(--site-cizgi);
+}
+
+.iskeletEditorial > div > .standartBolum {
+  grid-column: 1 / span 9;
+  width: 100%;
+}
+
+.iskeletEditorial > div[data-editorial-yon="sag"] > .standartBolum {
+  grid-column: 4 / -1;
+  border-left: 1px solid var(--site-cizgi);
+}
+
+.iskeletEditorial .standartBolum {
+  padding-right: clamp(32px, 7vw, 120px);
+  padding-left: clamp(32px, 7vw, 120px);
+}
+
+/* 04 · Katalog omurgası */
+.site[data-iskelet-nav="bant"] .siteHeader {
+  min-height: 132px;
+  grid-template-columns: 1fr auto;
+  align-content: center;
+  row-gap: 16px;
+}
+
+.site[data-iskelet-nav="bant"] .firmaLogo {
+  grid-column: 1 / -1;
+}
+
+.site[data-iskelet-nav="bant"] .masaustuMenu {
+  justify-content: flex-start;
+}
+
+.site[data-iskelet-hero="kompakt"] .heroBolumu:not(.gorselliHero) {
+  min-height: min(62svh, 660px);
+  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.5fr);
+  padding-top: clamp(70px, 7vw, 110px);
+  padding-bottom: clamp(70px, 7vw, 110px);
+}
+
+.iskeletIzgara[data-iskelet-grubu="katalog"] {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1px;
+  padding: 1px;
+  background: var(--site-cizgi);
+}
+
+.iskeletIzgara[data-iskelet-grubu="katalog"] > .standartBolum {
+  grid-column: span 6;
+  width: 100%;
+  padding: clamp(52px, 5vw, 90px);
+  background: var(--site-arka-plan);
+}
+
+.iskeletIzgara[data-iskelet-grubu="katalog"] > .standartBolum[data-bolum-turu="hizmetler"],
+.iskeletIzgara[data-iskelet-grubu="katalog"] > .standartBolum[data-bolum-turu="urunler"] {
+  grid-column: 1 / -1;
+}
+
+/* 05 · Süreç rotası */
+.site[data-iskelet-nav="numarali"] .siteHeader {
+  border-top: 5px solid var(--site-vurgu);
+}
+
+.site[data-iskelet-nav="numarali"] .masaustuMenu a {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.site[data-iskelet-hero="dikey"] .heroBolumu:not(.gorselliHero) {
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+}
+
+.site[data-iskelet-hero="dikey"] :is(.heroMetni, .mimariImza, .istegeBagliGorsel) {
+  width: min(100%, 1080px);
+}
+
+.site[data-iskelet-hero="dikey"] .mimariImza {
+  margin-left: clamp(0px, 14vw, 230px);
+}
+
+.iskeletRota {
+  position: relative;
+  width: min(100%, 1320px);
+  margin: 0 auto;
+  padding: clamp(60px, 8vw, 130px) clamp(24px, 6vw, 96px);
+}
+
+.iskeletRota::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: clamp(46px, 8vw, 124px);
+  width: 2px;
+  content: "";
+  background: var(--site-vurgu);
+}
+
+.iskeletRota > .standartBolum {
+  width: calc(100% - clamp(60px, 10vw, 160px));
+  margin-left: clamp(60px, 10vw, 160px);
+  padding: clamp(58px, 6vw, 100px);
+  border-bottom: 1px solid var(--site-cizgi);
+}
+
+.iskeletRota > .standartBolum::before {
+  position: absolute;
+  top: clamp(70px, 8vw, 120px);
+  left: calc(-1 * clamp(61px, 10vw, 161px));
+  width: 16px;
+  height: 16px;
+  border: 4px solid var(--site-arka-plan);
+  border-radius: 50%;
+  content: "";
+  background: var(--site-vurgu);
+}
+
+/* 06 · Güven merkezi / mozaik */
+.site[data-iskelet-nav="merkez"] .siteHeader {
+  min-height: 142px;
+  grid-template-columns: 1fr auto;
+  row-gap: 14px;
+}
+
+.site[data-iskelet-nav="merkez"] .firmaLogo {
+  grid-column: 1 / -1;
+  justify-self: center;
+  align-items: center;
+}
+
+.site[data-iskelet-nav="merkez"] .masaustuMenu {
+  justify-content: flex-start;
+}
+
+.site[data-iskelet-hero="guven"] .heroBolumu:not(.gorselliHero) {
+  grid-template-columns: minmax(0, 1fr);
+  text-align: center;
+}
+
+.site[data-iskelet-hero="guven"] :is(.heroMetni, .mimariImza) {
+  width: min(100%, 1120px);
+  margin-inline: auto;
+}
+
+.site[data-iskelet-hero="guven"] .butonlar,
+.site[data-iskelet-hero="guven"] .heroBilgiListesi {
+  justify-content: center;
+}
+
+.iskeletIzgara[data-iskelet-grubu="mozaik"] {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 30px);
+  padding: clamp(30px, 5vw, 82px);
+}
+
+.iskeletIzgara[data-iskelet-grubu="mozaik"] > .standartBolum {
+  grid-column: span 5;
+  width: 100%;
+  padding: clamp(52px, 5vw, 86px);
+  border: 1px solid var(--site-cizgi);
+}
+
+.iskeletIzgara[data-iskelet-grubu="mozaik"] > .standartBolum:nth-child(3n + 1) {
+  grid-column: span 7;
+}
+
+.iskeletIzgara[data-iskelet-grubu="mozaik"] > .standartBolum[data-bolum-turu="istatistik"] {
+  grid-column: 1 / -1;
+}
+
+/* 07 · Yerel servis */
+.site[data-iskelet-nav="yerel"] .siteHeader {
+  border-bottom: 4px solid var(--site-vurgu);
+}
+
+.site[data-iskelet-nav="yerel"] .firmaLogo small::before {
+  content: "● ";
+}
+
+.site[data-iskelet-hero="adres"] .heroBolumu:not(.gorselliHero) {
+  min-height: min(76svh, 760px);
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.64fr);
+  align-items: center;
+}
+
+.iskeletYerelBant {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--site-cizgi);
+  border-bottom: 1px solid var(--site-cizgi);
+  background: var(--site-ikinci-arka-plan);
+}
+
+.iskeletYerelBant > .standartBolum {
+  width: 100%;
+  padding: clamp(50px, 6vw, 92px);
+  background: transparent;
+}
+
+.iskeletYerelBant > .standartBolum + .standartBolum {
+  border-left: 1px solid var(--site-cizgi);
+}
+
+.iskeletYerelIcerik > .standartBolum:nth-child(even) {
+  max-width: 1180px;
+  margin-left: auto;
+}
+
+/* 08 · Rezervasyon masası */
+.site[data-iskelet-nav="aksiyon"] .headerAksiyon {
+  min-height: 54px;
+  padding-inline: 24px;
+}
+
+.site[data-iskelet-hero="form"] .heroBolumu:not(.gorselliHero) {
+  grid-template-columns: minmax(0, 1fr);
+  min-height: auto;
+  align-content: center;
+}
+
+.iskeletRezervasyonUst {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(360px, 0.8fr);
+  min-height: calc(100svh - 92px);
+  border-bottom: 1px solid var(--site-cizgi);
+}
+
+.iskeletRezervasyonUst > :is(.heroBolumu, .standartBolum) {
+  width: 100%;
+  min-height: 100%;
+  padding: clamp(58px, 7vw, 112px);
+}
+
+.iskeletRezervasyonUst > .standartBolum {
+  border-left: 1px solid var(--site-cizgi);
+  background: var(--site-ikinci-arka-plan);
+}
+
+.iskeletRezervasyonUst .formYerlesimi {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.iskeletRezervasyonIcerik {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.iskeletRezervasyonIcerik > .standartBolum {
+  width: 100%;
+  padding: clamp(58px, 7vw, 112px);
+  border-bottom: 1px solid var(--site-cizgi);
+}
+
+/* 09 · Sol raylı proje atölyesi */
+@media (min-width: 1001px) {
+  .site[data-iskelet-nav="sol-ray"] .siteHeader {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: 238px;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 42px;
+    padding: 44px 30px;
+    border-right: 1px solid var(--site-cizgi);
+    border-bottom: 0;
+  }
+
+  .site[data-iskelet-nav="sol-ray"] .masaustuMenu {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  .site[data-iskelet-nav="sol-ray"] .masaustuMenu a {
+    justify-content: flex-start;
+    border-bottom: 1px solid var(--site-cizgi);
+  }
+
+  .site[data-iskelet-nav="sol-ray"] .headerAksiyon {
+    width: 100%;
+    margin: auto 0 0;
+  }
+
+  .site[data-iskelet-nav="sol-ray"] :is(.sayfaIcerigi, .footer) {
+    margin-left: 238px;
+  }
+}
+
+.site[data-iskelet-hero="asimetrik"] .heroBolumu:not(.gorselliHero) {
+  grid-template-columns: minmax(0, 0.72fr) minmax(340px, 1.28fr);
+  align-items: end;
+}
+
+.site[data-iskelet-hero="asimetrik"] .mimariImza {
+  min-height: 620px;
+}
+
+.iskeletIzgara[data-iskelet-grubu="atolye"] {
+  display: grid;
+  grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
+  padding: clamp(30px, 5vw, 80px);
+  gap: clamp(18px, 3vw, 48px);
+}
+
+.iskeletIzgara[data-iskelet-grubu="atolye"] > .standartBolum {
+  width: 100%;
+  padding: clamp(54px, 5vw, 92px);
+  border: 1px solid var(--site-cizgi);
+}
+
+.iskeletIzgara[data-iskelet-grubu="atolye"] > .standartBolum:nth-child(3n + 1) {
+  grid-column: 1 / -1;
+}
+
+/* 10 · Premium, ortalanmış ve ferah */
+.site[data-iskelet-nav="minimal"] .siteHeader {
+  min-height: 78px;
+  border-bottom-color: transparent;
+}
+
+.site[data-iskelet-nav="minimal"] .masaustuMenu a > span {
+  display: none;
+}
+
+.site[data-iskelet-hero="merkez"] .heroBolumu:not(.gorselliHero) {
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 94svh;
+  text-align: center;
+}
+
+.site[data-iskelet-hero="merkez"] :is(.heroMetni, .mimariImza, .istegeBagliGorsel) {
+  width: min(100%, 980px);
+  margin-inline: auto;
+}
+
+.site[data-iskelet-hero="merkez"] .heroMetni h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 500;
+}
+
+.site[data-iskelet-hero="merkez"] :is(.butonlar, .heroBilgiListesi) {
+  justify-content: center;
+}
+
+.iskeletIzgara[data-iskelet-grubu="premium"] > .standartBolum {
+  width: min(100%, 1180px);
+  margin-inline: auto;
+  padding-top: clamp(120px, 13vw, 220px);
+  padding-bottom: clamp(120px, 13vw, 220px);
+  text-align: center;
+}
+
+.iskeletIzgara[data-iskelet-grubu="premium"] .liste {
+  text-align: left;
+}
+
+/* 11 · Acil servis konsolu */
+.site[data-iskelet-nav="servis"] .siteHeader {
+  border-top: 8px solid var(--site-vurgu);
+  background: var(--site-yazi);
+}
+
+.site[data-iskelet-nav="servis"] .siteHeader :is(.firmaLogo, .masaustuMenu a) {
+  color: var(--site-arka-plan);
+}
+
+.site[data-iskelet-hero="acil"] .heroBolumu:not(.gorselliHero) {
+  min-height: min(82svh, 840px);
+  grid-template-columns: minmax(0, 1.42fr) minmax(320px, 0.58fr);
+  border-bottom: 12px solid var(--site-vurgu);
+  background: var(--site-yazi);
+  color: var(--site-arka-plan);
+}
+
+.site[data-iskelet-hero="acil"] .heroMetni :is(h1, p),
+.site[data-iskelet-hero="acil"] .heroBilgiListesi strong {
+  color: var(--site-arka-plan);
+}
+
+.site[data-iskelet-hero="acil"] .heroBilgiListesi li {
+  border-color: color-mix(in srgb, var(--site-arka-plan) 24%, transparent);
+}
+
+.iskeletIzgara[data-iskelet-grubu="konsol"] {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  padding: 1px;
+  background: var(--site-cizgi);
+}
+
+.iskeletIzgara[data-iskelet-grubu="konsol"] > .standartBolum {
+  width: 100%;
+  padding: clamp(50px, 6vw, 100px);
+  background: var(--site-arka-plan);
+}
+
+.iskeletIzgara[data-iskelet-grubu="konsol"] > .standartBolum[data-bolum-turu="iletisim"],
+.iskeletIzgara[data-iskelet-grubu="konsol"] > .standartBolum[data-bolum-turu="hizmetler"] {
+  grid-column: 1 / -1;
+}
+
+/* 12 · Kurumsal teklif iskeleti */
+.site[data-iskelet-nav="kurumsal"] .siteHeader {
+  min-height: 104px;
+  border-top: 1px solid var(--site-cizgi);
+  border-bottom: 3px double var(--site-cizgi);
+}
+
+.site[data-iskelet-hero="bolunmus"] .heroBolumu:not(.gorselliHero) {
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.72fr);
+  gap: 0;
+  padding-right: 0;
+}
+
+.site[data-iskelet-hero="bolunmus"] .mimariImza {
+  min-height: 100%;
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.iskeletKurumsal {
+  padding: clamp(32px, 5vw, 82px);
+}
+
+.iskeletKurumsalSatir {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--site-cizgi);
+}
+
+.iskeletKurumsalSatir > .standartBolum {
+  width: 100%;
+  padding: clamp(58px, 7vw, 116px);
+}
+
+.iskeletKurumsalSatir > .standartBolum + .standartBolum {
+  border-left: 1px solid var(--site-cizgi);
+}
+
+@media (max-width: 1000px) {
+  .iskeletYanRay,
+  .iskeletRezervasyonUst,
+  .iskeletIzgara[data-iskelet-grubu="atolye"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .iskeletYanRay > aside,
+  .iskeletRezervasyonUst > .standartBolum {
+    border-top: 1px solid var(--site-cizgi);
+    border-left: 0;
+  }
+
+  .iskeletYanRay > aside > .standartBolum {
+    position: relative;
+    top: auto;
+  }
+
+  .iskeletIzgara[data-iskelet-grubu="mozaik"] > .standartBolum,
+  .iskeletIzgara[data-iskelet-grubu="mozaik"] > .standartBolum:nth-child(3n + 1) {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 760px) {
+  .site[data-iskelet-nav] .siteHeader,
+  .site[data-iskelet-nav="bant"] .siteHeader,
+  .site[data-iskelet-nav="merkez"] .siteHeader,
+  .site[data-iskelet-nav="editorial"] .siteHeader {
+    min-height: 72px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 0 18px;
+    border-top-width: 0;
+  }
+
+  .site[data-iskelet-nav] .firmaLogo {
+    grid-column: auto;
+    justify-self: start;
+    align-items: flex-start;
+  }
+
+  .site[data-iskelet-nav] .firmaLogo span {
+    max-width: 230px;
+    font-family: inherit;
+    font-size: 21px;
+  }
+
+  .site[data-iskelet-hero] .heroBolumu:not(.gorselliHero),
+  .site[data-iskelet-hero="editorial"] .heroBolumu:not(.gorselliHero),
+  .site[data-iskelet-hero="asimetrik"] .heroBolumu:not(.gorselliHero),
+  .site[data-iskelet-hero="bolunmus"] .heroBolumu:not(.gorselliHero) {
+    min-height: auto;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 30px;
+    padding: 86px 18px;
+    text-align: left;
+  }
+
+  .site[data-iskelet-hero] :is(.heroMetni, .mimariImza, .istegeBagliGorsel),
+  .site[data-iskelet-hero="editorial"] :is(.heroMetni, .mimariImza, .istegeBagliGorsel) {
+    width: 100%;
+    min-height: auto;
+    grid-column: auto;
+    margin: 0;
+  }
+
+  .site[data-iskelet-hero] :is(.butonlar, .heroBilgiListesi) {
+    justify-content: flex-start;
+  }
+
+  .istegeBagliGorsel,
+  .heroBolumu[data-gorsel-acik="true"] .istegeBagliGorsel {
+    min-height: 300px;
+    margin-bottom: 26px;
+  }
+
+  .iskeletYanRay,
+  .iskeletIzgara[data-iskelet-grubu],
+  .iskeletYerelBant,
+  .iskeletRezervasyonIcerik,
+  .iskeletKurumsalSatir {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0;
+    gap: 0;
+  }
+
+  .iskeletYanRay > div > .standartBolum,
+  .iskeletYanRay > aside > .standartBolum,
+  .iskeletIzgara[data-iskelet-grubu] > .standartBolum,
+  .iskeletIzgara[data-iskelet-grubu] > .standartBolum:nth-child(3n + 1),
+  .iskeletYerelBant > .standartBolum,
+  .iskeletRezervasyonUst > :is(.heroBolumu, .standartBolum),
+  .iskeletRezervasyonIcerik > .standartBolum,
+  .iskeletKurumsalSatir > .standartBolum {
+    grid-column: auto;
+    width: 100%;
+    padding: 74px 18px;
+    border-right: 0;
+    border-left: 0;
+  }
+
+  .iskeletEditorial > div,
+  .iskeletEditorial > div > .standartBolum,
+  .iskeletEditorial > div[data-editorial-yon="sag"] > .standartBolum {
+    display: block;
+    grid-column: auto;
+    width: 100%;
+    padding-right: 18px;
+    padding-left: 18px;
+    border-left: 0;
+  }
+
+  .iskeletRota {
+    padding: 40px 0;
+  }
+
+  .iskeletRota::before {
+    left: 20px;
+  }
+
+  .iskeletRota > .standartBolum {
+    width: calc(100% - 38px);
+    margin-left: 38px;
+    padding: 72px 18px 72px 28px;
+  }
+
+  .iskeletRota > .standartBolum::before {
+    left: -26px;
+  }
+
+  .iskeletKurumsal {
+    padding: 0;
+  }
+}
+
 .site[data-studyo-genislik="dar"] {
   --studyo-yatay-bosluk: clamp(34px, 10vw, 170px);
 }

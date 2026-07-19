@@ -132,9 +132,12 @@ const siteKaynagi = fs.readFileSync(
 if (
   siteKaynagi.includes("SektorSahnesi") ||
   /<(?:img|Image)\b/.test(siteKaynagi) ||
-  !siteKaynagi.includes("metinTemalari.module.css")
+  !siteKaynagi.includes("metinTemalari.module.css") ||
+  !siteKaynagi.includes("BolumGorselAlani") ||
+  !siteKaynagi.includes('data-site-parcasi="istege-bagli-gorsel"') ||
+  !siteKaynagi.includes("IskeletliSayfaAkisi")
 ) {
-  sorunlar.push("Yayın görünümünde görsel alanı kaldı veya metin teması eksik.");
+  sorunlar.push("Yayın görünümünde iskelet veya isteğe bağlı görsel altyapısı eksik.");
 }
 
 console.log(`Yayın kaynağı: ${kaynakYollari.length}`);

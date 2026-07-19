@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
   ArrowDownRight,
   ArrowRight,
@@ -20,10 +21,13 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { sektorDerinIcerigiGetir } from "@/data/sektorDerinIcerikleri";
 import { sektorTanimiGetir, temaTanimiGetir, varsayilanIcerikOlustur } from "@/data/yeniSektorler";
 import type { MedyaKaydi, ProjeVerisi, SektorSiteIcerigi } from "@/types/proje";
 import styles from "./sektorSiteleri.module.css";
+
+const SiteRotaBaglami = createContext("");
 
 interface SiteProps {
   proje: ProjeVerisi;
@@ -40,6 +44,14 @@ interface GovdeProps extends SiteProps {
 function telefonHref(telefon: string) {
   const temiz = telefon.replace(/[^\d+]/g, "");
   return temiz ? `tel:${temiz}` : "#iletisim";
+}
+
+function vurguUstuYazi(renk: string) {
+  const hex = renk.replace("#", "");
+  if (!/^[0-9a-f]{6}$/i.test(hex)) return "#ffffff";
+  const [r, g, b] = [hex.slice(0, 2), hex.slice(2, 4), hex.slice(4, 6)].map((deger) => parseInt(deger, 16));
+  const parlaklik = (r * 299 + g * 587 + b * 114) / 1000;
+  return parlaklik > 150 ? "#101312" : "#ffffff";
 }
 
 function whatsappHref(numara: string, firmaAdi: string) {
@@ -112,8 +124,141 @@ function Istatistikler({ icerik }: { icerik: SektorSiteIcerigi }) {
   return <div className={styles.istatistikler}>{icerik.istatistikler.map((item) => <div key={item.etiket}><strong>{item.deger}</strong><span>{item.etiket}</span></div>)}</div>;
 }
 
-function Iletisim({ proje, icerik, alanlar, baslik }: { proje: ProjeVerisi; icerik: SektorSiteIcerigi; alanlar: Record<string, string>; baslik?: string }) {
+function IletisimTemeli({ proje, icerik, alanlar, baslik }: { proje: ProjeVerisi; icerik: SektorSiteIcerigi; alanlar: Record<string, string>; baslik?: string }) {
   return <section className={styles.iletisim} id="iletisim"><div className={styles.iletisimMetni}><UstEtiket>İletişim masası</UstEtiket><h2>{baslik || icerik.ctaBaslik}</h2><p>{icerik.ctaMetni}</p><div className={styles.iletisimBilgileri}><a href={telefonHref(proje.telefon)}><Phone size={18} /><span><small>Telefon</small>{proje.telefon || "Numara eklenmedi"}</span></a><a href={whatsappHref(proje.whatsapp || proje.telefon, proje.firmaAdi)} target="_blank" rel="noreferrer"><MessageCircle size={18} /><span><small>WhatsApp</small>{proje.whatsapp || proje.telefon || "Numara eklenmedi"}</span></a><div><MapPin size={18} /><span><small>Adres</small>{proje.adres || [proje.ilce, proje.sehir].filter(Boolean).join(" / ")}</span></div><div><Clock3 size={18} /><span><small>Çalışma saatleri</small>{alanlar.calismaSaatleri || "Randevu ile"}</span></div></div></div><form className={styles.iletisimFormu} onSubmit={(e) => e.preventDefault()}><label>Adınız<input required placeholder="Ad Soyad" /></label><label>Telefon<input required inputMode="tel" placeholder="05xx xxx xx xx" /></label><label>İhtiyacınız<select defaultValue=""><option value="" disabled>Hizmet seçin</option>{icerik.hizmetler.filter((h) => h.aktif).map((h) => <option key={h.id}>{h.baslik}</option>)}</select></label><label>Mesajınız<textarea rows={4} placeholder="Kısaca ihtiyacınızı anlatın" /></label><button type="submit">Talebi hazırla <ArrowRight size={18} /></button><small>Form örnek akıştır; yayın sonrası WhatsApp veya e-posta entegrasyonu eklenebilir.</small></form></section>;
+}
+
+function KayanSerit({ kelimeler, ters = false }: { kelimeler: string[]; ters?: boolean }) {
+  const tekrar = [...kelimeler, ...kelimeler];
+  return (
+    <div className={`${styles.kayanSerit} ${ters ? styles.kayanSeritTers : ""}`} aria-hidden="true">
+      <div className={styles.kayanSeritIzi}>
+        {tekrar.map((kelime, index) => (
+          <span key={`${kelime}-${index}`}>
+            {kelime}
+            <i>✦</i>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MobilHizliAksiyon({ proje }: { proje: ProjeVerisi }) {
+  return (
+    <div className={styles.mobilHizliAksiyon}>
+      <a href={telefonHref(proje.telefon)}><Phone size={18} /><span><small>Hızlı bağlantı</small>Hemen ara</span></a>
+      <a href={whatsappHref(proje.whatsapp || proje.telefon, proje.firmaAdi)} target="_blank" rel="noreferrer"><MessageCircle size={18} /><span><small>Mesaj gönder</small>WhatsApp</span></a>
+    </div>
+  );
+}
+
+function ZenginIcerik({ proje }: { proje: ProjeVerisi }) {
+  const derin = sektorDerinIcerigiGetir(proje.sektor);
+  const hareketiAzalt = useReducedMotion();
+  const giris = hareketiAzalt ? false : { opacity: 0, y: 58, filter: "blur(12px)" };
+  const gorunur = { opacity: 1, y: 0, filter: "blur(0px)" };
+
+  return (
+    <section className={styles.zenginIcerik} data-hareket-dili={derin.hareketDili}>
+      <KayanSerit kelimeler={derin.kayanKelimeler} />
+
+      <motion.div
+        className={styles.zenginBaslik}
+        initial={giris}
+        whileInView={gorunur}
+        viewport={{ once: true, amount: 0.25 }}
+        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <div>
+          <UstEtiket>İşletmeye özel hizmet dosyası</UstEtiket>
+          <h2>{derin.baslik}</h2>
+        </div>
+        <p>{derin.aciklama}</p>
+      </motion.div>
+
+      <div className={styles.alanBulutu}>
+        {derin.calismaAlanlari.map((alan, index) => (
+          <motion.span
+            key={alan}
+            initial={hareketiAzalt ? false : { opacity: 0, scale: 0.82 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: index * 0.055, duration: 0.45 }}
+          >
+            {String(index + 1).padStart(2, "0")} · {alan}
+          </motion.span>
+        ))}
+      </div>
+
+      <div className={styles.paketGrid}>
+        {derin.paketler.map((paket, index) => (
+          <motion.article
+            key={paket.ad}
+            className={styles.paketKart}
+            initial={hareketiAzalt ? false : { opacity: 0, y: 45, scale: 0.94 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, amount: 0.22 }}
+            transition={{ delay: index * 0.1, duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
+            whileHover={hareketiAzalt ? undefined : { y: -10 }}
+          >
+            <span>{paket.etiket}</span>
+            <h3>{paket.ad}</h3>
+            <p>{paket.aciklama}</p>
+            <ul>
+              {paket.maddeler.map((madde) => <li key={madde}><Check size={14} />{madde}</li>)}
+            </ul>
+            <b>0{index + 1}</b>
+          </motion.article>
+        ))}
+      </div>
+
+      <div className={styles.kararRehberi}>
+        <motion.div
+          className={styles.kararBasligi}
+          initial={giris}
+          whileInView={gorunur}
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <span>KARAR REHBERİ / 04 SENARYO</span>
+          <h2>Hangi durumda nasıl ilerliyoruz?</h2>
+        </motion.div>
+        <div className={styles.senaryoGrid}>
+          {derin.senaryolar.map((senaryo, index) => (
+            <motion.article
+              key={senaryo.baslik}
+              initial={hareketiAzalt ? false : { opacity: 0, x: index % 2 ? 40 : -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.25 }}
+              transition={{ delay: index * 0.07, duration: 0.68, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <div><h3>{senaryo.baslik}</h3><p>{senaryo.aciklama}</p></div>
+              <ArrowDownRight />
+            </motion.article>
+          ))}
+        </div>
+      </div>
+
+      <div className={styles.kaliteBandi}>
+        <div><ShieldCheck /><span>KALİTE KONTROLÜ</span></div>
+        <ul>{derin.kaliteNotlari.map((not) => <li key={not}><i />{not}</li>)}</ul>
+      </div>
+
+      <KayanSerit kelimeler={[...derin.kayanKelimeler].reverse()} ters />
+    </section>
+  );
+}
+
+function Iletisim(props: { proje: ProjeVerisi; icerik: SektorSiteIcerigi; alanlar: Record<string, string>; baslik?: string }) {
+  const aktifSlug = useContext(SiteRotaBaglami);
+  return (
+    <>
+      {!aktifSlug && <ZenginIcerik proje={props.proje} />}
+      <IletisimTemeli {...props} />
+    </>
+  );
 }
 
 function AltSayfa({ proje, slug, git, icerik, alanlar, medya, tur }: GovdeProps & { tur: string }) {
@@ -222,6 +367,7 @@ const govdeler: Record<string, (props: GovdeProps) => ReactNode> = {
 
 export default function SektorSiteleri({ proje, baslangicSlug = "", gercekRotaKullan = false }: { proje: ProjeVerisi; baslangicSlug?: string; gercekRotaKullan?: boolean }) {
   const [slug, setSlug] = useState(baslangicSlug);
+  const hareketiAzalt = useReducedMotion();
   useEffect(() => { window.scrollTo({ top: 0, behavior: "auto" }); }, [slug]);
   const icerik = useMemo(() => {
     const temel = proje.siteIcerigi ?? varsayilanIcerikOlustur(proje.sektor);
@@ -230,7 +376,7 @@ export default function SektorSiteleri({ proje, baslangicSlug = "", gercekRotaKu
   const medya = Object.fromEntries((proje.medyalar ?? []).map((item) => [item.slot, item]));
   const alanlar = Object.fromEntries((proje.isletmeAlanlari ?? []).map((item) => [item.anahtar, item.deger]));
   const tema = temaTanimiGetir(proje.sektor, proje.sektorTemasi || proje.tema);
-  const renkStili = { "--site-bg": tema.renkler[0], "--site-text": tema.renkler[1], "--site-accent": tema.renkler[2], "--site-surface": tema.renkler[3] } as CSSProperties;
+  const renkStili = { "--site-bg": tema.renkler[0], "--site-text": tema.renkler[1], "--site-accent": tema.renkler[2], "--site-surface": tema.renkler[3], "--site-on-accent": vurguUstuYazi(tema.renkler[2]) } as CSSProperties;
   const Govde = govdeler[proje.sektor] ?? Kuafor;
   const tanim = sektorTanimiGetir(proje.sektor);
   const sayfayaGit = (hedef: string) => {
@@ -240,5 +386,24 @@ export default function SektorSiteleri({ proje, baslangicSlug = "", gercekRotaKu
     }
     setSlug(hedef);
   };
-  return <div className={styles.site} data-sektor={proje.sektor} data-tema={tema.id} data-iskelet={tanim.iskeletAdi} style={renkStili}><Govde proje={proje} slug={slug} git={sayfayaGit} icerik={icerik} medya={medya} alanlar={alanlar} /><footer className={styles.footer}><strong>{proje.firmaAdi}</strong><span>{tanim.iskeletAdi} · {new Date().getFullYear()}</span><a href={telefonHref(proje.telefon)}>İletişime geç <ArrowRight size={16} /></a></footer></div>;
+  return (
+    <div className={styles.site} data-sektor={proje.sektor} data-tema={tema.id} data-iskelet={tanim.iskeletAdi} style={renkStili}>
+      <SiteRotaBaglami.Provider value={slug}>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={slug || "ana-sayfa"}
+            className={styles.sayfaGecisi}
+            initial={hareketiAzalt ? false : { opacity: 0, y: 28, filter: "blur(10px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            exit={hareketiAzalt ? undefined : { opacity: 0, y: -18, filter: "blur(8px)" }}
+            transition={{ duration: hareketiAzalt ? 0 : 0.58, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <Govde proje={proje} slug={slug} git={sayfayaGit} icerik={icerik} medya={medya} alanlar={alanlar} />
+          </motion.div>
+        </AnimatePresence>
+      </SiteRotaBaglami.Provider>
+      <MobilHizliAksiyon proje={proje} />
+      <footer className={styles.footer}><strong>{proje.firmaAdi}</strong><span>{tanim.iskeletAdi} · {new Date().getFullYear()}</span><a href={telefonHref(proje.telefon)}>İletişime geç <ArrowRight size={16} /></a></footer>
+    </div>
+  );
 }

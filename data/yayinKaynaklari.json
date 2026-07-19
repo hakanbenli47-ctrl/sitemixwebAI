@@ -3,6 +3,7 @@
   "components/site/SektorSiteleri.tsx",
   "components/site/sektorSiteleri.module.css",
   "data/yeniSektorler.ts",
+  "data/sektorDerinIcerikleri.ts",
   "data/sektorSablonlari.ts",
   "data/sektorSunumProfilleri.ts",
   "data/sektorIcerikProfilleri.ts",

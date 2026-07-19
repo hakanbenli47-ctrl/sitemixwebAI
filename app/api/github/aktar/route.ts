@@ -366,6 +366,11 @@ async function kaynakDosyalariOku() {
       readFile(path.join(kokDizin, "data", "sektorSablonlari.ts"), "utf8"),
     "data/yeniSektorler.ts": () =>
       readFile(path.join(kokDizin, "data", "yeniSektorler.ts"), "utf8"),
+    "data/sektorDerinIcerikleri.ts": () =>
+      readFile(
+        path.join(kokDizin, "data", "sektorDerinIcerikleri.ts"),
+        "utf8",
+      ),
     "data/sektorSunumProfilleri.ts": () =>
       readFile(
         path.join(kokDizin, "data", "sektorSunumProfilleri.ts"),

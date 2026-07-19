@@ -27,6 +27,7 @@ function tsModulunuYukle(dosya) {
 }
 
 const katalog = tsModulunuYukle(path.join(kok, "data/yeniSektorler.ts"));
+const derinKatalog = tsModulunuYukle(path.join(kok, "data/sektorDerinIcerikleri.ts"));
 const sektorler = katalog.YENI_SEKTORLER;
 const beklenenSektorler = [
   "kuafor", "berber", "guzellik-salonu", "nail-artist", "nakliye",
@@ -59,6 +60,12 @@ for (const sektor of sektorler) {
   if (sayfalar.length !== sektor.sayfalar.length || !sayfalar[0].anaSayfa) sorunlar.push(`${sektor.id}: cok sayfali cikti bozuk.`);
   const medyalar = katalog.medyaAlanlariOlustur(sektor.id);
   if (medyalar.some((medya) => medya.acik || medya.url)) sorunlar.push(`${sektor.id}: gorsel alanlari kapali baslamali.`);
+  const derin = derinKatalog.sektorDerinIcerigiGetir(sektor.id);
+  if (derin.paketler.length < 3) sorunlar.push(`${sektor.id}: hizmet paketleri eksik.`);
+  if (derin.senaryolar.length < 4) sorunlar.push(`${sektor.id}: karar senaryolari eksik.`);
+  if (derin.calismaAlanlari.length < 6) sorunlar.push(`${sektor.id}: calisma alanlari eksik.`);
+  if (derin.kaliteNotlari.length < 4) sorunlar.push(`${sektor.id}: kalite notlari eksik.`);
+  if (derin.kayanKelimeler.length < 8) sorunlar.push(`${sektor.id}: kayan yazi icerigi eksik.`);
 }
 
 const renderer = fs.readFileSync(path.join(kok, "components/site/SektorSiteleri.tsx"), "utf8");
@@ -70,7 +77,7 @@ for (const islev of ["Kuafor", "Berber", "Guzellik", "Nail", "Nakliye", "Vip", "
   if (!renderer.includes(`function ${islev}(`)) sorunlar.push(`Renderer eksik: ${islev}`);
 }
 
-for (const guvence of ["BarberPole", "medya?.acik", "!medya.url.trim()", "Iletisim", "AltSayfa", "prefers-reduced-motion"]) {
+for (const guvence of ["BarberPole", "medya?.acik", "!medya.url.trim()", "Iletisim", "AltSayfa", "ZenginIcerik", "KayanSerit", "AnimatePresence", "prefers-reduced-motion"]) {
   const kaynak = guvence === "prefers-reduced-motion" ? css : renderer;
   if (!kaynak.includes(guvence)) sorunlar.push(`Sunum guvencesi eksik: ${guvence}`);
 }

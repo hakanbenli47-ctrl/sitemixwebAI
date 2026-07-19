@@ -6,6 +6,60 @@ const ts = require("typescript");
 const kok = path.resolve(__dirname, "..");
 const sorunlar = [];
 
+function rgb(renk) {
+  const hex = renk.replace("#", "");
+  if (!/^[0-9a-f]{6}$/i.test(hex)) return null;
+  return [hex.slice(0, 2), hex.slice(2, 4), hex.slice(4, 6)].map((deger) => Number.parseInt(deger, 16));
+}
+
+function parlaklik(renk) {
+  const degerler = rgb(renk);
+  if (!degerler) return 0;
+  const kanallar = degerler.map((deger) => {
+    const kanal = deger / 255;
+    return kanal <= 0.04045 ? kanal / 12.92 : ((kanal + 0.055) / 1.055) ** 2.4;
+  });
+  return kanallar[0] * 0.2126 + kanallar[1] * 0.7152 + kanallar[2] * 0.0722;
+}
+
+function kontrast(ilk, ikinci) {
+  const ilkParlaklik = parlaklik(ilk);
+  const ikinciParlaklik = parlaklik(ikinci);
+  return (Math.max(ilkParlaklik, ikinciParlaklik) + 0.05) / (Math.min(ilkParlaklik, ikinciParlaklik) + 0.05);
+}
+
+function karistir(ilk, ikinci, ilkOrani) {
+  const ilkRgb = rgb(ilk);
+  const ikinciRgb = rgb(ikinci);
+  if (!ilkRgb || !ikinciRgb) return ikinci;
+  return `#${ilkRgb.map((deger, index) => Math.round(deger * ilkOrani + ikinciRgb[index] * (1 - ilkOrani)).toString(16).padStart(2, "0")).join("")}`;
+}
+
+function zeminYazisi(arkaPlan, tercih) {
+  if (tercih && kontrast(tercih, arkaPlan) >= 4.8) return tercih;
+  return kontrast("#101312", arkaPlan) >= kontrast("#ffffff", arkaPlan) ? "#101312" : "#ffffff";
+}
+
+function vurguZemini(vurgu) {
+  const ilkYazi = zeminYazisi(vurgu);
+  if (kontrast(ilkYazi, vurgu) >= 4.8) return vurgu;
+  const hedef = ilkYazi === "#101312" ? "#ffffff" : "#000000";
+  for (let oran = 0.9; oran >= 0.1; oran -= 0.1) {
+    const aday = karistir(vurgu, hedef, oran);
+    if (kontrast(zeminYazisi(aday), aday) >= 4.8) return aday;
+  }
+  return hedef;
+}
+
+function vurguYazisi(vurgu, arkaPlan, guvenliYazi) {
+  if (kontrast(vurgu, arkaPlan) >= 4.8) return vurgu;
+  for (let oran = 0.9; oran >= 0.1; oran -= 0.1) {
+    const aday = karistir(vurgu, guvenliYazi, oran);
+    if (kontrast(aday, arkaPlan) >= 4.8) return aday;
+  }
+  return guvenliYazi;
+}
+
 function tsModulunuYukle(dosya) {
   const kaynak = fs.readFileSync(dosya, "utf8");
   const cikti = ts.transpileModule(kaynak, {
@@ -56,6 +110,23 @@ for (const sektor of sektorler) {
   if (sektor.icerik.sss.length < 3) sorunlar.push(`${sektor.id}: SSS icerigi eksik.`);
   if (!sektor.alanlar.some((alan) => alan.zorunlu)) sorunlar.push(`${sektor.id}: zorunlu sektor alani yok.`);
   if (sektor.temalar.some((tema) => tema.renkler.length !== 4)) sorunlar.push(`${sektor.id}: tema renk rolleri eksik.`);
+  for (const tema of sektor.temalar) {
+    const [arkaPlan, anaYazi, vurgu, yuzey] = tema.renkler;
+    const yuzeyYazisi = zeminYazisi(yuzey, anaYazi);
+    const guvenliVurguZemini = vurguZemini(vurgu);
+    const kontroller = [
+      ["ana zemin", anaYazi, arkaPlan],
+      ["yuzey", yuzeyYazisi, yuzey],
+      ["vurgu zemini", zeminYazisi(guvenliVurguZemini), guvenliVurguZemini],
+      ["ana zemin vurgusu", vurguYazisi(vurgu, arkaPlan, anaYazi), arkaPlan],
+      ["ters zemin vurgusu", vurguYazisi(vurgu, anaYazi, arkaPlan), anaYazi],
+      ["yuzey vurgusu", vurguYazisi(vurgu, yuzey, yuzeyYazisi), yuzey],
+    ];
+    for (const [rol, yazi, zemin] of kontroller) {
+      const oran = kontrast(yazi, zemin);
+      if (oran < 4.8) sorunlar.push(`${sektor.id}/${tema.id}: ${rol} kontrasti yetersiz (${oran.toFixed(2)}).`);
+    }
+  }
   const sayfalar = katalog.siteSayfalariOlustur(sektor.id);
   if (sayfalar.length !== sektor.sayfalar.length || !sayfalar[0].anaSayfa) sorunlar.push(`${sektor.id}: cok sayfali cikti bozuk.`);
   const medyalar = katalog.medyaAlanlariOlustur(sektor.id);
@@ -80,6 +151,10 @@ for (const islev of ["Kuafor", "Berber", "Guzellik", "Nail", "Nakliye", "Vip", "
 for (const guvence of ["BarberPole", "medya?.acik", "!medya.url.trim()", "Iletisim", "AltSayfa", "ZenginIcerik", "KayanSerit", "AnimatePresence", "prefers-reduced-motion"]) {
   const kaynak = guvence === "prefers-reduced-motion" ? css : renderer;
   if (!kaynak.includes(guvence)) sorunlar.push(`Sunum guvencesi eksik: ${guvence}`);
+}
+
+for (const kontrastGuvencesi of ["--site-on-surface", "--site-action-bg", "--site-accent-copy", "--site-accent-copy-reverse", "--site-accent-copy-surface", "--site-readable-accent"]) {
+  if (!renderer.includes(kontrastGuvencesi) && !css.includes(kontrastGuvencesi)) sorunlar.push(`Kontrast guvencesi eksik: ${kontrastGuvencesi}`);
 }
 
 for (const kirilim of ["@media (max-width: 1100px)", "@media (max-width: 820px)", "@media (max-width: 560px)"]) {

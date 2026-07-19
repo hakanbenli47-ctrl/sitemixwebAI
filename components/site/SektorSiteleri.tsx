@@ -46,12 +46,61 @@ function telefonHref(telefon: string) {
   return temiz ? `tel:${temiz}` : "#iletisim";
 }
 
-function vurguUstuYazi(renk: string) {
+function rgbDegeri(renk: string) {
   const hex = renk.replace("#", "");
-  if (!/^[0-9a-f]{6}$/i.test(hex)) return "#ffffff";
-  const [r, g, b] = [hex.slice(0, 2), hex.slice(2, 4), hex.slice(4, 6)].map((deger) => parseInt(deger, 16));
-  const parlaklik = (r * 299 + g * 587 + b * 114) / 1000;
-  return parlaklik > 150 ? "#101312" : "#ffffff";
+  if (!/^[0-9a-f]{6}$/i.test(hex)) return null;
+  return [hex.slice(0, 2), hex.slice(2, 4), hex.slice(4, 6)].map((deger) => parseInt(deger, 16)) as [number, number, number];
+}
+
+function bagilParlaklik(renk: string) {
+  const rgb = rgbDegeri(renk);
+  if (!rgb) return 0;
+  const kanallar = rgb.map((deger) => {
+    const kanal = deger / 255;
+    return kanal <= 0.04045 ? kanal / 12.92 : ((kanal + 0.055) / 1.055) ** 2.4;
+  });
+  return kanallar[0] * 0.2126 + kanallar[1] * 0.7152 + kanallar[2] * 0.0722;
+}
+
+function kontrastOrani(ilk: string, ikinci: string) {
+  const ilkParlaklik = bagilParlaklik(ilk);
+  const ikinciParlaklik = bagilParlaklik(ikinci);
+  return (Math.max(ilkParlaklik, ikinciParlaklik) + 0.05) / (Math.min(ilkParlaklik, ikinciParlaklik) + 0.05);
+}
+
+function renkleriKaristir(ilk: string, ikinci: string, ilkOrani: number) {
+  const ilkRgb = rgbDegeri(ilk);
+  const ikinciRgb = rgbDegeri(ikinci);
+  if (!ilkRgb || !ikinciRgb) return ikinci;
+  const sonuc = ilkRgb.map((deger, index) => Math.round(deger * ilkOrani + ikinciRgb[index] * (1 - ilkOrani)));
+  return `#${sonuc.map((deger) => deger.toString(16).padStart(2, "0")).join("")}`;
+}
+
+function zeminUstuYazi(arkaPlan: string, tercih?: string) {
+  if (tercih && kontrastOrani(tercih, arkaPlan) >= 4.8) return tercih;
+  const koyu = "#101312";
+  const acik = "#ffffff";
+  return kontrastOrani(koyu, arkaPlan) >= kontrastOrani(acik, arkaPlan) ? koyu : acik;
+}
+
+function okunakliVurguZemini(vurgu: string) {
+  const ilkYazi = zeminUstuYazi(vurgu);
+  if (kontrastOrani(ilkYazi, vurgu) >= 4.8) return vurgu;
+  const hedef = ilkYazi === "#101312" ? "#ffffff" : "#000000";
+  for (let vurguOrani = 0.9; vurguOrani >= 0.1; vurguOrani -= 0.1) {
+    const aday = renkleriKaristir(vurgu, hedef, vurguOrani);
+    if (kontrastOrani(zeminUstuYazi(aday), aday) >= 4.8) return aday;
+  }
+  return hedef;
+}
+
+function okunakliVurgu(vurgu: string, arkaPlan: string, guvenliYazi: string) {
+  if (kontrastOrani(vurgu, arkaPlan) >= 4.8) return vurgu;
+  for (let vurguOrani = 0.9; vurguOrani >= 0.1; vurguOrani -= 0.1) {
+    const aday = renkleriKaristir(vurgu, guvenliYazi, vurguOrani);
+    if (kontrastOrani(aday, arkaPlan) >= 4.8) return aday;
+  }
+  return guvenliYazi;
 }
 
 function whatsappHref(numara: string, firmaAdi: string) {
@@ -376,7 +425,21 @@ export default function SektorSiteleri({ proje, baslangicSlug = "", gercekRotaKu
   const medya = Object.fromEntries((proje.medyalar ?? []).map((item) => [item.slot, item]));
   const alanlar = Object.fromEntries((proje.isletmeAlanlari ?? []).map((item) => [item.anahtar, item.deger]));
   const tema = temaTanimiGetir(proje.sektor, proje.sektorTemasi || proje.tema);
-  const renkStili = { "--site-bg": tema.renkler[0], "--site-text": tema.renkler[1], "--site-accent": tema.renkler[2], "--site-surface": tema.renkler[3], "--site-on-accent": vurguUstuYazi(tema.renkler[2]) } as CSSProperties;
+  const [arkaPlan, anaYazi, vurgu, yuzey] = tema.renkler;
+  const yuzeyYazisi = zeminUstuYazi(yuzey, anaYazi);
+  const vurguZemini = okunakliVurguZemini(vurgu);
+  const renkStili = {
+    "--site-bg": arkaPlan,
+    "--site-text": anaYazi,
+    "--site-accent": vurgu,
+    "--site-action-bg": vurguZemini,
+    "--site-surface": yuzey,
+    "--site-on-accent": zeminUstuYazi(vurguZemini),
+    "--site-on-surface": yuzeyYazisi,
+    "--site-accent-copy": okunakliVurgu(vurgu, arkaPlan, anaYazi),
+    "--site-accent-copy-reverse": okunakliVurgu(vurgu, anaYazi, arkaPlan),
+    "--site-accent-copy-surface": okunakliVurgu(vurgu, yuzey, yuzeyYazisi),
+  } as CSSProperties;
   const Govde = govdeler[proje.sektor] ?? Kuafor;
   const tanim = sektorTanimiGetir(proje.sektor);
   const sayfayaGit = (hedef: string) => {

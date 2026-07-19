@@ -908,3 +908,230 @@
   .site[data-tema="tema-2"] .paketKart:nth-child(2),
   .mobilHizliAksiyon { animation: none !important; }
 }
+
+/* Tüm sektörlerde yüzey ve vurgu metinleri için WCAG kontrast katmanı */
+.site {
+  --site-on-surface: var(--site-text);
+  --site-accent-copy: var(--site-accent);
+  --site-accent-copy-reverse: var(--site-accent);
+  --site-accent-copy-surface: var(--site-accent);
+  --site-action-bg: var(--site-accent);
+  --site-readable-accent: var(--site-accent-copy);
+  --site-current-copy: var(--site-text);
+}
+
+.berber,
+.vip,
+.dovme,
+.organizasyon,
+.otoYikama,
+.otoKurtarma,
+.otoServis,
+.editorialKiris,
+.lookbook,
+.operasyonBolumu,
+.teknikPanel,
+.teshisMasasi,
+.iletisim,
+.footer,
+.kararRehberi,
+.kayanSerit {
+  --site-readable-accent: var(--site-accent-copy-reverse);
+  --site-current-copy: var(--site-bg);
+}
+
+.berberMenu,
+.concierge,
+.sterilBlok,
+.runOfShow,
+.paketKarsilastirma,
+.konumPaneli,
+.rescueRoute,
+.isEmri,
+.servisKaniti,
+.zenginIcerik {
+  --site-readable-accent: var(--site-accent-copy);
+  --site-current-copy: var(--site-text);
+}
+
+.mobilMenu,
+.ozellikler article,
+.iletisimFormu,
+.kuaforHero > aside,
+.kuaforHikaye,
+.guzellikGuven,
+.nakliyeHero > aside,
+.hijyenKaniti,
+.tesisatHero aside,
+.yuzeyKatalog {
+  --site-readable-accent: var(--site-accent-copy-surface);
+  --site-current-copy: var(--site-on-surface);
+  color: var(--site-on-surface);
+}
+
+.marka > span,
+.ustEtiket,
+.hizmet > span,
+.ozellikler svg,
+.surec li > span,
+.istatistikler strong,
+.kuaforHero > aside span,
+.berberRozet svg,
+.berberMenu > header span,
+.rituel span,
+.dikeyYazi,
+.lookbook header span,
+.nakliyeHero aside strong,
+.manifestoBolumu header span,
+.concierge header span,
+.conciergeGrid aside svg,
+.hijyenKaniti > div > svg,
+.inkDaire,
+.inkBand,
+.portfolioGrid > div > span,
+.sterilBlok > svg,
+.panelKod strong,
+.teknikPanel > header span,
+.tesisatHero aside > span,
+.teshisMasasi > div span,
+.eventTicker,
+.eventYil,
+.runOfShow header span,
+.yuzeyKatalog header span,
+.onceSonra > div > span,
+.washHero aside strong,
+.paketKarsilastirma header span,
+.detailingStory > div:first-child svg,
+.beforeAfter span,
+.konumPaneli svg,
+.devirGosterge strong,
+.servisHizmet > div > span,
+.servisKaniti > div > svg,
+.paketKart > span,
+.paketKart li svg,
+.kararBasligi > span,
+.senaryoGrid article > span,
+.senaryoGrid article > svg,
+.kayanSerit span i {
+  color: var(--site-readable-accent);
+}
+
+.site[data-tema="tema-2"] h1,
+.site[data-tema="tema-2"] .zenginBaslik h2 {
+  background-image: linear-gradient(100deg, var(--site-current-copy) 5%, var(--site-readable-accent) 38%, var(--site-current-copy) 58%, var(--site-readable-accent) 76%, var(--site-current-copy) 96%);
+}
+
+.iletisimFormu button,
+.lookKart,
+.nailServices > aside,
+.haliHero aside,
+.rescueHero aside,
+.eventServices aside,
+.basincKart,
+.elektrikHero aside,
+.berberKopya .anaButon,
+.vipHero .anaButon,
+.dovmeHero .anaButon,
+.eventHero .anaButon,
+.washHero .anaButon,
+.rescueHero .anaButon,
+.servisHero .anaButon {
+  background: var(--site-action-bg);
+  border-color: var(--site-action-bg);
+  color: var(--site-on-accent) !important;
+}
+
+.anaButon::before,
+.ikincilButon::before,
+.headerTelefon::before {
+  background: var(--site-action-bg);
+}
+
+.kaliteBandi,
+.alanBulutu span:hover,
+.mobilHizliAksiyon a:last-child {
+  background: var(--site-action-bg);
+}
+
+.site h1::selection,
+.site h2::selection {
+  background: var(--site-action-bg);
+}
+
+.anaButon:hover,
+.headerTelefon:hover,
+.ikincilButon:hover {
+  color: var(--site-on-accent) !important;
+}
+
+.marka small,
+.footer span,
+.iletisimBilgileri small,
+.iletisimFormu > small,
+.nakliyeHero aside small,
+.berberRozet span {
+  opacity: .72;
+}
+
+.hizmet p,
+.surec p,
+.iletisimMetni > p,
+.altHero p,
+.altIcerik details p,
+.manifesto p,
+.kuaforHero > div:first-of-type > p,
+.kuaforHero > aside p,
+.kuaforHikaye > div > p,
+.berberKopya > p,
+.berberClub > div p,
+.guzellikHero > div:nth-child(2) > p,
+.rituel p,
+.guzellikGuven p,
+.nailHero p,
+.nailServices aside p,
+.nakliyeHero > div:nth-child(2) > p,
+.operasyonBolumu > div > p,
+.vipHero p,
+.conciergeGrid aside p,
+.haliHero p,
+.hijyenKaniti > div > p,
+.dovmeHero p,
+.portfolioGrid p,
+.sterilBlok p,
+.elektrikHero > div:nth-child(2) > p,
+.olcumBolumu > div > p,
+.tesisatHero > div:first-child > p,
+.teshisMasasi p,
+.eventHero p,
+.eventServices aside p,
+.duvarHero > div:first-child > p,
+.onceSonra > div > p,
+.washHero p,
+.detailingStory > div > p,
+.rescueHero p,
+.servisHero p,
+.servisHizmet > div > p,
+.servisKaniti > div > p,
+.zenginBaslik > p,
+.paketKart > p,
+.senaryoGrid p {
+  color: color-mix(in srgb, var(--site-current-copy) 78%, transparent);
+  opacity: 1;
+}
+
+.iletisimFormu input,
+.iletisimFormu select,
+.iletisimFormu textarea {
+  color: var(--site-on-surface);
+}
+
+.iletisimFormu input::placeholder,
+.iletisimFormu textarea::placeholder {
+  color: color-mix(in srgb, var(--site-on-surface) 72%, transparent);
+  opacity: 1;
+}
+
+.iletisimFormu select option {
+  background: var(--site-surface);
+  color: var(--site-on-surface);
+}

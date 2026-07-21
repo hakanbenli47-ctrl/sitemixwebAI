@@ -319,6 +319,8 @@ export const YENI_SEKTORLER = sektorler.filter((sektor) =>
   BASLANGIC_SEKTORLERI.includes(sektor.id),
 );
 
+export const GORSEL_PAKET_SURUMU = 2;
+
 const EK_GORSEL_ALANLARI: Partial<Record<YeniSektorKimligi, MedyaSlotuTanimi[]>> = {
   kuafor: [
     { slot: "galeri-1", baslik: "Kesim portfolyosu" },
@@ -383,10 +385,7 @@ export function isletmeAlanlariOlustur(sektor: string): IsletmeAlaniDegeri[] {
   return sektorTanimiGetir(sektor).alanlar.map((alan) => ({ anahtar: alan.anahtar, etiket: alan.etiket, deger: "", zorunlu: alan.zorunlu }));
 }
 
-export function medyaAlanlariOlustur(
-  sektor: string,
-  tema: string = "tema-1",
-): MedyaKaydi[] {
+export function medyaAlanlariOlustur(sektor: string): MedyaKaydi[] {
   const tanim = sektorTanimiGetir(sektor);
   const alanlar = [
     ...tanim.medyaSlotlari,
@@ -399,8 +398,8 @@ export function medyaAlanlariOlustur(
       id: `${sektor}-medya-${index + 1}`,
       slot: alan.slot,
       baslik: alan.baslik,
-      acik: false,
-      url: `/site-assets/${sektor}/${tema}/${dosyaAdi}`,
+      acik: true,
+      url: `/site-assets/${sektor}/${dosyaAdi}`,
       dosyaAdi,
       alternatifMetin: alan.baslik,
     };

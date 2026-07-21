@@ -1,0 +1,10 @@
+Bu klasöre aşağıdaki WebP dosyalarını ekleyin:
+
+hero.webp
+once.webp
+sonra.webp
+detay.webp
+galeri-1.webp
+galeri-2.webp
+galeri-3.webp
+galeri-4.webp

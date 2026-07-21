@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Check, CirclePlus, Eye, FileImage, ImageOff, LayoutDashboard, Palette, RotateCcw, Save, Settings2, Trash2, Upload, X } from "lucide-react";
-import { medyaAlanlariOlustur, sektorTanimiGetir, varsayilanIcerikOlustur } from "@/data/yeniSektorler";
+import { GORSEL_PAKET_SURUMU, medyaAlanlariOlustur, sektorTanimiGetir, varsayilanIcerikOlustur } from "@/data/yeniSektorler";
 import type { EkOzellikKaydi, HizmetKaydi, MedyaKaydi, ProjeVerisi, SektorSiteIcerigi, SektorTemaKimligi } from "@/types/proje";
 import styles from "./yonetim.module.css";
 
@@ -53,15 +53,28 @@ export default function DuzenlemeSayfasi() {
         const kayit = window.localStorage.getItem(AKTIF_PROJE);
         if (kayit) {
           const kayitliProje = JSON.parse(kayit) as ProjeVerisi;
-          const varsayilanMedyalar = medyaAlanlariOlustur(
-            kayitliProje.sektor,
-            kayitliProje.sektorTemasi || kayitliProje.tema || "tema-1",
-          );
+          const varsayilanMedyalar = medyaAlanlariOlustur(kayitliProje.sektor);
           const mevcutMedyalar = kayitliProje.medyalar ?? [];
+          const eskiPaketMi = kayitliProje.gorselPaketSurumu !== GORSEL_PAKET_SURUMU;
+          const guncelMedyalar = mevcutMedyalar.map((medya) => {
+            if (!medya.url.startsWith("/site-assets/")) return medya;
+            const varsayilan = varsayilanMedyalar.find((item) => item.slot === medya.slot);
+            if (!varsayilan) return medya;
+            return {
+              ...medya,
+              url: varsayilan.url,
+              dosyaAdi: varsayilan.dosyaAdi,
+              acik: eskiPaketMi ? true : medya.acik,
+            };
+          });
           const eksikMedyalar = varsayilanMedyalar.filter(
-            (varsayilan) => !mevcutMedyalar.some((medya) => medya.slot === varsayilan.slot),
+            (varsayilan) => !guncelMedyalar.some((medya) => medya.slot === varsayilan.slot),
           );
-          setProje({ ...kayitliProje, medyalar: [...mevcutMedyalar, ...eksikMedyalar] });
+          setProje({
+            ...kayitliProje,
+            medyalar: [...guncelMedyalar, ...eksikMedyalar],
+            gorselPaketSurumu: GORSEL_PAKET_SURUMU,
+          });
         }
       } catch {
         setDurum("Proje kaydı okunamadı.");
@@ -119,14 +132,14 @@ export default function DuzenlemeSayfasi() {
 
   function temaDegistir(yeniTema: SektorTemaKimligi) {
     if (!proje) return;
-    const varsayilanMedyalar = medyaAlanlariOlustur(proje.sektor, yeniTema);
+    const varsayilanMedyalar = medyaAlanlariOlustur(proje.sektor);
     const mevcutMedyalar = proje.medyalar ?? varsayilanMedyalar;
     const medyalar = mevcutMedyalar.map((medya) => {
       if (!medya.url.startsWith("/site-assets/")) return medya;
       const varsayilan = varsayilanMedyalar.find((item) => item.slot === medya.slot);
       return varsayilan ? { ...medya, url: varsayilan.url, dosyaAdi: varsayilan.dosyaAdi } : medya;
     });
-    guncelle({ sektorTemasi: yeniTema, tema: yeniTema, medyalar });
+    guncelle({ sektorTemasi: yeniTema, tema: yeniTema, medyalar, gorselPaketSurumu: GORSEL_PAKET_SURUMU });
   }
 
   if (!proje || !tanim || !icerik) {
@@ -149,7 +162,7 @@ export default function DuzenlemeSayfasi() {
 
       {sekme === "hizmet" && <section className={styles.ciftPanel}><div className={styles.panel}><div className={styles.panelBasligi}><span>03</span><div><h2>Hizmetler</h2><p>Başlık ve açıklamayı düzenleyin; göz simgesiyle gösterimi açıp kapatın.</p></div></div><div className={styles.kayitListesi}>{hizmetler.map((hizmet, index) => <article key={hizmet.id} className={!hizmet.aktif ? styles.kapaliKayit : ""}><button type="button" className={styles.durumButonu} onClick={() => hizmetleriGuncelle(hizmetler.map((item) => item.id === hizmet.id ? { ...item, aktif: !item.aktif } : item))}>{hizmet.aktif ? <Check /> : <X />}</button><div><input value={hizmet.baslik} onChange={(e) => hizmetleriGuncelle(hizmetler.map((item, sira) => sira === index ? { ...item, baslik: e.target.value } : item))} /><textarea rows={2} value={hizmet.aciklama} onChange={(e) => hizmetleriGuncelle(hizmetler.map((item, sira) => sira === index ? { ...item, aciklama: e.target.value } : item))} /></div>{hizmet.ozelMi && <button type="button" className={styles.silButonu} onClick={() => hizmetleriGuncelle(hizmetler.filter((item) => item.id !== hizmet.id))}><Trash2 /></button>}</article>)}</div><div className={styles.ekle}><input value={yeniHizmet} onChange={(e) => setYeniHizmet(e.target.value)} placeholder="Yeni hizmet adı" /><button type="button" onClick={() => { const ad = yeniHizmet.trim(); if (!ad) return; hizmetleriGuncelle([...hizmetler, { id: kimlikOlustur(), baslik: ad, aciklama: "İşletmenize özel hizmet açıklaması.", aktif: true, ozelMi: true }]); setYeniHizmet(""); }}><CirclePlus /> Ekle</button></div></div><div className={styles.panel}><div className={styles.panelBasligi}><span>04</span><div><h2>Ek özellikler</h2><p>İşletmenin güven ve dönüşüm alanlarına eklenir.</p></div></div><div className={styles.kayitListesi}>{ozellikler.map((ozellik, index) => <article key={ozellik.id} className={!ozellik.aktif ? styles.kapaliKayit : ""}><button type="button" className={styles.durumButonu} onClick={() => ozellikleriGuncelle(ozellikler.map((item) => item.id === ozellik.id ? { ...item, aktif: !item.aktif } : item))}>{ozellik.aktif ? <Check /> : <X />}</button><div><input value={ozellik.baslik} onChange={(e) => ozellikleriGuncelle(ozellikler.map((item, sira) => sira === index ? { ...item, baslik: e.target.value } : item))} /><textarea rows={2} value={ozellik.aciklama} onChange={(e) => ozellikleriGuncelle(ozellikler.map((item, sira) => sira === index ? { ...item, aciklama: e.target.value } : item))} /></div>{ozellik.ozelMi && <button type="button" className={styles.silButonu} onClick={() => ozellikleriGuncelle(ozellikler.filter((item) => item.id !== ozellik.id))}><Trash2 /></button>}</article>)}</div><div className={styles.ekle}><input value={yeniOzellik} onChange={(e) => setYeniOzellik(e.target.value)} placeholder="Yeni özellik" /><button type="button" onClick={() => { const ad = yeniOzellik.trim(); if (!ad) return; ozellikleriGuncelle([...ozellikler, { id: kimlikOlustur(), baslik: ad, aciklama: "İşletmenize ait ek özellik.", aktif: true, ozelMi: true }]); setYeniOzellik(""); }}><CirclePlus /> Ekle</button></div></div></section>}
 
-      {sekme === "medya" && <section className={styles.panel}><div className={styles.panelBasligi}><span>05</span><div><h2>Sabit proje görselleri</h2><p>Varsayılan dosyalar public klasöründen okunur; yalnızca müşteri değişiklik isterse buradan yenisini yükleyin.</p></div></div><div className={styles.medyaGrid}>{(proje.medyalar ?? []).map((medya) => <article key={medya.id} className={medya.acik ? styles.acikMedya : ""}><div className={styles.medyaOnizleme}>{medya.url ? <img src={medya.url} alt={medya.alternatifMetin || medya.baslik} /> : <ImageOff />}</div><div className={styles.medyaBilgi}><span>{medya.slot.toUpperCase()}</span><h3>{medya.baslik}</h3><p>{medya.dosyaAdi || "Henüz dosya yüklenmedi"}</p><label>Alternatif metin<input value={medya.alternatifMetin || ""} onChange={(e) => guncelle({ medyalar: (proje.medyalar ?? []).map((item) => item.id === medya.id ? { ...item, alternatifMetin: e.target.value } : item) })} placeholder={`${proje.firmaAdi} ${medya.baslik}`} /></label></div><div className={styles.medyaAksiyon}><button type="button" onClick={() => guncelle({ medyalar: (proje.medyalar ?? []).map((item) => item.id === medya.id ? { ...item, acik: !item.acik } : item) })}>{medya.acik ? <><Check /> Alan açık</> : <><X /> Alan kapalı</>}</button><label><Upload /> Müşteri görseli yükle<input hidden type="file" accept="image/jpeg,image/png,image/webp,image/avif" onChange={(e) => { void medyaYukle(medya, e.target.files?.[0]); e.currentTarget.value = ""; }} /></label>{medya.url && !medya.url.startsWith("/site-assets/") && <button type="button" onClick={() => guncelle({ medyalar: (proje.medyalar ?? []).map((item) => item.id === medya.id ? { ...item, url: "", dosyaAdi: undefined } : item) })}><Trash2 /> Yükleneni kaldır</button>}<button type="button" onClick={() => { const varsayilan = medyaAlanlariOlustur(proje.sektor, proje.sektorTemasi)[(proje.medyalar ?? []).findIndex((item) => item.id === medya.id)]; guncelle({ medyalar: (proje.medyalar ?? []).map((item) => item.id === medya.id && varsayilan ? { ...varsayilan, id: item.id } : item) }); }}><RotateCcw /> Public görsele dön</button></div></article>)}</div><div className={styles.medyaAciklama}><FileImage /><p>Public görseller tema klasöründe sabit kalır. Studio’dan yüklenen müşteri görseli GitHub aktarımında bağımsız projenin public/images klasörüne alınır.</p></div></section>}
+      {sekme === "medya" && <section className={styles.panel}><div className={styles.panelBasligi}><span>05</span><div><h2>Hazır proje görselleri</h2><p>Sektörün görsel paketi her yeni projede otomatik açık gelir; yalnızca müşteri değişiklik isterse buradan yenisini yükleyin.</p></div></div><div className={styles.medyaGrid}>{(proje.medyalar ?? []).map((medya) => <article key={medya.id} className={medya.acik ? styles.acikMedya : ""}><div className={styles.medyaOnizleme}>{medya.url ? <img src={medya.url} alt={medya.alternatifMetin || medya.baslik} /> : <ImageOff />}</div><div className={styles.medyaBilgi}><span>{medya.slot.toUpperCase()}</span><h3>{medya.baslik}</h3><p>{medya.dosyaAdi || "Henüz dosya yüklenmedi"}</p><label>Alternatif metin<input value={medya.alternatifMetin || ""} onChange={(e) => guncelle({ medyalar: (proje.medyalar ?? []).map((item) => item.id === medya.id ? { ...item, alternatifMetin: e.target.value } : item) })} placeholder={`${proje.firmaAdi} ${medya.baslik}`} /></label></div><div className={styles.medyaAksiyon}><button type="button" onClick={() => guncelle({ medyalar: (proje.medyalar ?? []).map((item) => item.id === medya.id ? { ...item, acik: !item.acik } : item) })}>{medya.acik ? <><Check /> Alan açık</> : <><X /> Alan kapalı</>}</button><label><Upload /> Müşteri görseli yükle<input hidden type="file" accept="image/jpeg,image/png,image/webp,image/avif" onChange={(e) => { void medyaYukle(medya, e.target.files?.[0]); e.currentTarget.value = ""; }} /></label>{medya.url && !medya.url.startsWith("/site-assets/") && <button type="button" onClick={() => guncelle({ medyalar: (proje.medyalar ?? []).map((item) => item.id === medya.id ? { ...item, url: "", dosyaAdi: undefined } : item) })}><Trash2 /> Yükleneni kaldır</button>}<button type="button" onClick={() => { const varsayilan = medyaAlanlariOlustur(proje.sektor).find((item) => item.slot === medya.slot); guncelle({ medyalar: (proje.medyalar ?? []).map((item) => item.id === medya.id && varsayilan ? { ...varsayilan, id: item.id } : item) }); }}><RotateCcw /> Hazır görsele dön</button></div></article>)}</div><div className={styles.medyaAciklama}><FileImage /><p>Hazır sektör görselleri tüm temalarda otomatik kullanılır. GitHub aktarımında aktif görseller bağımsız projenin public/images klasörüne kopyalanır; müşteri için yüklediğiniz görsel yalnızca bu projeyi değiştirir.</p></div></section>}
 
       {sekme === "tema" && <section className={styles.panel}><div className={styles.panelBasligi}><span>06</span><div><h2>Üç bağımsız site düzeni</h2><p>Tema değişince yalnızca renk değil; hero, yüzey, bölüm ritmi ve görsel sunumu da değişir.</p></div></div><div className={styles.temaGrid}>{tanim.temalar.map((tema) => <button key={tema.id} type="button" className={proje.sektorTemasi === tema.id ? styles.seciliTema : ""} onClick={() => temaDegistir(tema.id)}><div>{tema.renkler.map((renk) => <i key={renk} style={{ background: renk }} />)}</div><span>{tema.id.replace("tema-", "0")} · {tema.yerlesimAdi}</span><h3>{tema.ad}</h3><p>{tema.aciklama}</p>{proje.sektorTemasi === tema.id && <strong><Check /> AKTİF TEMA</strong>}</button>)}</div></section>}
 

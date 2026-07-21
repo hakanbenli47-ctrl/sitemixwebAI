@@ -103,6 +103,8 @@ for (const guvence of [
   "guvenliProjeJson",
   'yayinProjesi.siteTipi === "cok-sayfa"',
   'gorsel.startsWith("/site-assets/")',
+  'Hazır görsel bulunamadı:',
+  "const dosyalar = await aktarilacakDosyalariOlustur(proje, repoAdi)",
   '\"app/sitemap.ts\": sitemapTs',
   '\"app/robots.ts\": robotsTs',
   '\"vercel.json\": vercelJson',

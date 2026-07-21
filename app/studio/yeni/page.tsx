@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, ChevronRight, CirclePlus, FileText, Layers3, Palette, Rows3, Sparkles } from "lucide-react";
 import {
   YENI_SEKTORLER,
+  GORSEL_PAKET_SURUMU,
   isletmeAlanlariOlustur,
   medyaAlanlariOlustur,
   sektorTanimiGetir,
@@ -110,7 +111,7 @@ export default function YeniProjeSayfasi() {
     const icerik = varsayilanIcerikOlustur(sektor);
     const projeSlug = benzersizProjeSlug(slug || firmaAdi);
     const proje: ProjeVerisi = {
-      id: kimlikOlustur(), firmaAdi: firmaAdi.trim(), sektor, sektorAdi: tanim.ad, siteTipi, telefon: telefon.trim(), whatsapp: (whatsapp || telefon).trim(), eposta: eposta.trim(), adres: adres.trim(), sehir: sehir.trim(), ilce: ilce.trim(), hizmetBolgesi: hizmetBolgesi.trim(), slug: projeSlug, tema, sektorTemasi: tema, sayfalar: siteSayfalariOlustur(sektor, siteTipi), isletmeAlanlari: alanlar, hizmetler, ekOzellikler: ozellikler, medyalar: medyaAlanlariOlustur(sektor, tema), siteIcerigi: { ...icerik, hizmetler, ozellikler }, yeniSistemMi: true, projeSurumu: 2, sablonSurumu: 11, githubRepoAdi: projeSlug, seoBaslik: `${firmaAdi.trim()} | Resmî Web Sitesi`, seoAciklama: icerik.heroAciklama, seoKelimeler: [firmaAdi.trim(), tanim.ad, sehir.trim(), ilce.trim()].filter(Boolean), gorselAlanlariHazirlandiMi: true, olusturulmaTarihi: tarih, guncellenmeTarihi: tarih,
+      id: kimlikOlustur(), firmaAdi: firmaAdi.trim(), sektor, sektorAdi: tanim.ad, siteTipi, telefon: telefon.trim(), whatsapp: (whatsapp || telefon).trim(), eposta: eposta.trim(), adres: adres.trim(), sehir: sehir.trim(), ilce: ilce.trim(), hizmetBolgesi: hizmetBolgesi.trim(), slug: projeSlug, tema, sektorTemasi: tema, sayfalar: siteSayfalariOlustur(sektor, siteTipi), isletmeAlanlari: alanlar, hizmetler, ekOzellikler: ozellikler, medyalar: medyaAlanlariOlustur(sektor), siteIcerigi: { ...icerik, hizmetler, ozellikler }, yeniSistemMi: true, projeSurumu: 2, sablonSurumu: 11, githubRepoAdi: projeSlug, seoBaslik: `${firmaAdi.trim()} | Resmî Web Sitesi`, seoAciklama: icerik.heroAciklama, seoKelimeler: [firmaAdi.trim(), tanim.ad, sehir.trim(), ilce.trim()].filter(Boolean), gorselAlanlariHazirlandiMi: true, gorselPaketSurumu: GORSEL_PAKET_SURUMU, olusturulmaTarihi: tarih, guncellenmeTarihi: tarih,
     };
     try {
       localStorage.setItem(AKTIF_PROJE, JSON.stringify(proje));
@@ -141,7 +142,39 @@ export default function YeniProjeSayfasi() {
 
       {adim === 3 && <section className={styles.icerikYerlesimi}><div><div className={styles.bolumBasligi}><span>HAZIR HİZMETLER</span><p>Kapalı hizmet sitede görünmez; sonradan tekrar açabilirsiniz.</p></div><div className={styles.secimListesi}>{hizmetler.map((hizmet) => <button key={hizmet.id} type="button" className={hizmet.aktif ? styles.seciliSatir : ""} onClick={() => setHizmetler((liste) => liste.map((kayit) => kayit.id === hizmet.id ? { ...kayit, aktif: !kayit.aktif } : kayit))}><span>{hizmet.aktif ? <Check /> : <CirclePlus />}</span><div><strong>{hizmet.baslik}</strong><p>{hizmet.aciklama}</p></div></button>)}</div><div className={styles.eklemeSatiri}><input value={yeniHizmet} onChange={(e) => setYeniHizmet(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") hizmetEkle(); }} placeholder="İşletmeye özel ek hizmet" /><button type="button" onClick={hizmetEkle}><CirclePlus /> Hizmet ekle</button></div></div><aside><div className={styles.bolumBasligi}><span>EK ÖZELLİKLER</span><p>Güven ve dönüşüm alanlarında gösterilir.</p></div><div className={styles.ozellikSecimleri}>{ozellikler.map((ozellik) => <button key={ozellik.id} type="button" className={ozellik.aktif ? styles.seciliOzellik : ""} onClick={() => setOzellikler((liste) => liste.map((kayit) => kayit.id === ozellik.id ? { ...kayit, aktif: !kayit.aktif } : kayit))}><Check /><span><strong>{ozellik.baslik}</strong><small>{ozellik.aciklama}</small></span></button>)}</div><div className={styles.eklemeSatiri}><input value={yeniOzellik} onChange={(e) => setYeniOzellik(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") ozellikEkle(); }} placeholder="Örn. Ücretsiz keşif" /><button type="button" onClick={ozellikEkle}><CirclePlus /> Özellik ekle</button></div></aside></section>}
 
-      {adim === 4 && <section className={styles.temaYerlesimi}>{tanim.temalar.map((kayit) => <button key={kayit.id} type="button" className={tema === kayit.id ? styles.seciliTema : ""} onClick={() => setTema(kayit.id)}><div className={styles.renkler}>{kayit.renkler.map((renk) => <i key={renk} style={{ background: renk }} />)}</div><span>{kayit.id.replace("tema-", "0")} · {kayit.yerlesimAdi}</span><h2>{kayit.ad}</h2><p>{kayit.aciklama}</p><small>{tema === kayit.id ? "SEÇİLDİ" : "TEMAYI SEÇ"}</small></button>)}<div className={styles.medyaNotu}><Sparkles /><div><strong>Görseller sabit public klasöründen okunacak.</strong><p>Dosyaları <code>public/site-assets/{sektor}/{tema}/</code> klasörüne koyabilirsiniz. Müşteri değişiklik isterse yalnızca Projeler → Düzenle → Görseller alanından değiştirilir.</p></div></div></section>}
+      {adim === 4 && (
+        <section className={styles.temaYerlesimi}>
+          {tanim.temalar.map((kayit) => (
+            <button
+              key={kayit.id}
+              type="button"
+              className={tema === kayit.id ? styles.seciliTema : ""}
+              onClick={() => setTema(kayit.id)}
+            >
+              <div className={styles.renkler}>
+                {kayit.renkler.map((renk) => (
+                  <i key={renk} style={{ background: renk }} />
+                ))}
+              </div>
+              <span>{kayit.id.replace("tema-", "0")} · {kayit.yerlesimAdi}</span>
+              <h2>{kayit.ad}</h2>
+              <p>{kayit.aciklama}</p>
+              <small>{tema === kayit.id ? "SEÇİLDİ" : "TEMAYI SEÇ"}</small>
+            </button>
+          ))}
+          <div className={styles.medyaNotu}>
+            <Sparkles />
+            <div>
+              <strong>Sektörün hazır görsel paketi otomatik kullanılacak.</strong>
+              <p>
+                Dosyaları yalnızca bir kez <code>public/site-assets/{sektor}/</code> klasörüne koyun.
+                Seçilen tema değişse de görseller korunur; müşteri değişiklik isterse Projeler →
+                Düzenle → Görseller alanından yalnızca ilgili görseli değiştirin.
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
 
       <footer className={styles.altBar}>
         <div><span>0{adim} / 04</span><strong>{tanim.ad} · {tanim.iskeletAdi}</strong></div>

@@ -561,6 +561,12 @@ async function gorselleriYerellestir(
 
       return siteYolu;
     } catch (error) {
+      if (temizGorsel.startsWith("/site-assets/")) {
+        throw new Error(
+          `Hazır görsel bulunamadı: ${temizGorsel}. Görseli public klasöründeki sektör dizinine ekleyin.`,
+          { cause: error },
+        );
+      }
       console.warn("Görsel repoya alınamadı, mevcut bağlantı korunuyor:", error);
       return temizGorsel;
     }
@@ -1123,6 +1129,8 @@ export async function POST(request: Request) {
     turkceSlugOlustur(proje.slug || proje.firmaAdi);
 
   try {
+    const dosyalar = await aktarilacakDosyalariOlustur(proje, repoAdi);
+
     const { repo, yeniOlusturuldu } = await repoBulVeyaOlustur({
       token,
       owner,
@@ -1132,8 +1140,6 @@ export async function POST(request: Request) {
 
     const branch =
       repo.default_branch || process.env.GITHUB_DEFAULT_BRANCH || "main";
-
-    const dosyalar = await aktarilacakDosyalariOlustur(proje, repoAdi);
 
     const commit = await dosyalariCommitEt({
       token,

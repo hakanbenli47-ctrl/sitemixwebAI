@@ -132,7 +132,14 @@ for (const sektor of sektorler) {
   const tekSayfa = katalog.siteSayfalariOlustur(sektor.id, "tek-sayfa");
   if (tekSayfa.length !== 1 || !tekSayfa[0].anaSayfa || tekSayfa[0].slug) sorunlar.push(`${sektor.id}: tek sayfali cikti bozuk.`);
   const medyalar = katalog.medyaAlanlariOlustur(sektor.id);
-  if (medyalar.some((medya) => medya.acik || !medya.url.startsWith(`/site-assets/${sektor.id}/tema-1/`))) sorunlar.push(`${sektor.id}: sabit public gorsel yolu bozuk.`);
+  if (medyalar.some((medya) => !medya.acik || medya.url !== `/site-assets/${sektor.id}/${medya.slot}.webp`)) sorunlar.push(`${sektor.id}: otomatik hazir gorsel yolu bozuk.`);
+  const gorselListesiYolu = path.join(kok, "public", "site-assets", sektor.id, "GORSEL-LISTESI.txt");
+  if (!fs.existsSync(gorselListesiYolu)) {
+    sorunlar.push(`${sektor.id}: hazir gorsel klasoru veya listesi yok.`);
+  } else {
+    const gorselListesi = fs.readFileSync(gorselListesiYolu, "utf8");
+    if (medyalar.some((medya) => !gorselListesi.includes(`${medya.slot}.webp`))) sorunlar.push(`${sektor.id}: klasor dosya listesi eksik.`);
+  }
   const galeriSlotlari = medyalar.filter((medya) => medya.slot.startsWith("galeri-"));
   if (galeriSlotlari.length !== 4) sorunlar.push(`${sektor.id}: dort hareketli galeri alani olmali.`);
   const derin = derinKatalog.sektorDerinIcerigiGetir(sektor.id);
@@ -169,7 +176,7 @@ for (const kirilim of ["@media (max-width: 1100px)", "@media (max-width: 820px)"
   if (!css.includes(kirilim)) sorunlar.push(`Mobil kirilim eksik: ${kirilim}`);
 }
 
-for (const islem of ["Müşteri görseli yükle", "Public görsele dön", "hizmetleriGuncelle", "ozellikleriGuncelle", "temaDegistir"]) {
+for (const islem of ["Müşteri görseli yükle", "Hazır görsele dön", "GORSEL_PAKET_SURUMU", "hizmetleriGuncelle", "ozellikleriGuncelle", "temaDegistir"]) {
   if (!editor.includes(islem)) sorunlar.push(`Duzenleme islemi eksik: ${islem}`);
 }
 

@@ -1,38 +1,52 @@
-# Sitemix sabit site görselleri
+# Sitemix hazır sektör görselleri
 
-Her sektör ve tema için görseller bu klasörde sabit tutulur:
+Görseller sektör başına yalnızca bir kez bu klasöre eklenir. Yeni proje hangi
+temayla oluşturulursa oluşturulsun aynı hazır paket otomatik açık gelir.
+GitHub aktarımında kullanılan dosyalar müşterinin bağımsız reposundaki
+`public/images` klasörüne kopyalanır.
 
-```text
-public/site-assets/<sektor>/<tema>/<slot>.webp
-```
+Kurallar:
 
-Örnek:
+- Dosyaları aşağıdaki adlarla ve `.webp` uzantısıyla kaydedin.
+- Dosya adlarında boşluk, Türkçe karakter veya ek numara kullanmayın.
+- Önerilen uzun kenar en az 1600 piksel, dosya boyutu en fazla 12 MB'dır.
+- Bir müşteriye özel değişiklik gerektiğinde ana paketi değiştirmeyin;
+  Studio'da Projeler → Düzenle → Görseller alanından yükleme yapın.
 
-```text
-public/site-assets/berber/tema-1/hero.webp
-public/site-assets/berber/tema-1/detay.webp
-public/site-assets/berber/tema-1/ekip.webp
-public/site-assets/berber/tema-1/galeri-1.webp
-public/site-assets/berber/tema-1/galeri-2.webp
-public/site-assets/berber/tema-1/galeri-3.webp
-public/site-assets/berber/tema-1/galeri-4.webp
-```
+## Kuaför — `kuafor/`
 
-Aktif sektör klasörleri:
+`hero.webp`, `donusum.webp`, `salon.webp`, `galeri-1.webp`, `galeri-2.webp`,
+`galeri-3.webp`, `galeri-4.webp`
 
-- `kuafor`
-- `berber`
-- `guzellik-salonu`
-- `nail-artist`
-- `oto-yikama`
-- `hali-yikama`
-- `nakliye`
+## Berber — `berber/`
 
-Her sektörün `tema-1`, `tema-2` ve `tema-3` alt klasörü olabilir. Gerekli
-dosya adları Studio içindeki Projeler → Düzenle → Görseller ekranında görünür.
-Görsel alanını açtığınızda dosya doğrudan bu konumdan okunur. Müşteri daha sonra
-değişiklik isterse yeni görseli aynı ekrandan yükleyebilirsiniz.
+`hero.webp`, `detay.webp`, `ekip.webp`, `galeri-1.webp`, `galeri-2.webp`,
+`galeri-3.webp`, `galeri-4.webp`
 
-`galeri-1.webp` ile `galeri-4.webp` arasındaki dört ek dosya, sitenin hareketli
-portfolyo vitrininde kullanılır. İstediğiniz alanı Studio'dan ayrı ayrı açıp
-kapatabilir veya müşteri görseliyle değiştirebilirsiniz.
+## Güzellik salonu — `guzellik-salonu/`
+
+`hero.webp`, `bakim.webp`, `sonuc.webp`, `galeri-1.webp`, `galeri-2.webp`,
+`galeri-3.webp`, `galeri-4.webp`
+
+## Nail artist — `nail-artist/`
+
+`hero.webp`, `look-1.webp`, `look-2.webp`, `look-3.webp`, `galeri-1.webp`,
+`galeri-2.webp`, `galeri-3.webp`, `galeri-4.webp`
+
+## Oto yıkama — `oto-yikama/`
+
+`hero.webp`, `once.webp`, `sonra.webp`, `detay.webp`, `galeri-1.webp`,
+`galeri-2.webp`, `galeri-3.webp`, `galeri-4.webp`
+
+## Halı yıkama — `hali-yikama/`
+
+`hero.webp`, `once.webp`, `sonra.webp`, `galeri-1.webp`, `galeri-2.webp`,
+`galeri-3.webp`, `galeri-4.webp`
+
+## Nakliye — `nakliye/`
+
+`hero.webp`, `paketleme.webp`, `filo.webp`, `galeri-1.webp`, `galeri-2.webp`,
+`galeri-3.webp`, `galeri-4.webp`
+
+Toplam 50 hazır görsel dosyası vardır. Görselleri ekledikten sonra yeni proje
+oluştururken ayrıca görsel seçmeniz veya yüklemeniz gerekmez.

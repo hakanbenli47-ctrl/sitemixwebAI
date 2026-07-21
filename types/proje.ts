@@ -144,6 +144,7 @@ export interface ProjeVerisi {
   otomatikGorsellerOlusturulduMu?: boolean;
   gorselsizSunumHazirlandiMi?: boolean;
   gorselAlanlariHazirlandiMi?: boolean;
+  gorselPaketSurumu?: number;
 
   githubAktarildiMi?: boolean;
   githubRepoAdi?: string;

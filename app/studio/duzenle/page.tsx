@@ -51,7 +51,18 @@ export default function DuzenlemeSayfasi() {
     const zamanlayici = window.setTimeout(() => {
       try {
         const kayit = window.localStorage.getItem(AKTIF_PROJE);
-        if (kayit) setProje(JSON.parse(kayit) as ProjeVerisi);
+        if (kayit) {
+          const kayitliProje = JSON.parse(kayit) as ProjeVerisi;
+          const varsayilanMedyalar = medyaAlanlariOlustur(
+            kayitliProje.sektor,
+            kayitliProje.sektorTemasi || kayitliProje.tema || "tema-1",
+          );
+          const mevcutMedyalar = kayitliProje.medyalar ?? [];
+          const eksikMedyalar = varsayilanMedyalar.filter(
+            (varsayilan) => !mevcutMedyalar.some((medya) => medya.slot === varsayilan.slot),
+          );
+          setProje({ ...kayitliProje, medyalar: [...mevcutMedyalar, ...eksikMedyalar] });
+        }
       } catch {
         setDurum("Proje kaydı okunamadı.");
       }

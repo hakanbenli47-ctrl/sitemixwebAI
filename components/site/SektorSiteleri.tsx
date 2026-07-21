@@ -143,7 +143,6 @@ function SiteBasligi({ proje, git, vurgu }: { proje: ProjeVerisi; git: (slug: st
       <SayfaLinki slug="" git={git} className={styles.marka}>
         {vurgu && <span>{vurgu}</span>}
         <strong>{proje.firmaAdi}</strong>
-        <small>{proje.sektorAdi}</small>
       </SayfaLinki>
       <nav className={styles.masaustuMenu} aria-label="Ana menü">
         {sayfalar.map((sayfa) => <SayfaLinki key={sayfa.id} slug={sayfa.slug} git={git}>{sayfa.menuBasligi}</SayfaLinki>)}
@@ -158,6 +157,48 @@ function SiteBasligi({ proje, git, vurgu }: { proje: ProjeVerisi; git: (slug: st
 function Medya({ medya, className }: { medya?: MedyaKaydi; className?: string }) {
   if (!medya?.acik || !medya.url.trim()) return null;
   return <figure className={`${styles.medya} ${className ?? ""}`}><Image src={medya.url} alt={medya.alternatifMetin || medya.baslik} fill unoptimized sizes="(max-width: 820px) 100vw, 50vw" /></figure>;
+}
+
+function GorselVitrini({ proje, medyalar }: { proje: ProjeVerisi; medyalar: MedyaKaydi[] }) {
+  const hareketiAzalt = useReducedMotion();
+  const galeri = medyalar.filter((medya) => medya.slot.startsWith("galeri-") && medya.acik && medya.url.trim());
+  if (!galeri.length) return null;
+
+  return (
+    <section className={styles.gorselVitrini} aria-label={`${proje.firmaAdi} görsel vitrini`}>
+      <motion.header
+        className={styles.vitrinBasligi}
+        initial={hareketiAzalt ? false : { opacity: 0, y: 45, filter: "blur(10px)" }}
+        whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: hareketiAzalt ? 0 : 0.8, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <div><UstEtiket>Görsel dosya</UstEtiket><h2>İşimizin içinden<br />gerçek kareler.</h2></div>
+        <p>{proje.firmaAdi} için seçilen çalışmalar, mekân detayları ve uygulama anları.</p>
+      </motion.header>
+      <div className={styles.vitrinSeridi} aria-hidden="true"><span>PORTFOLYO</span><i />{galeri.map((medya) => <span key={medya.id}>{medya.baslik}</span>)}</div>
+      <div className={styles.vitrinGrid}>
+        {galeri.map((medya, index) => (
+          <motion.figure
+            key={medya.id}
+            className={styles.vitrinKart}
+            initial={hareketiAzalt ? false : { opacity: 0, y: index % 2 ? 65 : 35, rotate: index % 2 ? 2.5 : -2.5 }}
+            whileInView={{ opacity: 1, y: 0, rotate: 0 }}
+            viewport={{ once: true, amount: 0.18 }}
+            transition={{ delay: hareketiAzalt ? 0 : index * 0.09, duration: hareketiAzalt ? 0 : 0.72, ease: [0.16, 1, 0.3, 1] }}
+            whileHover={hareketiAzalt ? undefined : { y: -14, rotate: index % 2 ? -1 : 1, transition: { duration: 0.25 } }}
+          >
+            <Image src={medya.url} alt={medya.alternatifMetin || medya.baslik} fill unoptimized sizes="(max-width: 720px) 92vw, 42vw" />
+            <figcaption><span>{String(index + 1).padStart(2, "0")}</span><strong>{medya.baslik}</strong><ArrowDownRight size={18} /></figcaption>
+          </motion.figure>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function HareketKatmani() {
+  return <div className={styles.hareketKatmani} aria-hidden="true"><i /><i /><i /><span /></div>;
 }
 
 function UstEtiket({ children }: { children: ReactNode }) {
@@ -338,7 +379,7 @@ function Iletisim(props: { proje: ProjeVerisi; icerik: SektorSiteIcerigi; alanla
 function AltSayfa({ proje, slug, git, icerik, alanlar, medya, tur }: GovdeProps & { tur: string }) {
   const hizmetSayfasi = /hizmet|uygulama|bakim|paket|tasima|transfer|yol-yardim|organizasyon/.test(slug);
   const iletisimSayfasi = /randevu|teklif|brief|iste|cagir|gonder|rezervasyon|talep|kesif/.test(slug);
-  const baslik = proje.sayfalar.find((sayfa) => sayfa.slug === slug)?.ad ?? proje.sektorAdi;
+  const baslik = proje.sayfalar.find((sayfa) => sayfa.slug === slug)?.ad ?? proje.firmaAdi;
   if (iletisimSayfasi) return <><SiteBasligi proje={proje} git={git} /><main className={styles.altSayfa} data-alt-tur={tur}><div className={styles.altHero}><UstEtiket>{icerik.rozet}</UstEtiket><h1>{baslik}</h1><p>{icerik.ctaMetni}</p></div><Iletisim proje={proje} icerik={icerik} alanlar={alanlar} baslik={icerik.ctaBaslik} /></main></>;
   return <><SiteBasligi proje={proje} git={git} /><main className={styles.altSayfa} data-alt-tur={tur}><div className={styles.altHero}><UstEtiket>{icerik.rozet}</UstEtiket><h1>{baslik}</h1><p>{hizmetSayfasi ? icerik.heroAciklama : icerik.hakkimizdaMetni}</p></div><Medya medya={medya.hero} className={styles.altMedya} />{hizmetSayfasi ? <section className={styles.altIcerik}><HizmetListesi icerik={icerik} numbered /><Surec icerik={icerik} rota={tur === "lojistik" || tur === "rescue"} /></section> : <section className={styles.altIcerik}><div className={styles.manifesto}><h2>{icerik.guvenBasligi}</h2><p>{icerik.guvenMetni}</p></div><Ozellikler icerik={icerik} />{icerik.sss.map((item) => <details key={item.soru}><summary>{item.soru}</summary><p>{item.cevap}</p></details>)}</section>}<Iletisim proje={proje} icerik={icerik} alanlar={alanlar} /></main></>;
 }
@@ -346,7 +387,7 @@ function AltSayfa({ proje, slug, git, icerik, alanlar, medya, tur }: GovdeProps 
 function Kuafor(props: GovdeProps) {
   if (props.slug) return <AltSayfa {...props} tur="editorial" />;
   const { proje, git, icerik, medya, alanlar } = props;
-  return <><SiteBasligi proje={proje} git={git} vurgu="S/" /><main className={styles.kuafor}><section className={styles.kuaforHero}><div><UstEtiket>{icerik.rozet}</UstEtiket><h1>{icerik.heroBaslik}</h1><p>{icerik.heroAciklama}</p><Aksiyonlar proje={proje} git={git} /></div><aside><span>Salon dosyası / 01</span><strong>{alanlar.uzmanlik || proje.sektorAdi}</strong><p>{icerik.slogan}</p></aside><Medya medya={medya.hero} /></section><section className={styles.editorialKiris}><span>Analiz</span><span>Teknik reçete</span><span>Uygulama</span><span>Evde bakım</span></section><section className={styles.kuaforHizmet}><div><UstEtiket>Hizmet seçkisi</UstEtiket><h2>Görünüm değil, size ait bir kullanım biçimi.</h2></div><HizmetListesi icerik={icerik} numbered compact /></section><section className={styles.kuaforHikaye}><Medya medya={medya.donusum} /><div><h2>{icerik.hakkimizdaBaslik}</h2><p>{icerik.hakkimizdaMetni}</p><Ozellikler icerik={icerik} /></div></section><Istatistikler icerik={icerik} /><Iletisim proje={proje} icerik={icerik} alanlar={alanlar} /></main></>;
+  return <><SiteBasligi proje={proje} git={git} vurgu="S/" /><main className={styles.kuafor}><section className={styles.kuaforHero}><div><UstEtiket>{icerik.rozet}</UstEtiket><h1>{icerik.heroBaslik}</h1><p>{icerik.heroAciklama}</p><Aksiyonlar proje={proje} git={git} /></div><aside><span>Salon dosyası / 01</span><strong>{alanlar.uzmanlik || "Kişiye özel saç tasarımı"}</strong><p>{icerik.slogan}</p></aside><Medya medya={medya.hero} /></section><section className={styles.editorialKiris}><span>Analiz</span><span>Teknik reçete</span><span>Uygulama</span><span>Evde bakım</span></section><section className={styles.kuaforHizmet}><div><UstEtiket>Hizmet seçkisi</UstEtiket><h2>Görünüm değil, size ait bir kullanım biçimi.</h2></div><HizmetListesi icerik={icerik} numbered compact /></section><section className={styles.kuaforHikaye}><Medya medya={medya.donusum} /><div><h2>{icerik.hakkimizdaBaslik}</h2><p>{icerik.hakkimizdaMetni}</p><Ozellikler icerik={icerik} /></div></section><Istatistikler icerik={icerik} /><Iletisim proje={proje} icerik={icerik} alanlar={alanlar} /></main></>;
 }
 
 function BarberPole() { return <div className={styles.barberPole} aria-hidden="true"><i /><span /></div>; }
@@ -447,7 +488,7 @@ export default function SektorSiteleri({ proje, baslangicSlug = "", gercekRotaKu
     const temel = proje.siteIcerigi ?? varsayilanIcerikOlustur(proje.sektor);
     return { ...temel, hizmetler: proje.hizmetler?.length ? proje.hizmetler : temel.hizmetler, ozellikler: proje.ekOzellikler?.length ? proje.ekOzellikler : temel.ozellikler };
   }, [proje]);
-  const medya = Object.fromEntries((proje.medyalar ?? []).map((item) => [item.slot, item]));
+  const medya = Object.fromEntries((proje.medyalar ?? []).map((item) => [item.slot, item])) as Record<string, MedyaKaydi>;
   const alanlar = Object.fromEntries((proje.isletmeAlanlari ?? []).map((item) => [item.anahtar, item.deger]));
   const tema = temaTanimiGetir(proje.sektor, proje.sektorTemasi || proje.tema);
   const [arkaPlan, anaYazi, vurgu, yuzey] = tema.renkler;
@@ -480,6 +521,7 @@ export default function SektorSiteleri({ proje, baslangicSlug = "", gercekRotaKu
   };
   return (
     <div className={styles.site} data-sektor={proje.sektor} data-tema={tema.id} data-yerlesim={tema.yerlesim} data-iskelet={tanim.iskeletAdi} style={renkStili}>
+      <HareketKatmani />
       <SiteRotaBaglami.Provider value={slug}>
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
@@ -494,9 +536,10 @@ export default function SektorSiteleri({ proje, baslangicSlug = "", gercekRotaKu
           </motion.div>
         </AnimatePresence>
       </SiteRotaBaglami.Provider>
+      <GorselVitrini proje={proje} medyalar={Object.values(medya)} />
       <MobilHizliAksiyon proje={proje} />
       <SosyalBaglantilar proje={proje} />
-      <footer className={styles.footer}><strong>{proje.firmaAdi}</strong><span>{tanim.iskeletAdi} · {new Date().getFullYear()}</span><a href={telefonHref(proje.telefon)}>İletişime geç <ArrowRight size={16} /></a></footer>
+      <footer className={styles.footer}><strong>{proje.firmaAdi}</strong><span>Resmî web sitesi · {new Date().getFullYear()}</span><a href={telefonHref(proje.telefon)}>İletişime geç <ArrowRight size={16} /></a></footer>
     </div>
   );
 }

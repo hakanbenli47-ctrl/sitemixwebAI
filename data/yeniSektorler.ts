@@ -319,6 +319,51 @@ export const YENI_SEKTORLER = sektorler.filter((sektor) =>
   BASLANGIC_SEKTORLERI.includes(sektor.id),
 );
 
+const EK_GORSEL_ALANLARI: Partial<Record<YeniSektorKimligi, MedyaSlotuTanimi[]>> = {
+  kuafor: [
+    { slot: "galeri-1", baslik: "Kesim portfolyosu" },
+    { slot: "galeri-2", baslik: "Renklendirme portfolyosu" },
+    { slot: "galeri-3", baslik: "Salon detayları" },
+    { slot: "galeri-4", baslik: "Uzman ekip" },
+  ],
+  berber: [
+    { slot: "galeri-1", baslik: "Saç kesimi portfolyosu" },
+    { slot: "galeri-2", baslik: "Sakal tasarımı" },
+    { slot: "galeri-3", baslik: "Barber club atmosferi" },
+    { slot: "galeri-4", baslik: "Usta koltukları" },
+  ],
+  "guzellik-salonu": [
+    { slot: "galeri-1", baslik: "Cilt bakımı uygulaması" },
+    { slot: "galeri-2", baslik: "Bakım odası" },
+    { slot: "galeri-3", baslik: "Kaş ve kirpik çalışması" },
+    { slot: "galeri-4", baslik: "Salon ekibi" },
+  ],
+  "nail-artist": [
+    { slot: "galeri-1", baslik: "Yeni sezon seti" },
+    { slot: "galeri-2", baslik: "Minimal nail art" },
+    { slot: "galeri-3", baslik: "Renk koleksiyonu" },
+    { slot: "galeri-4", baslik: "Çalışma masası" },
+  ],
+  "oto-yikama": [
+    { slot: "galeri-1", baslik: "Dış yıkama uygulaması" },
+    { slot: "galeri-2", baslik: "İç detay temizliği" },
+    { slot: "galeri-3", baslik: "Pasta cila sonucu" },
+    { slot: "galeri-4", baslik: "Yıkama istasyonu" },
+  ],
+  "hali-yikama": [
+    { slot: "galeri-1", baslik: "Teslim alma servisi" },
+    { slot: "galeri-2", baslik: "Yıkama hattı" },
+    { slot: "galeri-3", baslik: "Kurutma alanı" },
+    { slot: "galeri-4", baslik: "Paketli teslim" },
+  ],
+  nakliye: [
+    { slot: "galeri-1", baslik: "Profesyonel paketleme" },
+    { slot: "galeri-2", baslik: "Araç filosu" },
+    { slot: "galeri-3", baslik: "Yükleme operasyonu" },
+    { slot: "galeri-4", baslik: "Güvenli teslim" },
+  ],
+};
+
 export function sektorTanimiGetir(sektor: string): SektorTanimi {
   return sektorler.find((kayit) => kayit.id === sektor) ?? sektorler[0];
 }
@@ -342,7 +387,13 @@ export function medyaAlanlariOlustur(
   sektor: string,
   tema: string = "tema-1",
 ): MedyaKaydi[] {
-  return sektorTanimiGetir(sektor).medyaSlotlari.map((alan, index) => {
+  const tanim = sektorTanimiGetir(sektor);
+  const alanlar = [
+    ...tanim.medyaSlotlari,
+    ...(EK_GORSEL_ALANLARI[tanim.id] ?? []),
+  ];
+
+  return alanlar.map((alan, index) => {
     const dosyaAdi = `${alan.slot}.webp`;
     return {
       id: `${sektor}-medya-${index + 1}`,

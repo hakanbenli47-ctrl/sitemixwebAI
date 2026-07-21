@@ -199,12 +199,19 @@ function projeAciklamasiOlustur(proje: ProjeVerisi) {
     proje.seoAciklama?.trim() ||
     proje.siteIcerigi?.heroAciklama.trim() ||
     heroBolumu?.aciklama.trim() ||
-    `${proje.firmaAdi}, ${proje.sektorAdi} alanında profesyonel hizmet sunar.`
+    `${proje.firmaAdi}; hizmetleri, çalışmaları ve iletişim bilgileriyle yanınızda.`
   );
 }
 
 function seoBasligiOlustur(proje: ProjeVerisi) {
-  return proje.seoBaslik?.trim() || `${proje.firmaAdi} | ${proje.sektorAdi}`;
+  const kayitliBaslik = proje.seoBaslik?.trim();
+  const sektorIceriyor = kayitliBaslik
+    ?.toLocaleLowerCase("tr-TR")
+    .includes(proje.sektorAdi.toLocaleLowerCase("tr-TR"));
+
+  return kayitliBaslik && !sektorIceriyor
+    ? kayitliBaslik
+    : `${proje.firmaAdi} | Resmî Web Sitesi`;
 }
 
 function seoKelimeleriOlustur(proje: ProjeVerisi) {

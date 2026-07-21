@@ -133,6 +133,8 @@ for (const sektor of sektorler) {
   if (tekSayfa.length !== 1 || !tekSayfa[0].anaSayfa || tekSayfa[0].slug) sorunlar.push(`${sektor.id}: tek sayfali cikti bozuk.`);
   const medyalar = katalog.medyaAlanlariOlustur(sektor.id);
   if (medyalar.some((medya) => medya.acik || !medya.url.startsWith(`/site-assets/${sektor.id}/tema-1/`))) sorunlar.push(`${sektor.id}: sabit public gorsel yolu bozuk.`);
+  const galeriSlotlari = medyalar.filter((medya) => medya.slot.startsWith("galeri-"));
+  if (galeriSlotlari.length !== 4) sorunlar.push(`${sektor.id}: dort hareketli galeri alani olmali.`);
   const derin = derinKatalog.sektorDerinIcerigiGetir(sektor.id);
   if (derin.paketler.length < 3) sorunlar.push(`${sektor.id}: hizmet paketleri eksik.`);
   if (derin.senaryolar.length < 4) sorunlar.push(`${sektor.id}: karar senaryolari eksik.`);
@@ -150,9 +152,13 @@ for (const islev of ["Kuafor", "Berber", "Guzellik", "Nail", "Nakliye", "Hali", 
   if (!renderer.includes(`function ${islev}(`)) sorunlar.push(`Renderer eksik: ${islev}`);
 }
 
-for (const guvence of ["BarberPole", "medya?.acik", "!medya.url.trim()", "Iletisim", "AltSayfa", "ZenginIcerik", "KayanSerit", "AnimatePresence", "SosyalBaglantilar", "data-yerlesim", "prefers-reduced-motion"]) {
+for (const guvence of ["BarberPole", "medya?.acik", "!medya.url.trim()", "Iletisim", "AltSayfa", "ZenginIcerik", "KayanSerit", "GorselVitrini", "HareketKatmani", "AnimatePresence", "SosyalBaglantilar", "data-yerlesim", "prefers-reduced-motion"]) {
   const kaynak = guvence === "prefers-reduced-motion" ? css : renderer;
   if (!kaynak.includes(guvence)) sorunlar.push(`Sunum guvencesi eksik: ${guvence}`);
+}
+
+if (renderer.includes("{proje.sektorAdi}") || renderer.includes("|| proje.sektorAdi")) {
+  sorunlar.push("Musteri sitesinde sektor adi gorunur olmamali.");
 }
 
 for (const kontrastGuvencesi of ["--site-on-surface", "--site-action-bg", "--site-accent-copy", "--site-accent-copy-reverse", "--site-accent-copy-surface", "--site-readable-accent"]) {

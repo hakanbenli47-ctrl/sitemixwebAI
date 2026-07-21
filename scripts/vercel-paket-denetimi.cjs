@@ -190,6 +190,10 @@ async function calistir() {
     proje,
     "vercel-test-elektrik",
   );
+  const tekSayfaDosyalari = await aktarimRotasi.aktarilacakDosyalariOlustur(
+    { ...proje, siteTipi: "tek-sayfa" },
+    "vercel-test-elektrik-tek-sayfa",
+  );
 
   for (const [dosyaYolu, dosya] of Object.entries(dosyalar)) {
     const hedef = path.join(geciciDizin, ...dosyaYolu.split("/"));
@@ -224,6 +228,9 @@ async function calistir() {
     !Object.keys(dosyalar).includes("components/site/SektorSiteleri.tsx") ||
     !Object.keys(dosyalar).includes("components/site/sektorSiteleri.module.css") ||
     !Object.keys(dosyalar).includes("data/yeniSektorler.ts") ||
+    !Object.keys(dosyalar).includes("data/proje.json") ||
+    Object.keys(tekSayfaDosyalari).includes("app/[slug]/page.tsx") ||
+    !String(tekSayfaDosyalari["data/proje.json"]).includes('"siteTipi": "tek-sayfa"') ||
     !projeKaynagi.includes('"gorselAlaniAcikMi": true') ||
     !Object.keys(dosyalar).some((dosyaYolu) => dosyaYolu.startsWith("public/images/")) ||
     projeKaynagi.includes("data:image/png;base64") ||

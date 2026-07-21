@@ -108,6 +108,18 @@ function whatsappHref(numara: string, firmaAdi: string) {
   return temiz ? `https://wa.me/${temiz}?text=${encodeURIComponent(`${firmaAdi} hakkında bilgi almak istiyorum.`)}` : "#iletisim";
 }
 
+function sosyalHref(tur: string, deger: string) {
+  const temiz = deger.trim();
+  if (!temiz) return "";
+  if (/^https?:\/\//i.test(temiz)) return temiz;
+  const kullanici = temiz.replace(/^@/, "");
+  if (tur === "instagram") return `https://instagram.com/${kullanici}`;
+  if (tur === "tiktok") return `https://tiktok.com/@${kullanici}`;
+  if (tur === "facebook") return `https://facebook.com/${kullanici.replace(/^facebook\.com\//, "")}`;
+  if (tur === "youtube") return `https://youtube.com/${kullanici.startsWith("@") ? kullanici : `@${kullanici.replace(/^youtube\.com\/@?/, "")}`}`;
+  return temiz;
+}
+
 function SayfaLinki({ slug, git, children, className }: { slug: string; git: (slug: string) => void; children: ReactNode; className?: string }) {
   return (
     <a
@@ -200,6 +212,19 @@ function MobilHizliAksiyon({ proje }: { proje: ProjeVerisi }) {
       <a href={whatsappHref(proje.whatsapp || proje.telefon, proje.firmaAdi)} target="_blank" rel="noreferrer"><MessageCircle size={18} /><span><small>Mesaj gönder</small>WhatsApp</span></a>
     </div>
   );
+}
+
+function SosyalBaglantilar({ proje }: { proje: ProjeVerisi }) {
+  const alanlar = Object.fromEntries((proje.isletmeAlanlari ?? []).map((alan) => [alan.anahtar, alan.deger]));
+  const hesaplar = [
+    ["instagram", "Instagram"],
+    ["facebook", "Facebook"],
+    ["tiktok", "TikTok"],
+    ["youtube", "YouTube"],
+  ].map(([tur, etiket]) => ({ etiket, href: sosyalHref(tur, alanlar[tur] || "") })).filter((hesap) => hesap.href);
+
+  if (!hesaplar.length) return null;
+  return <nav className={styles.sosyalBaglantilar} aria-label="Sosyal medya hesapları"><span>BİZİ TAKİP EDİN</span>{hesaplar.map((hesap) => <a key={hesap.etiket} href={hesap.href} target="_blank" rel="noreferrer">{hesap.etiket}<ArrowDownRight size={15} /></a>)}</nav>;
 }
 
 function ZenginIcerik({ proje }: { proje: ProjeVerisi }) {
@@ -443,6 +468,10 @@ export default function SektorSiteleri({ proje, baslangicSlug = "", gercekRotaKu
   const Govde = govdeler[proje.sektor] ?? Kuafor;
   const tanim = sektorTanimiGetir(proje.sektor);
   const sayfayaGit = (hedef: string) => {
+    if (proje.siteTipi === "tek-sayfa" && hedef) {
+      document.getElementById("iletisim")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
     if (gercekRotaKullan) {
       window.location.assign(hedef ? `/${hedef}` : "/");
       return;
@@ -450,7 +479,7 @@ export default function SektorSiteleri({ proje, baslangicSlug = "", gercekRotaKu
     setSlug(hedef);
   };
   return (
-    <div className={styles.site} data-sektor={proje.sektor} data-tema={tema.id} data-iskelet={tanim.iskeletAdi} style={renkStili}>
+    <div className={styles.site} data-sektor={proje.sektor} data-tema={tema.id} data-yerlesim={tema.yerlesim} data-iskelet={tanim.iskeletAdi} style={renkStili}>
       <SiteRotaBaglami.Provider value={slug}>
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
@@ -466,6 +495,7 @@ export default function SektorSiteleri({ proje, baslangicSlug = "", gercekRotaKu
         </AnimatePresence>
       </SiteRotaBaglami.Provider>
       <MobilHizliAksiyon proje={proje} />
+      <SosyalBaglantilar proje={proje} />
       <footer className={styles.footer}><strong>{proje.firmaAdi}</strong><span>{tanim.iskeletAdi} · {new Date().getFullYear()}</span><a href={telefonHref(proje.telefon)}>İletişime geç <ArrowRight size={16} /></a></footer>
     </div>
   );

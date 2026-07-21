@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
+  Download,
   ExternalLink,
   Eye,
   FilePenLine,
@@ -120,6 +121,9 @@ export default function ProjelerSayfasi() {
   const [projeler, setProjeler] = useState<ProjeVerisi[]>([]);
   const [yukleniyor, setYukleniyor] = useState(true);
   const [depolamaHatasi, setDepolamaHatasi] = useState(false);
+  const [repoGirisi, setRepoGirisi] = useState("");
+  const [baglamaDurumu, setBaglamaDurumu] = useState("");
+  const [baglaniyor, setBaglaniyor] = useState(false);
 
   useEffect(() => {
     const yuklemeZamanlayicisi = window.setTimeout(() => {
@@ -225,6 +229,37 @@ export default function ProjelerSayfasi() {
     setProjeler(guncelProjeler);
   }
 
+  async function githubProjesiniBagla() {
+    const repo = repoGirisi.trim();
+    if (!repo) {
+      setBaglamaDurumu("Repository adı veya GitHub adresi girin.");
+      return;
+    }
+
+    setBaglaniyor(true);
+    setBaglamaDurumu("GitHub projesi okunuyor...");
+    try {
+      const cevap = await fetch("/api/github/proje-getir", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ repo }),
+      });
+      const veri = (await cevap.json()) as { basarili?: boolean; mesaj?: string; proje?: ProjeVerisi };
+      if (!cevap.ok || !veri.basarili || !veri.proje) throw new Error(veri.mesaj || "Proje getirilemedi.");
+
+      const guncelListe = [veri.proje, ...projeler.filter((proje) => proje.id !== veri.proje?.id)]
+        .sort((a, b) => tarihDegeri(b) - tarihDegeri(a));
+      if (!guvenliKaydet(PROJELER_ANAHTARI, guncelListe)) throw new Error("Proje tarayıcıya kaydedilemedi.");
+      setProjeler(guncelListe);
+      setRepoGirisi("");
+      setBaglamaDurumu(`${veri.proje.firmaAdi} yeniden Studio'ya bağlandı.`);
+    } catch (error) {
+      setBaglamaDurumu(error instanceof Error ? error.message : "GitHub projesi getirilemedi.");
+    } finally {
+      setBaglaniyor(false);
+    }
+  }
+
   return (
     <main className={styles.sayfa}>
       <header className={styles.ustAlan}>
@@ -246,6 +281,11 @@ export default function ProjelerSayfasi() {
           Oluşturduğun siteleri düzenle, önizle ve GitHub
           repositorylerini güncelle.
         </p>
+      </section>
+
+      <section className={styles.githubBagla}>
+        <div><span>ÖNCEKİ PROJELER</span><h2>GitHub’daki siteyi yeniden aç.</h2><p>Repository adı veya adresini girin; Studio proje verisini okuyup düzenleme listesine geri ekler.</p></div>
+        <div className={styles.githubBaglaFormu}><input value={repoGirisi} onChange={(event) => setRepoGirisi(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") void githubProjesiniBagla(); }} placeholder="firma-adi veya github.com/kullanici/firma-adi" aria-label="GitHub repository" /><button type="button" onClick={() => void githubProjesiniBagla()} disabled={baglaniyor}><Download size={17} />{baglaniyor ? "Bağlanıyor" : "Projeyi getir"}</button>{baglamaDurumu && <p>{baglamaDurumu}</p>}</div>
       </section>
 
       {depolamaHatasi && (

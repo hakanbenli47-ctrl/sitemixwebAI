@@ -64,6 +64,31 @@
   line-height: 1.7;
 }
 
+.githubBagla {
+  display: grid;
+  grid-template-columns: .85fr 1.15fr;
+  gap: clamp(35px, 8vw, 120px);
+  align-items: center;
+  padding: 38px 0;
+  border-bottom: 1px solid rgba(17, 23, 19, 0.18);
+}
+
+.githubBagla > div:first-child > span {
+  color: #1e4d3a;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+
+.githubBagla h2 { margin: 12px 0 8px; font-size: clamp(25px, 3vw, 42px); letter-spacing: -.05em; }
+.githubBagla > div:first-child p { max-width: 540px; margin: 0; color: #626a64; font-size: 11px; line-height: 1.6; }
+.githubBaglaFormu { display: grid; grid-template-columns: 1fr auto; }
+.githubBaglaFormu input { min-width: 0; min-height: 54px; padding: 0 16px; border: 1px solid rgba(17, 23, 19, .24); background: rgba(255,255,255,.45); color: #111713; outline: 0; }
+.githubBaglaFormu input:focus { border-color: #1e4d3a; box-shadow: 0 0 0 2px rgba(30,77,58,.1); }
+.githubBaglaFormu button { min-height: 54px; display: inline-flex; align-items: center; gap: 9px; padding: 0 18px; border: 0; background: #1e4d3a; color: white; font-size: 11px; font-weight: 800; cursor: pointer; }
+.githubBaglaFormu button:disabled { opacity: .55; cursor: wait; }
+.githubBaglaFormu > p { grid-column: 1/-1; margin: 10px 0 0; color: #1e4d3a; font-size: 10px; font-weight: 700; }
+
 .projeListesi {
   border-bottom: 1px solid rgba(17, 23, 19, 0.18);
 }
@@ -241,6 +266,7 @@
 }
 
 @media (max-width: 1100px) {
+  .githubBagla { grid-template-columns: 1fr; gap: 24px; }
   .listeBasligi {
     display: none;
   }
@@ -287,6 +313,9 @@
   .baslikAlani p {
     font-size: 14px;
   }
+
+  .githubBaglaFormu { grid-template-columns: 1fr; }
+  .githubBaglaFormu button { justify-content: center; }
 
   .projeSatiri {
     grid-template-columns: 1fr;

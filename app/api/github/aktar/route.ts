@@ -147,7 +147,17 @@ function yayinProjesiniNormalizeEt(proje: ProjeVerisi): ProjeVerisi {
         })),
     };
   });
-  kopya.siteTipi = "cok-sayfa";
+  if (kopya.siteTipi === "tek-sayfa") {
+    kopya.sayfalar = kopya.sayfalar.slice(0, 1).map((sayfa) => ({
+      ...sayfa,
+      slug: "",
+      anaSayfa: true,
+      menuGoster: true,
+      sira: 0,
+    }));
+  } else {
+    kopya.siteTipi = "cok-sayfa";
+  }
   kopya.guncellenmeTarihi = guvenliIsoTarihiOlustur(
     kopya.guncellenmeTarihi,
   );
@@ -448,6 +458,22 @@ async function gorseliIndir(gorsel: string) {
       mime,
       base64,
     };
+  }
+
+  if (gorsel.startsWith("/site-assets/")) {
+    const publicDizini = path.resolve(process.cwd(), "public");
+    const dosyaYolu = path.resolve(publicDizini, gorsel.replace(/^\/+/, ""));
+    const publicOnEki = `${publicDizini}${path.sep}`;
+    if (!dosyaYolu.startsWith(publicOnEki)) {
+      throw new Error("Public görsel yolu güvenli değil.");
+    }
+    const tampon = await readFile(dosyaYolu);
+    if (tampon.byteLength > 12 * 1024 * 1024) {
+      throw new Error("Görsel 12 MB sınırını aşıyor.");
+    }
+    const uzanti = path.extname(dosyaYolu).toLowerCase();
+    const mime = uzanti === ".png" ? "image/png" : uzanti === ".avif" ? "image/avif" : uzanti === ".gif" ? "image/gif" : uzanti === ".jpg" || uzanti === ".jpeg" ? "image/jpeg" : "image/webp";
+    return { mime, base64: tampon.toString("base64") };
   }
 
   if (!/^https?:\/\//i.test(gorsel)) {
@@ -920,12 +946,13 @@ npm run dev
 
     "app/layout.tsx": layoutTsx,
     "app/page.tsx": pageTsx,
-    "app/[slug]/page.tsx": dinamikSayfaTsx,
     "app/sitemap.ts": sitemapTs,
     "app/robots.ts": robotsTs,
     "app/globals.css": globalCss,
 
     "data/proje.ts": projeTs,
+    "data/proje.json": guvenliProjeJson,
+    ...(yayinProjesi.siteTipi === "cok-sayfa" ? { "app/[slug]/page.tsx": dinamikSayfaTsx } : {}),
     ...kaynaklar,
     ...yerelGorselSonucu.gorselDosyalari,
   };

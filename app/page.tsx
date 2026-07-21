@@ -14,7 +14,7 @@ export default function AnaSayfa() {
           <span>SITEMIX</span>
           <small>STUDIO</small>
         </Link>
-        <div className="surum">10 güçlü hizmet sektörüne özel stüdyo</div>
+        <div className="surum">7 sektör · 21 bağımsız site teması</div>
       </header>
 
       <section className="hero">
@@ -23,15 +23,15 @@ export default function AnaSayfa() {
         </div>
 
         <h1>
-          Görsel aramadan,
+          Normal web sitesi gibi,
           <br />
-          sektöre özel siteler oluştur.
+          Studio’dan kolayca yönet.
         </h1>
 
         <p>
-          Firma bilgilerini, sektörünü ve sunduğun hizmetleri seç. Hazır içerik
-          paketleri, bağımsız sayfalar ve görsel düzenleyiciyle kod yazmadan
-          profesyonel bir web sitesi kur.
+          Her müşteri için tek veya çok sayfalı bağımsız bir proje oluştur.
+          İşletme bilgilerini ve görselleri Studio’dan yönet; projeyi kendi
+          GitHub repositorysine gönder ve daha sonra yeniden açıp güncelle.
         </p>
 
         <div className="heroButonlar">
@@ -58,10 +58,10 @@ export default function AnaSayfa() {
           </div>
 
           <div className="ozellikMetni">
-            <h2>Görsel çok sayfalı stüdyo</h2>
+            <h2>Tek sayfa veya çok sayfa</h2>
             <p>
-              Sayfaları, bölümleri ve metinleri canlı önizleme üzerinde yönet;
-              hazır blokları ekle ve istediğin sıraya taşı.
+              Proje başında yapıyı seç; Studio GitHub’a çıkacak gerçek rotaları
+              ve bağımsız site paketini buna göre hazırlasın.
             </p>
           </div>
         </div>
@@ -74,8 +74,8 @@ export default function AnaSayfa() {
           <div className="ozellikMetni">
             <h2>Sektöre özel tasarım dili</h2>
             <p>
-              Kuaförden nakliyata, tesisatçıdan VIP transfere odaklanan on iş
-              kolu için ayrı içerik, renk, tipografi ve hareket dili kullan.
+              Kuaför, berber, güzellik salonu, nail artist, oto yıkama, halı
+              yıkama ve nakliye için üçer ayrı site düzeni kullan.
             </p>
           </div>
         </div>

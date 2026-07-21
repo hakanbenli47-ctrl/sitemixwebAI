@@ -21,6 +21,8 @@ export interface TemaTanimi {
   ad: string;
   aciklama: string;
   renkler: [string, string, string, string];
+  yerlesim: "editorial" | "sinematik" | "dinamik";
+  yerlesimAdi: string;
 }
 
 export interface SayfaTanimi {
@@ -54,12 +56,28 @@ const t = (
   ad: string,
   aciklama: string,
   renkler: [string, string, string, string],
-): TemaTanimi => ({ id, ad, aciklama, renkler });
+): TemaTanimi => ({
+  id,
+  ad,
+  aciklama,
+  renkler,
+  yerlesim:
+    id === "tema-1" ? "editorial" : id === "tema-2" ? "sinematik" : "dinamik",
+  yerlesimAdi:
+    id === "tema-1"
+      ? "Editoryal site"
+      : id === "tema-2"
+        ? "Sinematik site"
+        : "Dinamik vitrin",
+});
 
 const ortakAlanlar: AlanTanimi[] = [
   { anahtar: "yetkili", etiket: "Yetkili kişi", yerTutucu: "Ad Soyad", zorunlu: false },
   { anahtar: "calismaSaatleri", etiket: "Çalışma saatleri", yerTutucu: "Pzt–Cmt 09.00–19.00", zorunlu: true },
   { anahtar: "instagram", etiket: "Instagram", yerTutucu: "@isletme", zorunlu: false },
+  { anahtar: "facebook", etiket: "Facebook", yerTutucu: "facebook.com/isletme", zorunlu: false },
+  { anahtar: "tiktok", etiket: "TikTok", yerTutucu: "@isletme", zorunlu: false },
+  { anahtar: "youtube", etiket: "YouTube", yerTutucu: "youtube.com/@isletme", zorunlu: false },
 ];
 
 const sektorler: SektorTanimi[] = [
@@ -285,7 +303,21 @@ const sektorler: SektorTanimi[] = [
   },
 ];
 
-export const YENI_SEKTORLER = sektorler;
+const BASLANGIC_SEKTORLERI: YeniSektorKimligi[] = [
+  "kuafor",
+  "berber",
+  "guzellik-salonu",
+  "nail-artist",
+  "oto-yikama",
+  "hali-yikama",
+  "nakliye",
+];
+
+// İlk sürümde yalnızca kullanıcının aktif olarak satış yaptığı işletme grupları
+// gösterilir. Eski proje tanımları geriye dönük düzenleme için dosyada korunur.
+export const YENI_SEKTORLER = sektorler.filter((sektor) =>
+  BASLANGIC_SEKTORLERI.includes(sektor.id),
+);
 
 export function sektorTanimiGetir(sektor: string): SektorTanimi {
   return sektorler.find((kayit) => kayit.id === sektor) ?? sektorler[0];
@@ -306,12 +338,32 @@ export function isletmeAlanlariOlustur(sektor: string): IsletmeAlaniDegeri[] {
   return sektorTanimiGetir(sektor).alanlar.map((alan) => ({ anahtar: alan.anahtar, etiket: alan.etiket, deger: "", zorunlu: alan.zorunlu }));
 }
 
-export function medyaAlanlariOlustur(sektor: string): MedyaKaydi[] {
-  return sektorTanimiGetir(sektor).medyaSlotlari.map((alan, index) => ({ id: `${sektor}-medya-${index + 1}`, slot: alan.slot, baslik: alan.baslik, acik: false, url: "" }));
+export function medyaAlanlariOlustur(
+  sektor: string,
+  tema: string = "tema-1",
+): MedyaKaydi[] {
+  return sektorTanimiGetir(sektor).medyaSlotlari.map((alan, index) => {
+    const dosyaAdi = `${alan.slot}.webp`;
+    return {
+      id: `${sektor}-medya-${index + 1}`,
+      slot: alan.slot,
+      baslik: alan.baslik,
+      acik: false,
+      url: `/site-assets/${sektor}/${tema}/${dosyaAdi}`,
+      dosyaAdi,
+      alternatifMetin: alan.baslik,
+    };
+  });
 }
 
-export function siteSayfalariOlustur(sektor: string): SiteSayfasi[] {
-  return sektorTanimiGetir(sektor).sayfalar.map((sayfa, index) => ({
+export function siteSayfalariOlustur(
+  sektor: string,
+  siteTipi: "tek-sayfa" | "cok-sayfa" = "cok-sayfa",
+): SiteSayfasi[] {
+  const sayfalar = sektorTanimiGetir(sektor).sayfalar;
+  const aktifSayfalar = siteTipi === "tek-sayfa" ? sayfalar.slice(0, 1) : sayfalar;
+
+  return aktifSayfalar.map((sayfa, index) => ({
     id: `${sektor}-sayfa-${index + 1}`,
     rol: index === 0 ? "ana" : index === 1 ? "hizmet" : index === 4 ? "aksiyon" : "ozel",
     ad: sayfa.ad,

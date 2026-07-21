@@ -85,12 +85,11 @@ const derinKatalog = tsModulunuYukle(path.join(kok, "data/sektorDerinIcerikleri.
 const sektorler = katalog.YENI_SEKTORLER;
 const beklenenSektorler = [
   "kuafor", "berber", "guzellik-salonu", "nail-artist", "nakliye",
-  "vip-tasimacilik", "hali-yikama", "dovmeci", "elektrikci", "tesisatci",
-  "organizasyon", "duvar-isleri", "oto-yikama", "oto-kurtarma", "oto-servis",
+  "hali-yikama", "oto-yikama",
 ];
 
-if (!Array.isArray(sektorler) || sektorler.length !== 15) {
-  sorunlar.push(`Sektor sayisi 15 olmali; bulunan: ${sektorler?.length ?? 0}`);
+if (!Array.isArray(sektorler) || sektorler.length !== 7) {
+  sorunlar.push(`Sektor sayisi 7 olmali; bulunan: ${sektorler?.length ?? 0}`);
 }
 
 const kimlikler = new Set(sektorler.map((sektor) => sektor.id));
@@ -98,7 +97,7 @@ const iskeletler = new Set(sektorler.map((sektor) => sektor.iskeletAdi));
 for (const id of beklenenSektorler) {
   if (!kimlikler.has(id)) sorunlar.push(`Eksik sektor: ${id}`);
 }
-if (iskeletler.size !== 15) sorunlar.push("Her sektorun iskelet adi benzersiz olmali.");
+if (iskeletler.size !== 7) sorunlar.push("Her sektorun iskelet adi benzersiz olmali.");
 
 for (const sektor of sektorler) {
   if (sektor.temalar.length !== 3) sorunlar.push(`${sektor.id}: uc tema yok.`);
@@ -110,6 +109,7 @@ for (const sektor of sektorler) {
   if (sektor.icerik.sss.length < 3) sorunlar.push(`${sektor.id}: SSS icerigi eksik.`);
   if (!sektor.alanlar.some((alan) => alan.zorunlu)) sorunlar.push(`${sektor.id}: zorunlu sektor alani yok.`);
   if (sektor.temalar.some((tema) => tema.renkler.length !== 4)) sorunlar.push(`${sektor.id}: tema renk rolleri eksik.`);
+  if (new Set(sektor.temalar.map((tema) => tema.yerlesim)).size !== 3) sorunlar.push(`${sektor.id}: uc ayri site yerlesimi yok.`);
   for (const tema of sektor.temalar) {
     const [arkaPlan, anaYazi, vurgu, yuzey] = tema.renkler;
     const yuzeyYazisi = zeminYazisi(yuzey, anaYazi);
@@ -129,8 +129,10 @@ for (const sektor of sektorler) {
   }
   const sayfalar = katalog.siteSayfalariOlustur(sektor.id);
   if (sayfalar.length !== sektor.sayfalar.length || !sayfalar[0].anaSayfa) sorunlar.push(`${sektor.id}: cok sayfali cikti bozuk.`);
+  const tekSayfa = katalog.siteSayfalariOlustur(sektor.id, "tek-sayfa");
+  if (tekSayfa.length !== 1 || !tekSayfa[0].anaSayfa || tekSayfa[0].slug) sorunlar.push(`${sektor.id}: tek sayfali cikti bozuk.`);
   const medyalar = katalog.medyaAlanlariOlustur(sektor.id);
-  if (medyalar.some((medya) => medya.acik || medya.url)) sorunlar.push(`${sektor.id}: gorsel alanlari kapali baslamali.`);
+  if (medyalar.some((medya) => medya.acik || !medya.url.startsWith(`/site-assets/${sektor.id}/tema-1/`))) sorunlar.push(`${sektor.id}: sabit public gorsel yolu bozuk.`);
   const derin = derinKatalog.sektorDerinIcerigiGetir(sektor.id);
   if (derin.paketler.length < 3) sorunlar.push(`${sektor.id}: hizmet paketleri eksik.`);
   if (derin.senaryolar.length < 4) sorunlar.push(`${sektor.id}: karar senaryolari eksik.`);
@@ -144,11 +146,11 @@ const css = fs.readFileSync(path.join(kok, "components/site/sektorSiteleri.modul
 const editor = fs.readFileSync(path.join(kok, "app/studio/duzenle/page.tsx"), "utf8");
 const wizard = fs.readFileSync(path.join(kok, "app/studio/yeni/page.tsx"), "utf8");
 
-for (const islev of ["Kuafor", "Berber", "Guzellik", "Nail", "Nakliye", "Vip", "Hali", "Dovme", "Elektrik", "Tesisat", "Organizasyon", "Duvar", "OtoYikama", "OtoKurtarma", "OtoServis"]) {
+for (const islev of ["Kuafor", "Berber", "Guzellik", "Nail", "Nakliye", "Hali", "OtoYikama"]) {
   if (!renderer.includes(`function ${islev}(`)) sorunlar.push(`Renderer eksik: ${islev}`);
 }
 
-for (const guvence of ["BarberPole", "medya?.acik", "!medya.url.trim()", "Iletisim", "AltSayfa", "ZenginIcerik", "KayanSerit", "AnimatePresence", "prefers-reduced-motion"]) {
+for (const guvence of ["BarberPole", "medya?.acik", "!medya.url.trim()", "Iletisim", "AltSayfa", "ZenginIcerik", "KayanSerit", "AnimatePresence", "SosyalBaglantilar", "data-yerlesim", "prefers-reduced-motion"]) {
   const kaynak = guvence === "prefers-reduced-motion" ? css : renderer;
   if (!kaynak.includes(guvence)) sorunlar.push(`Sunum guvencesi eksik: ${guvence}`);
 }
@@ -161,11 +163,11 @@ for (const kirilim of ["@media (max-width: 1100px)", "@media (max-width: 820px)"
   if (!css.includes(kirilim)) sorunlar.push(`Mobil kirilim eksik: ${kirilim}`);
 }
 
-for (const islem of ["Görsel yükle", "Değiştir", "Görseli kaldır", "Sıfırla", "hizmetleriGuncelle", "ozellikleriGuncelle"]) {
+for (const islem of ["Müşteri görseli yükle", "Public görsele dön", "hizmetleriGuncelle", "ozellikleriGuncelle", "temaDegistir"]) {
   if (!editor.includes(islem)) sorunlar.push(`Duzenleme islemi eksik: ${islem}`);
 }
 
-for (const guvence of ["siteTipi: \"cok-sayfa\"", "medyaAlanlariOlustur", "siteSayfalariOlustur", "varsayilanIcerikOlustur"]) {
+for (const guvence of ["setSiteTipi", "benzersizProjeSlug", "medyaAlanlariOlustur", "siteSayfalariOlustur", "varsayilanIcerikOlustur"]) {
   if (!wizard.includes(guvence)) sorunlar.push(`Proje olusturma guvencesi eksik: ${guvence}`);
 }
 

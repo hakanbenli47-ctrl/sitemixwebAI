@@ -167,6 +167,31 @@ for (const guvence of ["BarberPole", "medya?.acik", "!medya.url.trim()", "Iletis
   if (!kaynak.includes(guvence)) sorunlar.push(`Sunum guvencesi eksik: ${guvence}`);
 }
 
+for (const berberGuvencesi of ["BerberKimlikBandi", "BerberGorselDosyasi", "altBerberImza"]) {
+  if (!renderer.includes(berberGuvencesi)) sorunlar.push(`Berber sunum guvencesi eksik: ${berberGuvencesi}`);
+}
+for (const berberRenkGuvencesi of ["--barber-red", "--barber-white", "--barber-blue", "--barber-stripe", "data-alt-tur=\"barber\""]) {
+  if (!css.includes(berberRenkGuvencesi)) sorunlar.push(`Berber renk guvencesi eksik: ${berberRenkGuvencesi}`);
+}
+
+const berberTanimi = sektorler.find((sektor) => sektor.id === "berber");
+if (berberTanimi) {
+  const berberIcerigi = katalog.varsayilanIcerikOlustur("berber");
+  const gorunenBerberMetinleri = [
+    ...berberTanimi.sayfalar.map((sayfa) => sayfa.ad),
+    ...katalog.medyaAlanlariOlustur("berber").map((medya) => `${medya.baslik} ${medya.alternatifMetin}`),
+    berberIcerigi.rozet, berberIcerigi.slogan, berberIcerigi.heroBaslik, berberIcerigi.heroAciklama,
+    berberIcerigi.hakkimizdaBaslik, berberIcerigi.hakkimizdaMetni, berberIcerigi.guvenBasligi, berberIcerigi.guvenMetni,
+    berberIcerigi.ctaBaslik, berberIcerigi.ctaMetni,
+    ...berberIcerigi.hizmetler.flatMap((hizmet) => [hizmet.baslik, hizmet.aciklama]),
+    ...berberIcerigi.ozellikler.flatMap((ozellik) => [ozellik.baslik, ozellik.aciklama]),
+    ...berberIcerigi.sss.flatMap((kayit) => [kayit.soru, kayit.cevap]),
+  ].join(" ");
+  if (/\bberber\b|\bbarber\b/i.test(gorunenBerberMetinleri) || renderer.includes("BARBER<br")) {
+    sorunlar.push("Berber musteri sitesinde sektor adi gorunuyor.");
+  }
+}
+
 if (renderer.includes("{proje.sektorAdi}") || renderer.includes("|| proje.sektorAdi")) {
   sorunlar.push("Musteri sitesinde sektor adi gorunur olmamali.");
 }

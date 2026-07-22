@@ -477,12 +477,47 @@ function Iletisim(props: { proje: ProjeVerisi; icerik: SektorSiteIcerigi; alanla
   );
 }
 
+function BarberPole({ mini = false }: { mini?: boolean }) {
+  return <div className={`${styles.barberPole} ${mini ? styles.barberPoleMini : ""}`} aria-hidden="true"><i /><span /></div>;
+}
+
+function BerberKimlikBandi() {
+  return (
+    <div className={styles.berberKimlikBandi} aria-label="Hizmet ilkeleri">
+      <span>Randevulu servis</span><i />
+      <span>Temiz ekipman</span><i />
+      <span>Kişisel form</span>
+    </div>
+  );
+}
+
+function BerberGorselDosyasi({ proje, icerik, medya }: Pick<GovdeProps, "proje" | "icerik" | "medya">) {
+  const detayAcik = medya.detay?.acik && medya.detay.url.trim();
+  const ekipAcik = medya.ekip?.acik && medya.ekip.url.trim();
+  if (!detayAcik && !ekipAcik) return null;
+
+  return (
+    <section className={styles.berberGorselDosyasi} aria-label={`${proje.firmaAdi} işçilik ve mekân detayları`}>
+      <header>
+        <span>İŞÇİLİK / ATMOSFER</span>
+        <h2>Detayda temiz.<br />Duruşta size özel.</h2>
+      </header>
+      <div className={styles.berberGorselGrid}>
+        {detayAcik && <article><Medya medya={medya.detay} /><div><span>01 · FORM</span><strong>Geçiş, kontur ve son dokunuş yakından kontrol edilir.</strong></div></article>}
+        {ekipAcik && <article><Medya medya={medya.ekip} /><div><span>02 · KULÜP</span><strong>Her koltuk aynı servis disipliniyle hazırlanır.</strong></div></article>}
+        <aside><ShieldCheck /><span>Servis standardı</span><h3>{icerik.guvenBasligi}</h3><p>{icerik.guvenMetni}</p></aside>
+      </div>
+    </section>
+  );
+}
+
 function AltSayfa({ proje, slug, git, icerik, alanlar, medya, tur }: GovdeProps & { tur: string }) {
   const hizmetSayfasi = /hizmet|uygulama|bakim|paket|tasima|transfer|yol-yardim|organizasyon/.test(slug);
   const iletisimSayfasi = /randevu|teklif|brief|iste|cagir|gonder|rezervasyon|talep|kesif/.test(slug);
   const baslik = proje.sayfalar.find((sayfa) => sayfa.slug === slug)?.ad ?? proje.firmaAdi;
-  if (iletisimSayfasi) return <><SiteBasligi proje={proje} git={git} /><main className={styles.altSayfa} data-alt-tur={tur}><div className={styles.altHero}><UstEtiket>{icerik.rozet}</UstEtiket><h1>{baslik}</h1><p>{icerik.ctaMetni}</p></div><Iletisim proje={proje} icerik={icerik} alanlar={alanlar} baslik={icerik.ctaBaslik} /></main></>;
-  return <><SiteBasligi proje={proje} git={git} /><main className={styles.altSayfa} data-alt-tur={tur}><div className={styles.altHero}><UstEtiket>{icerik.rozet}</UstEtiket><h1>{baslik}</h1><p>{hizmetSayfasi ? icerik.heroAciklama : icerik.hakkimizdaMetni}</p></div><Medya medya={medya.hero} className={styles.altMedya} />{hizmetSayfasi ? <section className={styles.altIcerik}><HizmetListesi icerik={icerik} numbered /><Surec icerik={icerik} rota={tur === "lojistik" || tur === "rescue"} /></section> : <section className={styles.altIcerik}><div className={styles.manifesto}><h2>{icerik.guvenBasligi}</h2><p>{icerik.guvenMetni}</p></div><Ozellikler icerik={icerik} />{bolumAcik(icerik, "sss") && icerik.sss.map((item) => <details key={item.soru}><summary>{item.soru}</summary><p>{item.cevap}</p></details>)}</section>}{bolumAcik(icerik, "detayliIcerik") && <AltDetayliIcerik proje={proje} />}<Iletisim proje={proje} icerik={icerik} alanlar={alanlar} /></main></>;
+  const berberImzasi = tur === "barber" && <div className={styles.altBerberImza}><BarberPole mini /><span>Randevulu servis<br /><strong>Usta işçiliği</strong></span></div>;
+  if (iletisimSayfasi) return <><SiteBasligi proje={proje} git={git} /><main className={styles.altSayfa} data-alt-tur={tur}><div className={styles.altHero}>{berberImzasi}<UstEtiket>{icerik.rozet}</UstEtiket><h1>{baslik}</h1><p>{icerik.ctaMetni}</p></div><Iletisim proje={proje} icerik={icerik} alanlar={alanlar} baslik={icerik.ctaBaslik} /></main></>;
+  return <><SiteBasligi proje={proje} git={git} /><main className={styles.altSayfa} data-alt-tur={tur}><div className={styles.altHero}>{berberImzasi}<UstEtiket>{icerik.rozet}</UstEtiket><h1>{baslik}</h1><p>{hizmetSayfasi ? icerik.heroAciklama : icerik.hakkimizdaMetni}</p></div><Medya medya={medya.hero} className={styles.altMedya} />{hizmetSayfasi ? <section className={styles.altIcerik}><HizmetListesi icerik={icerik} numbered /><Surec icerik={icerik} rota={tur === "lojistik" || tur === "rescue"} /></section> : <section className={styles.altIcerik}><div className={styles.manifesto}><h2>{icerik.guvenBasligi}</h2><p>{icerik.guvenMetni}</p></div><Ozellikler icerik={icerik} />{bolumAcik(icerik, "sss") && icerik.sss.map((item) => <details key={item.soru}><summary>{item.soru}</summary><p>{item.cevap}</p></details>)}</section>}{bolumAcik(icerik, "detayliIcerik") && <AltDetayliIcerik proje={proje} />}<Iletisim proje={proje} icerik={icerik} alanlar={alanlar} /></main></>;
 }
 
 function Kuafor(props: GovdeProps) {
@@ -491,12 +526,10 @@ function Kuafor(props: GovdeProps) {
   return <><SiteBasligi proje={proje} git={git} vurgu="S/" /><main className={styles.kuafor}><section className={styles.kuaforHero}><div><UstEtiket>{icerik.rozet}</UstEtiket><h1>{icerik.heroBaslik}</h1><p>{icerik.heroAciklama}</p><Aksiyonlar proje={proje} git={git} /></div><aside><span>Salon dosyası / 01</span><strong>{alanlar.uzmanlik || "Kişiye özel saç tasarımı"}</strong><p>{icerik.slogan}</p></aside><Medya medya={medya.hero} /></section><section className={styles.editorialKiris}><span>Analiz</span><span>Teknik reçete</span><span>Uygulama</span><span>Evde bakım</span></section><section className={styles.kuaforHizmet}><div><UstEtiket>Hizmet seçkisi</UstEtiket><h2>Görünüm değil, size ait bir kullanım biçimi.</h2></div><HizmetListesi icerik={icerik} numbered compact /></section><section className={styles.kuaforHikaye}><Medya medya={medya.donusum} /><div><h2>{icerik.hakkimizdaBaslik}</h2><p>{icerik.hakkimizdaMetni}</p><Ozellikler icerik={icerik} /></div></section><Istatistikler icerik={icerik} /><Iletisim proje={proje} icerik={icerik} alanlar={alanlar} /></main></>;
 }
 
-function BarberPole() { return <div className={styles.barberPole} aria-hidden="true"><i /><span /></div>; }
-
 function Berber(props: GovdeProps) {
   if (props.slug) return <AltSayfa {...props} tur="barber" />;
   const { proje, git, icerik, medya, alanlar } = props;
-  return <><SiteBasligi proje={proje} git={git} vurgu="B/" /><main className={styles.berber}><section className={styles.berberHero}><BarberPole /><div className={styles.berberKopya}><UstEtiket>{icerik.rozet}</UstEtiket><h1>{icerik.heroBaslik}</h1><p>{icerik.heroAciklama}</p><Aksiyonlar proje={proje} git={git} /></div><div className={styles.berberRozet}><Star /><strong>BARBER<br />CLUB</strong><span>{proje.sehir || "TÜRKİYE"}</span></div><Medya medya={medya.hero} /></section><section className={styles.berberMenu}><header><span>THE SERVICE MENU</span><h2>Koltuğa oturun.<br />Gerisini ustaya bırakın.</h2></header><HizmetListesi icerik={icerik} numbered /></section><section className={styles.berberClub}><div><h2>{icerik.hakkimizdaBaslik}</h2><p>{icerik.hakkimizdaMetni}</p></div><Surec icerik={icerik} /><BarberPole /></section><Iletisim proje={proje} icerik={icerik} alanlar={alanlar} baslik="Koltuğunuzu ayıralım." /></main></>;
+  return <><SiteBasligi proje={proje} git={git} vurgu="B/" /><main className={styles.berber}><section className={styles.berberHero}><BarberPole /><div className={styles.berberKopya}><UstEtiket>{icerik.rozet}</UstEtiket><h1>{icerik.heroBaslik}</h1><p>{icerik.heroAciklama}</p><Aksiyonlar proje={proje} git={git} /></div><div className={styles.berberRozet}><Star /><strong>USTA<br />KULÜBÜ</strong><span>{proje.sehir || "TÜRKİYE"}</span></div><Medya medya={medya.hero} /></section><BerberKimlikBandi /><section className={styles.berberMenu}><header><span>HİZMET MENÜSÜ</span><h2>Koltuğa oturun.<br />Gerisini ustaya bırakın.</h2></header><HizmetListesi icerik={icerik} numbered /></section>{bolumAcik(icerik, "gorselAnlati") && <BerberGorselDosyasi proje={proje} icerik={icerik} medya={medya} />}<section className={styles.berberClub}><div><h2>{icerik.hakkimizdaBaslik}</h2><p>{icerik.hakkimizdaMetni}</p></div><Surec icerik={icerik} /><BarberPole /></section><Iletisim proje={proje} icerik={icerik} alanlar={alanlar} baslik="Koltuğunuzu ayıralım." /></main></>;
 }
 
 function Guzellik(props: GovdeProps) {
@@ -637,7 +670,7 @@ export default function SektorSiteleri({ proje, baslangicSlug = "", gercekRotaKu
           </motion.div>
         </AnimatePresence>
       </SiteRotaBaglami.Provider>
-      {bolumAcik(icerik, "gorselAnlati") && <GorselAnlati proje={proje} medyalar={Object.values(medya)} slug={slug} />}
+      {bolumAcik(icerik, "gorselAnlati") && (proje.sektor !== "berber" || Boolean(slug)) && <GorselAnlati proje={proje} medyalar={Object.values(medya)} slug={slug} />}
       {bolumAcik(icerik, "gorselVitrini") && <GorselVitrini proje={proje} medyalar={Object.values(medya)} />}
       <MobilHizliAksiyon proje={proje} />
       <SosyalBaglantilar proje={proje} />

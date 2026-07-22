@@ -320,6 +320,90 @@ export const YENI_SEKTORLER = sektorler.filter((sektor) =>
 );
 
 export const GORSEL_PAKET_SURUMU = 2;
+export const SEKTOR_ICERIK_SURUMU = 2;
+
+const ZENGINLESTIRILMIS_HIZMETLER: Partial<Record<YeniSektorKimligi, Array<[string, string]>>> = {
+  kuafor: [
+    ["Saç kesimi ve şekillendirme", "Yüz şekli, saçın doğal düşüşü ve günlük hazırlık süresi birlikte değerlendirilir. Kesim; yıkama, son şekillendirme ve evde kullanım önerisiyle tamamlanır."],
+    ["Renklendirme ve balyaj", "Mevcut ton, saç geçmişi ve hedef renk üzerinden uygulanabilir bir renk planı hazırlanır. Açma, tonlama ve renk koruyucu bakım adımları işlem öncesinde açıklanır."],
+    ["Keratin ve yoğun bakım", "Nem kaybı, matlık, kabarma ve yıpranma düzeyine göre bakım içeriği seçilir. Uygulama sonrasında sonucu koruyacak yıkama ve ısı kullanımı önerileri paylaşılır."],
+    ["Gelin saçı ve prova", "Kıyafet, aksesuar, yüz formu ve etkinlik saati birlikte ele alınır. Prova, renk tazeleme ve düğün günü hazırlığı tek takvimde planlanır."],
+    ["Fön, topuz ve özel gün", "Günlük fön, davet topuzu, örgü ve kalıcı şekillendirme seçenekleri istenen görünüme göre hazırlanır. Süre ve aksesuar ihtiyacı randevu öncesinde netleştirilir."],
+    ["Saç ve saç derisi analizi", "Saç telinin yapısı, saç derisinin mevcut durumu ve kullanılan ürünler değerlendirilir. Kesim, bakım veya renk işlemi için anlaşılır bir yol haritası çıkarılır."],
+    ["Renk düzeltme", "İstenmeyen ton, renk bandı ve önceki boya işlemleri kontrollü biçimde değerlendirilir. Saç sağlığını koruyan tek seans veya aşamalı düzeltme planı hazırlanır."],
+    ["Çocuk ve genç saç tasarımı", "Yaşa, saç yapısına ve kolay kullanıma uygun kesim planlanır. Rahat bir servis süresi ayrılarak bakım ve şekillendirme aileyle birlikte anlatılır."],
+  ],
+  berber: [
+    ["Saç kesimi", "Yüz ve kafa formuna göre makas-makine dengesi, geçiş yüksekliği ve üst form belirlenir. Yıkama, şekillendirme ve ürün önerisi servis içinde tamamlanır."],
+    ["Fade ve modern kesimler", "Skin fade, taper ve düşük-yüksek geçiş seçenekleri kullanım alışkanlığına göre planlanır. Bakım sıklığı ve bir sonraki kesim zamanı açıkça paylaşılır."],
+    ["Sakal tasarımı", "Sakal yoğunluğu, çene hattı ve yüz oranı değerlendirilir. Sıcak havlu, kontur, kısaltma ve bakım ürünleriyle temiz bir sonuç hazırlanır."],
+    ["Saç ve sakal paketi", "Saç formu ile sakal hattı aynı koltuk servisinde birbirine uyarlanır. Yıkama, sıcak havlu, kontur ve son şekillendirme tek randevuda tamamlanır."],
+    ["Damat tıraşı", "Etkinlik öncesi prova, cilt hazırlığı ve saç-sakal formu birlikte planlanır. Düğün günü için yeterli süre ayrılır ve son dokunuşlar eksiksiz tamamlanır."],
+    ["Çocuk kesimi", "Çocuğun yaşına ve rahatlığına göre sakin bir servis akışı uygulanır. Kolay şekillenen, okul ve günlük kullanıma uygun bir form hazırlanır."],
+    ["Sıcak havlu ve cilt bakımı", "Tıraş öncesi cilt hazırlanır; sıcak havlu, nazik temizleme ve nem desteği uygulanır. Tıraş sonrası hassasiyeti azaltmaya yardımcı bakım önerileri verilir."],
+    ["Saç derisi ve bakım ritüeli", "Kuruluk, yağlanma ve ürün birikimi değerlendirilerek uygun temizlik ve bakım adımları seçilir. Evde kullanılabilecek ürün miktarı ve uygulama sıklığı anlatılır."],
+  ],
+  "guzellik-salonu": [
+    ["Profesyonel cilt bakımı", "Cilt tipi, hassasiyet ve bakım hedefi ön görüşmede değerlendirilir. Arındırma, nem, bariyer desteği ve bakım sonrası ev rutini kişiye göre planlanır."],
+    ["Derin arındırma ve nem bakımı", "Gözenek görünümü, kuruluk ve matlık ihtiyacına göre kontrollü bir uygulama hazırlanır. Kullanılan ürünler ve önerilen tekrar aralığı işlem öncesinde açıklanır."],
+    ["Kaş ve kirpik uygulamaları", "Yüz oranına uygun kaş şekillendirme, kirpik lifting ve bakım seçenekleri birlikte değerlendirilir. İşlem süresi ve sonrasında dikkat edilecek noktalar paylaşılır."],
+    ["Bölgesel bakım", "Hedef bölge, mevcut durum ve beklenen sonuç üzerinden gerçekçi bir seans planı oluşturulur. Uygulama sıklığı ve destekleyici günlük alışkanlıklar anlatılır."],
+    ["Lazer epilasyon", "Bölge, kıl yapısı ve cilt hassasiyeti değerlendirilerek kişisel seans takvimi hazırlanır. İşlem öncesi hazırlık ve sonrası koruma adımları açıkça paylaşılır."],
+    ["Kalıcı makyaj", "Yüz anatomisi, doğal görünüm beklentisi ve renk seçimi ön çizimle netleştirilir. Uygulama, iyileşme ve kontrol randevusu birlikte planlanır."],
+    ["Özel gün bakım programı", "Etkinlik tarihine göre cilt, kaş ve kirpik uygulamaları doğru günlere yerleştirilir. Cildi yormadan canlı bir görünüm sağlayacak hazırlık takvimi oluşturulur."],
+    ["Bakım danışmanlığı", "Hangi işlemin uygun olduğundan emin olmayanlar için kısa bir ihtiyaç görüşmesi yapılır. Bütçe, zaman ve bakım hedefi doğrultusunda gereksiz uygulama eklenmeden öneri sunulur."],
+  ],
+  "nail-artist": [
+    ["Kalıcı oje", "Tırnak yüzeyi kontrollü hazırlanır; ten tonu ve günlük kullanıma uygun renk seçilir. Uygulama kuru manikür, form düzenleme ve bakım önerisiyle tamamlanır."],
+    ["Protez tırnak", "Tırnak yatağı ve kullanım alışkanlığına uygun uzunluk, form ve malzeme seçilir. Doğal görünüm ile dayanıklılık dengesi kişiye göre planlanır."],
+    ["Jel güçlendirme", "Kırılmaya ve bükülmeye eğilimli doğal tırnaklar için koruyucu bir katman hazırlanır. Yenileme süresi ve doğru kullanım alışkanlıkları açıklanır."],
+    ["Kişisel nail art", "Gönderilen referans; tırnak ölçüsü, renk paleti ve seçilen uzunluğa göre yeniden yorumlanır. Tasarım yoğunluğu ve randevu süresi önceden netleştirilir."],
+    ["Manikür", "Tırnak çevresi, kütikül ve form ihtiyacı hijyenik bir hazırlıkla ele alınır. Temiz görünüm, bakım yağı ve evde koruma önerileriyle servis tamamlanır."],
+    ["Çıkarma ve yenileme", "Mevcut ürün doğal tırnağı zorlamadan kontrollü şekilde çıkarılır. Tırnak yüzeyi değerlendirilerek bakım, güçlendirme veya yeni set seçilir."],
+    ["Pedikür ve ayak bakımı", "Tırnak formu ve çevre bakımı konforlu bir uygulamayla düzenlenir. Kalıcı oje veya doğal bakım seçeneği ihtiyaca göre eklenir."],
+    ["Özel gün seti", "Kıyafet, aksesuar ve etkinlik temasına uygun renk ve tasarım planlanır. Referans seçimi ile randevu süresi etkinlik tarihinden önce kesinleştirilir."],
+  ],
+  nakliye: [
+    ["Şehir içi evden eve", "Çıkış-varış adresi, kat, asansör ve eşya hacmi önceden değerlendirilir. Uygun araç, ekip sayısı, yükleme saati ve teslim planı teklifte açıkça belirtilir."],
+    ["Şehirler arası nakliye", "Rota, çıkış zamanı, tahmini teslim aralığı ve araç kullanım biçimi netleştirilir. Eşya listesi ve teslim yetkilisi operasyon dosyasına eklenir."],
+    ["Ofis ve kurumsal taşıma", "Departmanlar, hassas ekipmanlar ve iş sürekliliği önceliklerine göre aşamalı taşıma planı hazırlanır. Etiketleme, BT ekipmanı ve yeni yerleşim sırası kayıt altına alınır."],
+    ["Parça eşya taşıma", "Az hacimli yük için ölçü, ağırlık, alınacak ve bırakılacak adres bilgileri değerlendirilir. Paylaşımlı veya özel araç seçeneği teslim beklentisine göre sunulur."],
+    ["Profesyonel paketleme", "Kırılabilir, tekstil, elektronik ve mobilya için farklı koruma malzemeleri kullanılır. Koliler oda ve içerik bilgisiyle etiketlenerek teslimi kolaylaştırır."],
+    ["Asansörlü taşıma", "Bina cephesi, kat yüksekliği ve kurulum alanı önceden kontrol edilir. Dış cephe asansörü, güvenlik alanı ve yükleme sırası operasyon planına eklenir."],
+    ["Mobilya sökme ve kurma", "Taşınacak mobilyalar bağlantı ve parça yapısına göre sökülür, korumalı şekilde taşınır ve yeni adreste temel kurulumu tamamlanır."],
+    ["Kısa ve uzun süreli depolama", "Eşya hacmi, depolama süresi ve erişim ihtiyacı belirlenir. Paketleme, kayıt, giriş-çıkış ve teslim koşulları teklif aşamasında açıklanır."],
+  ],
+  "hali-yikama": [
+    ["Halı ve kilim yıkama", "Dokuma, renk dayanımı, leke ve kullanım yoğunluğu kabul sırasında değerlendirilir. Ürüne uygun yıkama programı, kontrollü kurutma ve son kontrol uygulanır."],
+    ["Koltuk ve sandalye temizliği", "Kumaş türü, renk dayanımı ve leke bölgeleri yerinde incelenir. Ön vakum, leke çalışması ve kontrollü nem uygulamasıyla süreç tamamlanır."],
+    ["Yatak ve baza hijyeni", "Yüzey tozu, leke ve koku ihtiyacına göre derin vakum ve kumaşa uygun temizlik yapılır. Kuruma ve yeniden kullanım süresi müşteriye bildirilir."],
+    ["Perde ve stor temizliği", "Ürün tipi ve montaj durumu değerlendirilerek sökme-takma veya yerinde uygulama seçilir. Hassas kumaşlar ayrı programla işleme alınır."],
+    ["Yorgan ve battaniye", "Dolgu yapısı, ürün etiketi ve leke durumu kontrol edilir. Uygun yıkama, tam kurutma ve temiz paketleme sonrasında teslim edilir."],
+    ["Cami ve iş yeri halısı", "Metrekare, kullanım saatleri ve kuruma ihtiyacına göre yerinde veya tesiste çalışma planlanır. Bölgesel uygulama sayesinde alanın kullanımı kontrollü sürdürülür."],
+    ["Leke ve koku işlemi", "Lekenin kaynağı ve ürün dokusu değerlendirilerek uygun ön işlem uygulanır. Çıkma olasılığı ve renk riski işlem başlamadan açıkça anlatılır."],
+    ["Ücretsiz servis ve paketli teslim", "Ürün adedi, ilçe ve uygun saat bilgisi alınarak servis rotası oluşturulur. Ürünler müşteri kaydıyla eşleştirilir ve temiz paketli şekilde geri teslim edilir."],
+  ],
+  "oto-yikama": [
+    ["İç-dış temizlik", "Araç kabulünde dış yüzey, jant, kabin ve hassas alanlar birlikte kontrol edilir. Dengeli dış yıkama ve temel kabin temizliği teslim kontrolüyle tamamlanır."],
+    ["Detaylı iç temizlik", "Koltuk, tavan, taban, bagaj ve plastik yüzeyler malzemesine uygun ürünlerle ayrı ayrı temizlenir. Kuruma süresi ve teslim saati önceden planlanır."],
+    ["Pasta-cila", "Boya yüzeyi ışık altında incelenir ve çizik derinliğine göre uygun aşındırma seviyesi seçilir. Parlaklık uygulaması yüzey temizliği ve son kontrolle tamamlanır."],
+    ["Boya koruma", "Yüzey demir tozu, kir ve kalıntılardan arındırılarak koruyucu uygulamaya hazırlanır. Koruma türü, dayanım beklentisi ve bakım koşulları açıklanır."],
+    ["Seramik kaplama", "Boya durumu ve kullanım beklentisine göre hazırlık, polisaj ve kaplama planı oluşturulur. Kürlenme süresi ve sonrasındaki doğru yıkama yöntemi paylaşılır."],
+    ["Motor yüzeyi temizliği", "Elektrik bağlantıları ve hassas parçalar korunarak kontrollü yüzey temizliği yapılır. Yoğun basınç yerine güvenli ürün ve ekipman kullanılır."],
+    ["Far parlatma", "Matlaşma ve yüzey hasarı kademeli zımpara-polisaj işlemiyle azaltılır. Sonuç koruyucu katman ve iki taraflı görünüm kontrolüyle teslim edilir."],
+    ["Jant ve lastik detaylandırma", "Jant yüzeyi, balata tozu ve lastik yanakları ayrı ürünlerle temizlenir. Uygulama koruyucu son kat ve temiz görünümle tamamlanır."],
+  ],
+};
+
+const ZENGINLESTIRILMIS_METINLER: Partial<Record<YeniSektorKimligi, Partial<Pick<SektorSiteIcerigi, "heroAciklama" | "hakkimizdaMetni" | "guvenMetni" | "ctaMetni">>>> = {
+  kuafor: { heroAciklama: "Yüz şeklinizi, saçın doğal yapısını, geçmiş işlemleri ve günlük hazırlık sürenizi birlikte değerlendiriyoruz. Kesimden renklendirmeye kadar uygulanabilir sonucu, işlem süresini ve bakım ihtiyacını randevu öncesinde netleştiriyoruz.", hakkimizdaMetni: "Saç geçmişinizi dinler, beğendiğiniz referansları gerçek saç yapınızla birlikte değerlendirir ve ulaşılabilir sonucu açıkça anlatırız. Uygulama boyunca kullanılan formül ve teknik notlar kaydedilir; böylece sonraki ziyaretlerde aynı dili koruyan, sürdürülebilir bir saç planı oluşturulur.", guvenMetni: "Kullanılan ürün, işlem sırası, bekleme süresi ve evde bakım önerileri açıkça paylaşılır. Saç sağlığını zorlayacak bir işlem gerektiğinde tek seans yerine aşamalı plan önerilir; sonraki kontrol ve bakım zamanı birlikte belirlenir.", ctaMetni: "Mevcut saçınızın bir fotoğrafını, istediğiniz görünümü ve uygun olduğunuz günleri WhatsApp’tan gönderin. Size uygun hizmeti, tahmini süreyi ve görüşme gerekip gerekmediğini birlikte netleştirelim." },
+  berber: { heroAciklama: "Saç ve sakal formunu yüz hatlarınız, kullanım alışkanlığınız ve bakım sıklığınızla birlikte planlıyoruz. İstediğiniz kesimi, tercih ettiğiniz ustayı ve uygun saati mesajla paylaşın; koltuk sürenizi önceden ayıralım.", hakkimizdaMetni: "Her müşterinin kesim numarasını, geçiş seviyesini, sakal hattını ve ürün tercihini tanımaya önem veririz. Klasik berber zanaatını hijyen, zamanında randevu ve güncel tekniklerle bir araya getirerek her ziyarette tutarlı bir servis sunarız.", guvenMetni: "Her servis öncesinde ekipman hazırlanır, metal aletler temizlenir ve tek kullanımlık ürünler yenilenir. Kesim sırasında istenen form adım adım kontrol edilir; finalde ürün kullanımı ve bir sonraki bakım aralığı anlatılır.", ctaMetni: "Saç, sakal veya paket tercihinizi; istediğiniz gün ve saatle birlikte gönderin. Uygun ustayı ve koltuk süresini kontrol edip randevunuzu hızlıca netleştirelim." },
+  "guzellik-salonu": { heroAciklama: "Cilt tipinizi, hassasiyetlerinizi, bakım hedefinizi ve ayırabileceğiniz zamanı birlikte değerlendiriyoruz. Uygulama içeriğini, seans süresini ve gerçekçi sonuç beklentisini işlem başlamadan açıkça paylaşıyoruz.", hakkimizdaMetni: "Her bakım kısa bir ihtiyaç görüşmesiyle başlar. Kullanılan ürünler, uygulama notları, bilinen hassasiyetler ve önerilen tekrar aralığı kişisel bakım dosyanıza eklenir; sonraki randevuda cildin verdiği yanıt üzerinden plan güncellenir.", guvenMetni: "Uygulama alanı, ekipman ve sarf malzemeleri her randevu için yeniden hazırlanır. Ürün içeriği ve uygulama adımları paylaşılır; hassasiyet durumunda yoğunluk azaltılır veya daha uygun bir seçenek önerilir.", ctaMetni: "İlgilendiğiniz bakımı, bilinen hassasiyetlerinizi ve uygun olduğunuz günleri yazın. Hangi uygulamanın size uygun olduğunu, seans süresini ve ön hazırlığı birlikte belirleyelim." },
+  "nail-artist": { heroAciklama: "Tırnak yapınıza uygun formu, günlük kullanımınıza uygun uzunluğu ve tarzınızı tamamlayan tasarımı birlikte seçiyoruz. Referans görselinizi önceden göndererek uygulama süresini, renkleri ve varsa çıkarma işlemini randevudan önce netleştirebilirsiniz.", hakkimizdaMetni: "Beğendiğiniz modeli birebir kopyalamak yerine tırnak yatağınıza, ten tonunuza ve kullanım alışkanlığınıza göre yeniden yorumlarız. Her set için form, renk ve detay planı hazırlanır; yenileme zamanı ve bakım önerileri servis sonunda paylaşılır.", guvenMetni: "Metal ekipmanlar steril edilir, tek kullanımlık sarf malzemeleri her müşteri için yenilenir ve çalışma yüzeyi yeniden hazırlanır. Mevcut ürünün güvenli çıkarılması ve doğal tırnağın korunması tasarım kadar önemli kabul edilir.", ctaMetni: "Beğendiğiniz modeli, istediğiniz uzunluğu ve mevcut tırnak durumunuzu fotoğrafla gönderin. Tasarımın süresini, uygun uygulamayı ve en yakın randevu seçeneğini birlikte netleştirelim." },
+  nakliye: { heroAciklama: "Çıkış-varış adresi, kat bilgisi, asansör durumu, eşya hacmi ve özel parçaları önceden değerlendiriyoruz. Uygun araç, ekip, paketleme kapsamı ve teslim planını yazılı ve anlaşılır bir teklifte bir araya getiriyoruz.", hakkimizdaMetni: "Her taşınma için ayrı bir operasyon dosyası oluşturulur. Erişim koşulları, hassas eşyalar, mobilya işlemleri, yükleme sırası ve teslim sorumlusu önceden kaydedilir; araç ve ekip bu bilgiler doğrultusunda planlanır.", guvenMetni: "Paketleme kapsamı, kat ve asansör koşulları, araç tipi, ekip sayısı ve hizmet sınırları teklif aşamasında netleştirilir. Taşıma günü ek maliyet veya kapsam belirsizliği yaşanmaması için değişiklikler işe başlamadan onaylanır.", ctaMetni: "Çıkış-varış konumunu, kat ve asansör bilgisini, taşınma tarihini ve mümkünse eşya fotoğraflarını gönderin. Araç, ekip, paketleme ve tahmini süreyi içeren planı hazırlayalım." },
+  "hali-yikama": { heroAciklama: "Halıdan koltuğa, yataktan perdeye kadar her ürünü dokusu, leke durumu ve kullanım alanına göre değerlendiriyoruz. Ürün adedi, ilçe ve uygun saat bilgisini paylaşın; servis rotasını ve tahmini teslim süresini netleştirelim.", hakkimizdaMetni: "Teslim alınan ürünler müşteri kaydıyla eşleştirilir, doku ve leke durumuna göre ayrılır ve uygun programla işleme alınır. Yıkama, kontrollü kurutma, son kontrol ve temiz paketleme adımları tamamlandıktan sonra servis planına eklenir.", guvenMetni: "Renk dayanımı, hassas dokuma ve yoğun leke gibi riskler kabul sırasında değerlendirilir. Kullanılan yöntem ürün yapısına göre seçilir; sonuç beklentisi, kuruma süresi ve teslim aralığı müşteriye açıkça bildirilir.", ctaMetni: "Yıkanacak ürünlerin türünü ve adetini, bulunduğunuz ilçeyi ve uygun servis saatini gönderin. Alım günü, tahmini teslim süresi ve fiyatlandırma için hızlıca dönüş yapalım." },
+  "oto-yikama": { heroAciklama: "Aracın boya, kabin, jant ve hassas yüzeylerini kabul sırasında birlikte değerlendiriyoruz. İhtiyaca uygun paketi, uygulama süresini, teslim saatini ve ek işlemleri işe başlamadan netleştiriyoruz.", hakkimizdaMetni: "Her araç aynı ürün ve yöntemle temizlenmez. Boya durumu, iç mekân malzemeleri, leke yoğunluğu ve kullanım beklentisi kontrol edilerek araç için ayrı bir uygulama reçetesi hazırlanır.", guvenMetni: "İç, dış ve jant ekipmanları ayrılır; yüzeye uygun ürün ve kontrollü uygulama kullanılır. Araç teslimden önce aydınlık alanda çevresel olarak kontrol edilir ve koruyucu uygulamaların bakım koşulları müşteriye anlatılır.", ctaMetni: "Araç marka-modelini, istediğiniz işlemi ve mümkünse mevcut durum fotoğraflarını gönderin. Uygun paketi, tahmini süreyi ve en yakın randevu saatini birlikte belirleyelim." },
+};
 
 const EK_GORSEL_ALANLARI: Partial<Record<YeniSektorKimligi, MedyaSlotuTanimi[]>> = {
   kuafor: [
@@ -376,9 +460,22 @@ export function yeniSektorMu(sektor: string): sektor is YeniSektorKimligi {
 
 export function varsayilanIcerikOlustur(sektor: string): SektorSiteIcerigi {
   const tanim = sektorTanimiGetir(sektor);
-  const hizmetler: HizmetKaydi[] = tanim.icerik.hizmetler.map(([baslik, aciklama], index) => ({ id: `${tanim.id}-hizmet-${index + 1}`, baslik, aciklama, aktif: true }));
+  const hizmetKaynagi = ZENGINLESTIRILMIS_HIZMETLER[tanim.id] ?? tanim.icerik.hizmetler;
+  const metinler = ZENGINLESTIRILMIS_METINLER[tanim.id] ?? {};
+  const hizmetler: HizmetKaydi[] = hizmetKaynagi.map(([baslik, aciklama], index) => ({ id: `${tanim.id}-hizmet-${index + 1}`, baslik, aciklama, aktif: true }));
   const ozellikler: EkOzellikKaydi[] = tanim.icerik.ozellikler.map(([baslik, aciklama], index) => ({ id: `${tanim.id}-ozellik-${index + 1}`, baslik, aciklama, aktif: true }));
-  return { ...tanim.icerik, hizmetler, ozellikler };
+  return {
+    ...tanim.icerik,
+    ...metinler,
+    hizmetler,
+    ozellikler,
+    bolumGorunurlugu: {
+      detayliIcerik: true,
+      gorselAnlati: true,
+      gorselVitrini: true,
+      sss: true,
+    },
+  };
 }
 
 export function isletmeAlanlariOlustur(sektor: string): IsletmeAlaniDegeri[] {

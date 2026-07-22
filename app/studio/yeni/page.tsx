@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, Check, ChevronRight, CirclePlus, FileText, Layer
 import {
   YENI_SEKTORLER,
   GORSEL_PAKET_SURUMU,
+  SEKTOR_ICERIK_SURUMU,
   isletmeAlanlariOlustur,
   medyaAlanlariOlustur,
   sektorTanimiGetir,
@@ -111,7 +112,7 @@ export default function YeniProjeSayfasi() {
     const icerik = varsayilanIcerikOlustur(sektor);
     const projeSlug = benzersizProjeSlug(slug || firmaAdi);
     const proje: ProjeVerisi = {
-      id: kimlikOlustur(), firmaAdi: firmaAdi.trim(), sektor, sektorAdi: tanim.ad, siteTipi, telefon: telefon.trim(), whatsapp: (whatsapp || telefon).trim(), eposta: eposta.trim(), adres: adres.trim(), sehir: sehir.trim(), ilce: ilce.trim(), hizmetBolgesi: hizmetBolgesi.trim(), slug: projeSlug, tema, sektorTemasi: tema, sayfalar: siteSayfalariOlustur(sektor, siteTipi), isletmeAlanlari: alanlar, hizmetler, ekOzellikler: ozellikler, medyalar: medyaAlanlariOlustur(sektor), siteIcerigi: { ...icerik, hizmetler, ozellikler }, yeniSistemMi: true, projeSurumu: 2, sablonSurumu: 11, githubRepoAdi: projeSlug, seoBaslik: `${firmaAdi.trim()} | Resmî Web Sitesi`, seoAciklama: icerik.heroAciklama, seoKelimeler: [firmaAdi.trim(), tanim.ad, sehir.trim(), ilce.trim()].filter(Boolean), gorselAlanlariHazirlandiMi: true, gorselPaketSurumu: GORSEL_PAKET_SURUMU, olusturulmaTarihi: tarih, guncellenmeTarihi: tarih,
+      id: kimlikOlustur(), firmaAdi: firmaAdi.trim(), sektor, sektorAdi: tanim.ad, siteTipi, telefon: telefon.trim(), whatsapp: (whatsapp || telefon).trim(), eposta: eposta.trim(), adres: adres.trim(), sehir: sehir.trim(), ilce: ilce.trim(), hizmetBolgesi: hizmetBolgesi.trim(), slug: projeSlug, tema, sektorTemasi: tema, sayfalar: siteSayfalariOlustur(sektor, siteTipi), isletmeAlanlari: alanlar, hizmetler, ekOzellikler: ozellikler, medyalar: medyaAlanlariOlustur(sektor), siteIcerigi: { ...icerik, hizmetler, ozellikler }, yeniSistemMi: true, projeSurumu: 2, sablonSurumu: 11, githubRepoAdi: projeSlug, seoBaslik: `${firmaAdi.trim()} | Resmî Web Sitesi`, seoAciklama: icerik.heroAciklama, seoKelimeler: [firmaAdi.trim(), tanim.ad, sehir.trim(), ilce.trim()].filter(Boolean), gorselAlanlariHazirlandiMi: true, gorselPaketSurumu: GORSEL_PAKET_SURUMU, sektorIcerikSurumu: SEKTOR_ICERIK_SURUMU, olusturulmaTarihi: tarih, guncellenmeTarihi: tarih,
     };
     try {
       localStorage.setItem(AKTIF_PROJE, JSON.stringify(proje));

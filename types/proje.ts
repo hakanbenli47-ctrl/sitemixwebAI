@@ -84,6 +84,13 @@ export interface IstatistikKaydi {
   etiket: string;
 }
 
+export interface BolumGorunurlugu {
+  detayliIcerik?: boolean;
+  gorselAnlati?: boolean;
+  gorselVitrini?: boolean;
+  sss?: boolean;
+}
+
 export interface SektorSiteIcerigi {
   rozet: string;
   slogan: string;
@@ -100,6 +107,7 @@ export interface SektorSiteIcerigi {
   surec: SurecAdimi[];
   sss: SssKaydi[];
   istatistikler: IstatistikKaydi[];
+  bolumGorunurlugu?: BolumGorunurlugu;
 }
 
 export interface ProjeVerisi {
@@ -145,6 +153,7 @@ export interface ProjeVerisi {
   gorselsizSunumHazirlandiMi?: boolean;
   gorselAlanlariHazirlandiMi?: boolean;
   gorselPaketSurumu?: number;
+  sektorIcerikSurumu?: number;
 
   githubAktarildiMi?: boolean;
   githubRepoAdi?: string;

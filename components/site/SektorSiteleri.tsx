@@ -22,7 +22,7 @@ import {
   Zap,
 } from "lucide-react";
 import { createContext, useContext, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
-import { sektorDerinIcerigiGetir } from "@/data/sektorDerinIcerikleri";
+import { sektorDerinIcerigiGetir, sektorIletisimRehberiGetir } from "@/data/sektorDerinIcerikleri";
 import { sektorTanimiGetir, temaTanimiGetir, varsayilanIcerikOlustur } from "@/data/yeniSektorler";
 import type { MedyaKaydi, ProjeVerisi, SektorSiteIcerigi } from "@/types/proje";
 import styles from "./sektorSiteleri.module.css";
@@ -39,6 +39,12 @@ interface GovdeProps extends SiteProps {
   icerik: SektorSiteIcerigi;
   medya: Record<string, MedyaKaydi>;
   alanlar: Record<string, string>;
+}
+
+type GorunurBolum = "detayliIcerik" | "gorselAnlati" | "gorselVitrini" | "sss";
+
+function bolumAcik(icerik: SektorSiteIcerigi, bolum: GorunurBolum) {
+  return icerik.bolumGorunurlugu?.[bolum] !== false;
 }
 
 function telefonHref(telefon: string) {
@@ -192,6 +198,64 @@ function GorselVitrini({ proje, medyalar }: { proje: ProjeVerisi; medyalar: Medy
             <figcaption><span>{String(index + 1).padStart(2, "0")}</span><strong>{medya.baslik}</strong><ArrowDownRight size={18} /></figcaption>
           </motion.figure>
         ))}
+      </div>
+    </section>
+  );
+}
+
+function GorselAnlati({ proje, medyalar, slug }: { proje: ProjeVerisi; medyalar: MedyaKaydi[]; slug: string }) {
+  const hareketiAzalt = useReducedMotion();
+  const rehber = sektorIletisimRehberiGetir(proje.sektor);
+  const aktifGorseller = medyalar.filter((medya) => medya.acik && medya.url.trim());
+  if (aktifGorseller.length < 2) return null;
+
+  const kaydirma = slug ? Array.from(slug).reduce((toplam, harf) => toplam + harf.charCodeAt(0), 0) % aktifGorseller.length : 0;
+  const sirali = [...aktifGorseller.slice(kaydirma), ...aktifGorseller.slice(0, kaydirma)];
+  const secilenler = sirali.slice(0, Math.min(3, sirali.length));
+
+  return (
+    <section className={styles.gorselAnlati} aria-label={`${proje.firmaAdi} çalışma ve iletişim alanı`}>
+      <motion.header
+        className={styles.anlatiBasligi}
+        initial={hareketiAzalt ? false : { opacity: 0, y: 35 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: hareketiAzalt ? 0 : 0.7 }}
+      >
+        <div><UstEtiket>Yakından bakın</UstEtiket><h2>Detayları görün,<br />ihtiyacınızı anlatın.</h2></div>
+        <p>Çalışma biçimimizi görsellerle inceleyin; aklınızdaki hizmet için kısa bilgileri göndererek hızlıca net bir başlangıç yapın.</p>
+      </motion.header>
+      <div className={styles.anlatiGrid}>
+        {secilenler.map((medya, index) => (
+          <motion.figure
+            key={`${slug}-${medya.id}`}
+            className={styles.anlatiGorsel}
+            initial={hareketiAzalt ? false : { opacity: 0, y: 40 + index * 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.18 }}
+            transition={{ delay: hareketiAzalt ? 0 : index * 0.08, duration: hareketiAzalt ? 0 : 0.65 }}
+          >
+            <Image src={medya.url} alt={medya.alternatifMetin || medya.baslik} fill unoptimized sizes="(max-width: 720px) 88vw, 32vw" />
+            <figcaption><span>0{index + 1}</span>{medya.baslik}</figcaption>
+          </motion.figure>
+        ))}
+        <motion.aside
+          className={styles.anlatiIletisim}
+          initial={hareketiAzalt ? false : { opacity: 0, scale: 0.94 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: hareketiAzalt ? 0 : 0.7 }}
+        >
+          <MessageCircle />
+          <span>Hızlı ön görüşme</span>
+          <h3>{rehber.baslik}</h3>
+          <p>{rehber.aciklama}</p>
+          <ul>{rehber.istenenBilgiler.map((bilgi) => <li key={bilgi}><Check size={14} />{bilgi}</li>)}</ul>
+          <div>
+            <a href={whatsappHref(proje.whatsapp || proje.telefon, proje.firmaAdi)} target="_blank" rel="noreferrer">WhatsApp’tan gönder <ArrowRight size={16} /></a>
+            <a href={telefonHref(proje.telefon)}>Bizi arayın <Phone size={15} /></a>
+          </div>
+        </motion.aside>
       </div>
     </section>
   );
@@ -366,11 +430,48 @@ function ZenginIcerik({ proje }: { proje: ProjeVerisi }) {
   );
 }
 
+function AltDetayliIcerik({ proje }: { proje: ProjeVerisi }) {
+  const derin = sektorDerinIcerigiGetir(proje.sektor);
+  return (
+    <section className={styles.altDetayliIcerik}>
+      <header>
+        <UstEtiket>Hizmet seçenekleri</UstEtiket>
+        <h2>{derin.baslik}</h2>
+        <p>{derin.aciklama}</p>
+      </header>
+      <div className={styles.altPaketGrid}>
+        {derin.paketler.map((paket, index) => (
+          <article key={paket.ad}>
+            <span>0{index + 1} · {paket.etiket}</span>
+            <h3>{paket.ad}</h3>
+            <p>{paket.aciklama}</p>
+            <ul>{paket.maddeler.map((madde) => <li key={madde}><Check size={14} />{madde}</li>)}</ul>
+          </article>
+        ))}
+      </div>
+      <div className={styles.altSenaryoGrid}>
+        {derin.senaryolar.map((senaryo) => <article key={senaryo.baslik}><ArrowDownRight /><div><h3>{senaryo.baslik}</h3><p>{senaryo.aciklama}</p></div></article>)}
+      </div>
+    </section>
+  );
+}
+
+function SssBolumu({ icerik }: { icerik: SektorSiteIcerigi }) {
+  if (!icerik.sss.length) return null;
+  return (
+    <section className={styles.sssBolumu}>
+      <header><UstEtiket>Merak edilenler</UstEtiket><h2>Karar vermeden önce bilmek isteyebilecekleriniz.</h2></header>
+      <div>{icerik.sss.map((item, index) => <details key={item.soru}><summary><span>0{index + 1}</span>{item.soru}<ChevronRight /></summary><p>{item.cevap}</p></details>)}</div>
+    </section>
+  );
+}
+
 function Iletisim(props: { proje: ProjeVerisi; icerik: SektorSiteIcerigi; alanlar: Record<string, string>; baslik?: string }) {
   const aktifSlug = useContext(SiteRotaBaglami);
   return (
     <>
-      {!aktifSlug && <ZenginIcerik proje={props.proje} />}
+      {!aktifSlug && bolumAcik(props.icerik, "detayliIcerik") && <ZenginIcerik proje={props.proje} />}
+      {!aktifSlug && bolumAcik(props.icerik, "sss") && <SssBolumu icerik={props.icerik} />}
       <IletisimTemeli {...props} />
     </>
   );
@@ -381,7 +482,7 @@ function AltSayfa({ proje, slug, git, icerik, alanlar, medya, tur }: GovdeProps 
   const iletisimSayfasi = /randevu|teklif|brief|iste|cagir|gonder|rezervasyon|talep|kesif/.test(slug);
   const baslik = proje.sayfalar.find((sayfa) => sayfa.slug === slug)?.ad ?? proje.firmaAdi;
   if (iletisimSayfasi) return <><SiteBasligi proje={proje} git={git} /><main className={styles.altSayfa} data-alt-tur={tur}><div className={styles.altHero}><UstEtiket>{icerik.rozet}</UstEtiket><h1>{baslik}</h1><p>{icerik.ctaMetni}</p></div><Iletisim proje={proje} icerik={icerik} alanlar={alanlar} baslik={icerik.ctaBaslik} /></main></>;
-  return <><SiteBasligi proje={proje} git={git} /><main className={styles.altSayfa} data-alt-tur={tur}><div className={styles.altHero}><UstEtiket>{icerik.rozet}</UstEtiket><h1>{baslik}</h1><p>{hizmetSayfasi ? icerik.heroAciklama : icerik.hakkimizdaMetni}</p></div><Medya medya={medya.hero} className={styles.altMedya} />{hizmetSayfasi ? <section className={styles.altIcerik}><HizmetListesi icerik={icerik} numbered /><Surec icerik={icerik} rota={tur === "lojistik" || tur === "rescue"} /></section> : <section className={styles.altIcerik}><div className={styles.manifesto}><h2>{icerik.guvenBasligi}</h2><p>{icerik.guvenMetni}</p></div><Ozellikler icerik={icerik} />{icerik.sss.map((item) => <details key={item.soru}><summary>{item.soru}</summary><p>{item.cevap}</p></details>)}</section>}<Iletisim proje={proje} icerik={icerik} alanlar={alanlar} /></main></>;
+  return <><SiteBasligi proje={proje} git={git} /><main className={styles.altSayfa} data-alt-tur={tur}><div className={styles.altHero}><UstEtiket>{icerik.rozet}</UstEtiket><h1>{baslik}</h1><p>{hizmetSayfasi ? icerik.heroAciklama : icerik.hakkimizdaMetni}</p></div><Medya medya={medya.hero} className={styles.altMedya} />{hizmetSayfasi ? <section className={styles.altIcerik}><HizmetListesi icerik={icerik} numbered /><Surec icerik={icerik} rota={tur === "lojistik" || tur === "rescue"} /></section> : <section className={styles.altIcerik}><div className={styles.manifesto}><h2>{icerik.guvenBasligi}</h2><p>{icerik.guvenMetni}</p></div><Ozellikler icerik={icerik} />{bolumAcik(icerik, "sss") && icerik.sss.map((item) => <details key={item.soru}><summary>{item.soru}</summary><p>{item.cevap}</p></details>)}</section>}{bolumAcik(icerik, "detayliIcerik") && <AltDetayliIcerik proje={proje} />}<Iletisim proje={proje} icerik={icerik} alanlar={alanlar} /></main></>;
 }
 
 function Kuafor(props: GovdeProps) {
@@ -536,7 +637,8 @@ export default function SektorSiteleri({ proje, baslangicSlug = "", gercekRotaKu
           </motion.div>
         </AnimatePresence>
       </SiteRotaBaglami.Provider>
-      <GorselVitrini proje={proje} medyalar={Object.values(medya)} />
+      {bolumAcik(icerik, "gorselAnlati") && <GorselAnlati proje={proje} medyalar={Object.values(medya)} slug={slug} />}
+      {bolumAcik(icerik, "gorselVitrini") && <GorselVitrini proje={proje} medyalar={Object.values(medya)} />}
       <MobilHizliAksiyon proje={proje} />
       <SosyalBaglantilar proje={proje} />
       <footer className={styles.footer}><strong>{proje.firmaAdi}</strong><span>Resmî web sitesi · {new Date().getFullYear()}</span><a href={telefonHref(proje.telefon)}>İletişime geç <ArrowRight size={16} /></a></footer>

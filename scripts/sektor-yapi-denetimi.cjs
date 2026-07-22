@@ -131,6 +131,9 @@ for (const sektor of sektorler) {
   if (sayfalar.length !== sektor.sayfalar.length || !sayfalar[0].anaSayfa) sorunlar.push(`${sektor.id}: cok sayfali cikti bozuk.`);
   const tekSayfa = katalog.siteSayfalariOlustur(sektor.id, "tek-sayfa");
   if (tekSayfa.length !== 1 || !tekSayfa[0].anaSayfa || tekSayfa[0].slug) sorunlar.push(`${sektor.id}: tek sayfali cikti bozuk.`);
+  const zenginIcerik = katalog.varsayilanIcerikOlustur(sektor.id);
+  if (zenginIcerik.hizmetler.length < 8) sorunlar.push(`${sektor.id}: ayrintili hizmet sayisi sekizden az.`);
+  if (!zenginIcerik.bolumGorunurlugu?.gorselAnlati || !zenginIcerik.bolumGorunurlugu?.detayliIcerik) sorunlar.push(`${sektor.id}: yeni dolu bolumler varsayilan acik degil.`);
   const medyalar = katalog.medyaAlanlariOlustur(sektor.id);
   if (medyalar.some((medya) => !medya.acik || medya.url !== `/site-assets/${sektor.id}/${medya.slot}.webp`)) sorunlar.push(`${sektor.id}: otomatik hazir gorsel yolu bozuk.`);
   const gorselListesiYolu = path.join(kok, "public", "site-assets", sektor.id, "GORSEL-LISTESI.txt");
@@ -159,7 +162,7 @@ for (const islev of ["Kuafor", "Berber", "Guzellik", "Nail", "Nakliye", "Hali", 
   if (!renderer.includes(`function ${islev}(`)) sorunlar.push(`Renderer eksik: ${islev}`);
 }
 
-for (const guvence of ["BarberPole", "medya?.acik", "!medya.url.trim()", "Iletisim", "AltSayfa", "ZenginIcerik", "KayanSerit", "GorselVitrini", "HareketKatmani", "AnimatePresence", "SosyalBaglantilar", "data-yerlesim", "prefers-reduced-motion"]) {
+for (const guvence of ["BarberPole", "medya?.acik", "!medya.url.trim()", "Iletisim", "AltSayfa", "AltDetayliIcerik", "SssBolumu", "ZenginIcerik", "KayanSerit", "GorselAnlati", "GorselVitrini", "HareketKatmani", "AnimatePresence", "SosyalBaglantilar", "data-yerlesim", "prefers-reduced-motion"]) {
   const kaynak = guvence === "prefers-reduced-motion" ? css : renderer;
   if (!kaynak.includes(guvence)) sorunlar.push(`Sunum guvencesi eksik: ${guvence}`);
 }
@@ -176,7 +179,7 @@ for (const kirilim of ["@media (max-width: 1100px)", "@media (max-width: 820px)"
   if (!css.includes(kirilim)) sorunlar.push(`Mobil kirilim eksik: ${kirilim}`);
 }
 
-for (const islem of ["Müşteri görseli yükle", "Hazır görsele dön", "GORSEL_PAKET_SURUMU", "hizmetleriGuncelle", "ozellikleriGuncelle", "temaDegistir"]) {
+for (const islem of ["Müşteri görseli yükle", "Hazır görsele dön", "GORSEL_PAKET_SURUMU", "SEKTOR_ICERIK_SURUMU", "bolumGorunurlugunuDegistir", "hizmetleriGuncelle", "ozellikleriGuncelle", "temaDegistir"]) {
   if (!editor.includes(islem)) sorunlar.push(`Duzenleme islemi eksik: ${islem}`);
 }
 

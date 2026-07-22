@@ -48,5 +48,5 @@ Kurallar:
 `hero.webp`, `paketleme.webp`, `filo.webp`, `galeri-1.webp`, `galeri-2.webp`,
 `galeri-3.webp`, `galeri-4.webp`
 
-Toplam 50 hazır görsel dosyası vardır. Görselleri ekledikten sonra yeni proje
+Toplam 51 hazır görsel dosyası vardır. Görselleri ekledikten sonra yeni proje
 oluştururken ayrıca görsel seçmeniz veya yüklemeniz gerekmez.

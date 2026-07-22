@@ -13,3 +13,15 @@
 @media(max-width:1000px){.ciftPanel{grid-template-columns:1fr}.medyaGrid{grid-template-columns:1fr}.temaGrid{grid-template-columns:1fr}.temaGrid>button{min-height:330px}}
 @media(max-width:760px){.sayfa{padding-inline:17px}.ustBar{grid-template-columns:1fr auto}.ustBar>div:nth-child(2){display:none}.ustAksiyonlar a{display:none}.baslik{grid-template-columns:1fr;gap:25px}.baslik h1{font-size:clamp(47px,15vw,74px)}.sekmeler{grid-template-columns:repeat(5,1fr)}.sekmeler button{min-height:54px}.sekmeler button span{display:none}.formGrid,.metinGrid{grid-template-columns:1fr}.tamAlan{grid-column:auto}.panel{padding:20px 14px}.panelBasligi{grid-template-columns:35px 1fr}.medyaGrid article{grid-template-columns:1fr}.medyaOnizleme{min-height:260px}.kayitCubugu>div:first-child{display:none}.kayitCubugu>div:last-child{width:100%}.kayitCubugu a,.kayitCubugu button{flex:1;justify-content:center}}
 @media(max-width:480px){.kayitListesi article{grid-template-columns:34px 1fr}.kayitListesi article>.silButonu{grid-column:2}.medyaAksiyon{display:grid}.medyaAksiyon>*{justify-content:center}.temaGrid>button>div{height:100px}}
+.bolumKontrolleri{display:grid;grid-template-columns:minmax(240px,1.2fr) repeat(2,minmax(190px,1fr));gap:10px;margin-top:30px;padding-top:30px;border-top:1px solid var(--cizgi)}
+.bolumKontrolleri>div{grid-row:span 2;padding:20px;background:rgba(255,255,255,.36)}
+.bolumKontrolleri>div strong{display:block;margin-bottom:8px;font-size:16px}
+.bolumKontrolleri>div p{margin:0;color:#636c67;font-size:10px;line-height:1.65}
+.bolumKontrolleri button{display:grid;grid-template-columns:28px 1fr;align-items:center;gap:10px;min-height:67px;padding:12px;border:1px solid var(--cizgi);background:transparent;color:var(--yazi);text-align:left;cursor:pointer}
+.bolumKontrolleri button>svg{width:17px;height:17px}
+.bolumKontrolleri button>span{font-size:10px;font-weight:850}
+.bolumKontrolleri button small{display:block;margin-top:5px;color:#757d78;font-size:8px;font-weight:700}
+.bolumKontrolleri button.bolumAcik{border-color:var(--vurgu);background:rgba(227,91,51,.08)}
+.bolumKontrolleri button.bolumAcik>svg{color:var(--vurgu)}
+@media(max-width:1000px){.bolumKontrolleri{grid-template-columns:repeat(2,1fr)}.bolumKontrolleri>div{grid-column:1/-1;grid-row:auto}}
+@media(max-width:560px){.bolumKontrolleri{grid-template-columns:1fr}}

@@ -21,6 +21,12 @@ export interface SektorDerinIcerigi {
   kaliteNotlari: string[];
 }
 
+export interface SektorIletisimRehberi {
+  baslik: string;
+  aciklama: string;
+  istenenBilgiler: string[];
+}
+
 const icerikler: Record<string, SektorDerinIcerigi> = {
   kuafor: {
     hareketDili: "editorial",
@@ -311,4 +317,22 @@ const icerikler: Record<string, SektorDerinIcerigi> = {
 
 export function sektorDerinIcerigiGetir(sektor: string): SektorDerinIcerigi {
   return icerikler[sektor] ?? icerikler.kuafor;
+}
+
+const iletisimRehberleri: Record<string, SektorIletisimRehberi> = {
+  kuafor: { baslik: "Saçınızı görmeden de doğru görüşmeyi başlatabiliriz.", aciklama: "Kısa bilgiler ve bir fotoğraf, hizmet ile randevu süresini doğru planlamamıza yardımcı olur.", istenenBilgiler: ["Mevcut saçınızın güncel fotoğrafı", "Beğendiğiniz kesim veya renk referansı", "Uygun olduğunuz gün ve saatler"] },
+  berber: { baslik: "Koltuk sürenizi mesajla ayıralım.", aciklama: "İstediğiniz servisi ve zamanı paylaşın; uygun usta ve randevu seçeneğiyle dönüş yapalım.", istenenBilgiler: ["Saç, sakal veya paket tercihi", "Varsa tercih ettiğiniz usta", "Uygun olduğunuz gün ve saat"] },
+  "guzellik-salonu": { baslik: "Hangi bakımın uygun olduğunu birlikte belirleyelim.", aciklama: "Bakım hedefinizi ve hassasiyetlerinizi yazın; doğru uygulamayı seçmeden önce kısa bir ön değerlendirme yapalım.", istenenBilgiler: ["İlgilendiğiniz bakım veya hedef", "Bilinen alerji ve hassasiyetler", "Uygun olduğunuz randevu aralığı"] },
+  "nail-artist": { baslik: "Referansınızı gönderin, set süresini netleştirelim.", aciklama: "Tasarım yoğunluğu ve mevcut ürün durumu randevu süresini değiştirir; önceden paylaşmanız yeterli.", istenenBilgiler: ["Beğendiğiniz tasarım görseli", "Mevcut tırnak veya ürün fotoğrafı", "İstenen uzunluk ve randevu günü"] },
+  nakliye: { baslik: "Birkaç bilgiyle taşıma planınızı çıkaralım.", aciklama: "Adres ve eşya bilgilerini gönderin; uygun araç, ekip, paketleme ve tahmini süreyi tek teklifte hazırlayalım.", istenenBilgiler: ["Çıkış-varış adresi ve katlar", "Asansör durumu ve taşınma tarihi", "Eşya listesi veya oda fotoğrafları"] },
+  "hali-yikama": { baslik: "Servis rotasına eklenmek için ürünleri yazmanız yeterli.", aciklama: "Ürün türü, adet ve ilçe bilgisiyle alım günü ve tahmini teslim süresini planlayabiliriz.", istenenBilgiler: ["Halı, koltuk veya diğer ürün türü", "Adet, ölçü veya yaklaşık metrekare", "İlçe ve uygun teslim alma saati"] },
+  "oto-yikama": { baslik: "Aracınız için doğru paketi birlikte seçelim.", aciklama: "Araç ve ihtiyaç bilgisini gönderin; gereksiz işlem eklemeden süre ve paket önerelim.", istenenBilgiler: ["Araç marka, model ve gövde tipi", "İstenen işlem veya mevcut sorun", "Fotoğraf ve uygun randevu zamanı"] },
+};
+
+export function sektorIletisimRehberiGetir(sektor: string): SektorIletisimRehberi {
+  return iletisimRehberleri[sektor] ?? {
+    baslik: "İhtiyacınızı birlikte netleştirelim.",
+    aciklama: "Kısa bilgileri paylaşın; uygun hizmet, süre ve sonraki adımla ilgili hızlıca dönüş yapalım.",
+    istenenBilgiler: ["İhtiyacınızın kısa açıklaması", "Varsa fotoğraf veya ölçü", "Uygun olduğunuz gün ve saat"],
+  };
 }

@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Check, CirclePlus, Eye, FileImage, ImageOff, LayoutDashboard, Palette, RotateCcw, Save, Settings2, Trash2, Upload, X } from "lucide-react";
-import { GORSEL_PAKET_SURUMU, medyaAlanlariOlustur, sektorTanimiGetir, varsayilanIcerikOlustur } from "@/data/yeniSektorler";
+import { GORSEL_PAKET_SURUMU, SEKTOR_ICERIK_SURUMU, medyaAlanlariOlustur, sektorTanimiGetir, varsayilanIcerikOlustur } from "@/data/yeniSektorler";
 import type { EkOzellikKaydi, HizmetKaydi, MedyaKaydi, ProjeVerisi, SektorSiteIcerigi, SektorTemaKimligi } from "@/types/proje";
 import styles from "./yonetim.module.css";
 
@@ -54,8 +54,11 @@ export default function DuzenlemeSayfasi() {
         if (kayit) {
           const kayitliProje = JSON.parse(kayit) as ProjeVerisi;
           const varsayilanMedyalar = medyaAlanlariOlustur(kayitliProje.sektor);
+          const sektorTanimi = sektorTanimiGetir(kayitliProje.sektor);
+          const varsayilanIcerik = varsayilanIcerikOlustur(kayitliProje.sektor);
           const mevcutMedyalar = kayitliProje.medyalar ?? [];
           const eskiPaketMi = kayitliProje.gorselPaketSurumu !== GORSEL_PAKET_SURUMU;
+          const eskiIcerikMi = kayitliProje.sektorIcerikSurumu !== SEKTOR_ICERIK_SURUMU;
           const guncelMedyalar = mevcutMedyalar.map((medya) => {
             if (!medya.url.startsWith("/site-assets/")) return medya;
             const varsayilan = varsayilanMedyalar.find((item) => item.slot === medya.slot);
@@ -70,10 +73,38 @@ export default function DuzenlemeSayfasi() {
           const eksikMedyalar = varsayilanMedyalar.filter(
             (varsayilan) => !guncelMedyalar.some((medya) => medya.slot === varsayilan.slot),
           );
+          const mevcutSiteIcerigi = kayitliProje.siteIcerigi ?? varsayilanIcerik;
+          const mevcutHizmetler = kayitliProje.hizmetler ?? mevcutSiteIcerigi.hizmetler ?? [];
+          const guncelHizmetler = eskiIcerikMi
+            ? [
+                ...varsayilanIcerik.hizmetler.map((varsayilan, index) => {
+                  const mevcut = mevcutHizmetler.find((hizmet) => hizmet.id === varsayilan.id) ?? mevcutHizmetler[index];
+                  const eskiVarsayilanAciklama = sektorTanimi.icerik.hizmetler[index]?.[1];
+                  const kullaniciDuzenlemis = mevcut && eskiVarsayilanAciklama && mevcut.aciklama !== eskiVarsayilanAciklama;
+                  return kullaniciDuzenlemis ? mevcut : { ...varsayilan, aktif: mevcut?.aktif ?? true };
+                }),
+                ...mevcutHizmetler.filter((hizmet) => hizmet.ozelMi),
+              ]
+            : mevcutHizmetler;
+          const metinAlanlari = ["heroAciklama", "hakkimizdaMetni", "guvenMetni", "ctaMetni"] as const;
+          const guncelSiteIcerigi = eskiIcerikMi
+            ? metinAlanlari.reduce<SektorSiteIcerigi>((sonuc, alan) => {
+                const mevcutMetin = mevcutSiteIcerigi[alan];
+                const eskiVarsayilan = sektorTanimi.icerik[alan];
+                return { ...sonuc, [alan]: !mevcutMetin || mevcutMetin === eskiVarsayilan ? varsayilanIcerik[alan] : mevcutMetin };
+              }, {
+                ...mevcutSiteIcerigi,
+                hizmetler: guncelHizmetler,
+                bolumGorunurlugu: { ...varsayilanIcerik.bolumGorunurlugu, ...mevcutSiteIcerigi.bolumGorunurlugu },
+              })
+            : mevcutSiteIcerigi;
           setProje({
             ...kayitliProje,
             medyalar: [...guncelMedyalar, ...eksikMedyalar],
             gorselPaketSurumu: GORSEL_PAKET_SURUMU,
+            hizmetler: guncelHizmetler,
+            siteIcerigi: guncelSiteIcerigi,
+            sektorIcerikSurumu: SEKTOR_ICERIK_SURUMU,
           });
         }
       } catch {
@@ -102,6 +133,17 @@ export default function DuzenlemeSayfasi() {
 
   function ozellikleriGuncelle(ozellikler: EkOzellikKaydi[]) {
     guncelle({ ekOzellikler: ozellikler, siteIcerigi: icerik ? { ...icerik, ozellikler } : undefined });
+  }
+
+  function bolumGorunurlugunuDegistir(alan: keyof NonNullable<SektorSiteIcerigi["bolumGorunurlugu"]>) {
+    if (!icerik) return;
+    const mevcut = icerik.bolumGorunurlugu?.[alan] !== false;
+    icerikGuncelle({
+      bolumGorunurlugu: {
+        ...icerik.bolumGorunurlugu,
+        [alan]: !mevcut,
+      },
+    });
   }
 
   function kaydet() {
@@ -158,7 +200,35 @@ export default function DuzenlemeSayfasi() {
 
       {sekme === "isletme" && <section className={styles.panel}><div className={styles.panelBasligi}><span>01</span><div><h2>İşletme bilgileri</h2><p>En sık değişen kimlik, iletişim ve sektör alanları.</p></div></div><div className={styles.formGrid}><label>İşletme adı *<input value={proje.firmaAdi} onChange={(e) => guncelle({ firmaAdi: e.target.value })} /></label><label>Telefon *<input value={proje.telefon} onChange={(e) => guncelle({ telefon: e.target.value })} /></label><label>WhatsApp<input value={proje.whatsapp} onChange={(e) => guncelle({ whatsapp: e.target.value })} /></label><label>E-posta<input value={proje.eposta} onChange={(e) => guncelle({ eposta: e.target.value })} /></label><label>Şehir *<input value={proje.sehir} onChange={(e) => guncelle({ sehir: e.target.value })} /></label><label>İlçe<input value={proje.ilce} onChange={(e) => guncelle({ ilce: e.target.value })} /></label><label className={styles.tamAlan}>Adres<textarea rows={3} value={proje.adres} onChange={(e) => guncelle({ adres: e.target.value })} /></label><label className={styles.tamAlan}>Hizmet bölgesi<input value={proje.hizmetBolgesi || ""} onChange={(e) => guncelle({ hizmetBolgesi: e.target.value })} /></label>{(proje.isletmeAlanlari ?? []).map((alan, index) => <label key={alan.anahtar}>{alan.etiket}{alan.zorunlu && " *"}<input value={alan.deger} onChange={(e) => { const liste = [...(proje.isletmeAlanlari ?? [])]; liste[index] = { ...alan, deger: e.target.value }; guncelle({ isletmeAlanlari: liste }); }} /></label>)}</div></section>}
 
-      {sekme === "metin" && <section className={styles.panel}><div className={styles.panelBasligi}><span>02</span><div><h2>Hazır içerik şeması</h2><p>Metinler önceden doludur. İsterseniz işletmeye göre ince ayar yapabilirsiniz.</p></div></div><div className={styles.metinGrid}><label>Üst rozet<input value={icerik.rozet} onChange={(e) => icerikGuncelle({ rozet: e.target.value })} /></label><label>Slogan<input value={icerik.slogan} onChange={(e) => icerikGuncelle({ slogan: e.target.value })} /></label><label className={styles.tamAlan}>Ana başlık<textarea rows={3} value={icerik.heroBaslik} onChange={(e) => icerikGuncelle({ heroBaslik: e.target.value })} /></label><label className={styles.tamAlan}>Ana açıklama<textarea rows={4} value={icerik.heroAciklama} onChange={(e) => icerikGuncelle({ heroAciklama: e.target.value })} /></label><label>Hakkımızda başlığı<textarea rows={3} value={icerik.hakkimizdaBaslik} onChange={(e) => icerikGuncelle({ hakkimizdaBaslik: e.target.value })} /></label><label>Güven başlığı<textarea rows={3} value={icerik.guvenBasligi} onChange={(e) => icerikGuncelle({ guvenBasligi: e.target.value })} /></label><label>Hakkımızda metni<textarea rows={6} value={icerik.hakkimizdaMetni} onChange={(e) => icerikGuncelle({ hakkimizdaMetni: e.target.value })} /></label><label>Güven metni<textarea rows={6} value={icerik.guvenMetni} onChange={(e) => icerikGuncelle({ guvenMetni: e.target.value })} /></label><label>Çağrı başlığı<input value={icerik.ctaBaslik} onChange={(e) => icerikGuncelle({ ctaBaslik: e.target.value })} /></label><label>Çağrı açıklaması<input value={icerik.ctaMetni} onChange={(e) => icerikGuncelle({ ctaMetni: e.target.value })} /></label></div></section>}
+      {sekme === "metin" && (
+        <section className={styles.panel}>
+          <div className={styles.panelBasligi}><span>02</span><div><h2>Hazır içerik şeması</h2><p>Metinler ayrıntılı ve iletişime yönlendiren biçimde hazırdır. İsterseniz işletmeye göre düzenleyebilir, ek bölümleri kapatabilirsiniz.</p></div></div>
+          <div className={styles.metinGrid}>
+            <label>Üst rozet<input value={icerik.rozet} onChange={(e) => icerikGuncelle({ rozet: e.target.value })} /></label>
+            <label>Slogan<input value={icerik.slogan} onChange={(e) => icerikGuncelle({ slogan: e.target.value })} /></label>
+            <label className={styles.tamAlan}>Ana başlık<textarea rows={3} value={icerik.heroBaslik} onChange={(e) => icerikGuncelle({ heroBaslik: e.target.value })} /></label>
+            <label className={styles.tamAlan}>Ana açıklama<textarea rows={4} value={icerik.heroAciklama} onChange={(e) => icerikGuncelle({ heroAciklama: e.target.value })} /></label>
+            <label>Hakkımızda başlığı<textarea rows={3} value={icerik.hakkimizdaBaslik} onChange={(e) => icerikGuncelle({ hakkimizdaBaslik: e.target.value })} /></label>
+            <label>Güven başlığı<textarea rows={3} value={icerik.guvenBasligi} onChange={(e) => icerikGuncelle({ guvenBasligi: e.target.value })} /></label>
+            <label>Hakkımızda metni<textarea rows={6} value={icerik.hakkimizdaMetni} onChange={(e) => icerikGuncelle({ hakkimizdaMetni: e.target.value })} /></label>
+            <label>Güven metni<textarea rows={6} value={icerik.guvenMetni} onChange={(e) => icerikGuncelle({ guvenMetni: e.target.value })} /></label>
+            <label>Çağrı başlığı<input value={icerik.ctaBaslik} onChange={(e) => icerikGuncelle({ ctaBaslik: e.target.value })} /></label>
+            <label>Çağrı açıklaması<input value={icerik.ctaMetni} onChange={(e) => icerikGuncelle({ ctaMetni: e.target.value })} /></label>
+          </div>
+          <div className={styles.bolumKontrolleri}>
+            <div><strong>Ek bölüm görünürlüğü</strong><p>İhtiyaç duymadığınız bölümü tek tıkla kapatabilir, daha sonra yeniden açabilirsiniz.</p></div>
+            {([
+              ["detayliIcerik", "Detaylı hizmet dosyası"],
+              ["gorselAnlati", "Görsel anlatı ve hızlı görüşme"],
+              ["gorselVitrini", "Hareketli portfolyo vitrini"],
+              ["sss", "Sık sorulan sorular"],
+            ] as const).map(([alan, etiket]) => {
+              const acik = icerik.bolumGorunurlugu?.[alan] !== false;
+              return <button key={alan} type="button" className={acik ? styles.bolumAcik : ""} onClick={() => bolumGorunurlugunuDegistir(alan)}>{acik ? <Check /> : <X />}<span>{etiket}<small>{acik ? "Sitede gösteriliyor" : "Sitede gizli"}</small></span></button>;
+            })}
+          </div>
+        </section>
+      )}
 
       {sekme === "hizmet" && <section className={styles.ciftPanel}><div className={styles.panel}><div className={styles.panelBasligi}><span>03</span><div><h2>Hizmetler</h2><p>Başlık ve açıklamayı düzenleyin; göz simgesiyle gösterimi açıp kapatın.</p></div></div><div className={styles.kayitListesi}>{hizmetler.map((hizmet, index) => <article key={hizmet.id} className={!hizmet.aktif ? styles.kapaliKayit : ""}><button type="button" className={styles.durumButonu} onClick={() => hizmetleriGuncelle(hizmetler.map((item) => item.id === hizmet.id ? { ...item, aktif: !item.aktif } : item))}>{hizmet.aktif ? <Check /> : <X />}</button><div><input value={hizmet.baslik} onChange={(e) => hizmetleriGuncelle(hizmetler.map((item, sira) => sira === index ? { ...item, baslik: e.target.value } : item))} /><textarea rows={2} value={hizmet.aciklama} onChange={(e) => hizmetleriGuncelle(hizmetler.map((item, sira) => sira === index ? { ...item, aciklama: e.target.value } : item))} /></div>{hizmet.ozelMi && <button type="button" className={styles.silButonu} onClick={() => hizmetleriGuncelle(hizmetler.filter((item) => item.id !== hizmet.id))}><Trash2 /></button>}</article>)}</div><div className={styles.ekle}><input value={yeniHizmet} onChange={(e) => setYeniHizmet(e.target.value)} placeholder="Yeni hizmet adı" /><button type="button" onClick={() => { const ad = yeniHizmet.trim(); if (!ad) return; hizmetleriGuncelle([...hizmetler, { id: kimlikOlustur(), baslik: ad, aciklama: "İşletmenize özel hizmet açıklaması.", aktif: true, ozelMi: true }]); setYeniHizmet(""); }}><CirclePlus /> Ekle</button></div></div><div className={styles.panel}><div className={styles.panelBasligi}><span>04</span><div><h2>Ek özellikler</h2><p>İşletmenin güven ve dönüşüm alanlarına eklenir.</p></div></div><div className={styles.kayitListesi}>{ozellikler.map((ozellik, index) => <article key={ozellik.id} className={!ozellik.aktif ? styles.kapaliKayit : ""}><button type="button" className={styles.durumButonu} onClick={() => ozellikleriGuncelle(ozellikler.map((item) => item.id === ozellik.id ? { ...item, aktif: !item.aktif } : item))}>{ozellik.aktif ? <Check /> : <X />}</button><div><input value={ozellik.baslik} onChange={(e) => ozellikleriGuncelle(ozellikler.map((item, sira) => sira === index ? { ...item, baslik: e.target.value } : item))} /><textarea rows={2} value={ozellik.aciklama} onChange={(e) => ozellikleriGuncelle(ozellikler.map((item, sira) => sira === index ? { ...item, aciklama: e.target.value } : item))} /></div>{ozellik.ozelMi && <button type="button" className={styles.silButonu} onClick={() => ozellikleriGuncelle(ozellikler.filter((item) => item.id !== ozellik.id))}><Trash2 /></button>}</article>)}</div><div className={styles.ekle}><input value={yeniOzellik} onChange={(e) => setYeniOzellik(e.target.value)} placeholder="Yeni özellik" /><button type="button" onClick={() => { const ad = yeniOzellik.trim(); if (!ad) return; ozellikleriGuncelle([...ozellikler, { id: kimlikOlustur(), baslik: ad, aciklama: "İşletmenize ait ek özellik.", aktif: true, ozelMi: true }]); setYeniOzellik(""); }}><CirclePlus /> Ekle</button></div></div></section>}
 

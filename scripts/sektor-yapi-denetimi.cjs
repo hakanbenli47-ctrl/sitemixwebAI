@@ -196,8 +196,19 @@ if (renderer.includes("{proje.sektorAdi}") || renderer.includes("|| proje.sektor
   sorunlar.push("Musteri sitesinde sektor adi gorunur olmamali.");
 }
 
+if (renderer.includes("vurgu=") || /function SiteBasligi\([^)]*vurgu/.test(renderer)) {
+  sorunlar.push("Site basliginda isletme adi yaninda sektor isareti gorunmemeli.");
+}
+
 for (const kontrastGuvencesi of ["--site-on-surface", "--site-action-bg", "--site-accent-copy", "--site-accent-copy-reverse", "--site-accent-copy-surface", "--site-readable-accent"]) {
   if (!renderer.includes(kontrastGuvencesi) && !css.includes(kontrastGuvencesi)) sorunlar.push(`Kontrast guvencesi eksik: ${kontrastGuvencesi}`);
+}
+
+if (!/\.sssBolumu\s*\{[^}]*--site-current-copy:\s*var\(--site-text\)[^}]*color:\s*var\(--site-text\)/s.test(css)) {
+  sorunlar.push("Merak edilenler bolumu tema metin rengini guvenli bicimde sabitlemiyor.");
+}
+if (!/\.site\[data-sektor="berber"\]\s+\.sssBolumu\s*\{[^}]*--site-current-copy:\s*var\(--site-bg\)[^}]*color:\s*var\(--site-bg\)/s.test(css)) {
+  sorunlar.push("Berber merak edilenler bolumu koyu tema baglamina uyarlanmamis.");
 }
 
 for (const kirilim of ["@media (max-width: 1100px)", "@media (max-width: 820px)", "@media (max-width: 560px)"]) {
